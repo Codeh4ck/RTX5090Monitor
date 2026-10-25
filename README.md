@@ -1,129 +1,176 @@
-# RTX 5090 Monitoring
+# RTX Monitor
 
-.NET 10 service with independently managed WireView, ASUS GPU and MSI Ai1300TS / Ai1600TS PSU plugins, live JSON configuration, a typed shared WebSocket stream, and original plugin-specific payloads/endpoints. The Xeneon widget workspace remains inert.
+RTX Monitor is a Windows service, desktop app, and Corsair Xeneon Edge iCUE widget for GPU connector and PSU monitoring. View per-pin current, voltage and power, GPU temperatures and clocks, and supported PSU telemetry from one local backend.
 
-The desktop [Debug Console](docs/debug-console.md) is available in Debug builds or with `EnableTelemetryDebug=true`; ordinary Release packages exclude it. Open it from Configuration → Maintenance for side-by-side local telemetry simulation.
+The service collects readings and manages warning policies. The desktop app configures the service and provides a monitoring dashboard and Windows notifications. The widget provides a customizable, read-only display in iCUE.
 
-The MSI plugin publishes verified PSU-side pin currents and cooling telemetry, with optional fan control. See [MSI support, configuration and hardware verification](docs/msi-psu.md).
+## Screenshots
 
-The WinUI 3 desktop client and full configurator are under the solution's **UI** folder. See [desktop setup and architecture](docs/desktop-app.md) for publishing, simulated-data mode, tray/startup behavior and configuration.
+### Desktop app
 
-The **Installer** folder builds an offline setup EXE with a required local service, optional desktop app, Modify/Repair/Uninstall and configuration-preserving upgrade rollback. Run `./scripts/Build-Release.ps1 -Version 0.3.1` to create the installer/widget ZIP. See [release and uninstall instructions](docs/releases.md). Building a release does not install it.
+**ASUS ROG Astral** - live connector metrics, per-pin distribution, GPU status and MSI PSU current comparison.
 
-## Service endpoints
+![RTX Monitor desktop app showing live ASUS ROG Astral telemetry](assets/screenshots/desktop-asus.png)
 
-All routes use `localhost:59273`. The original WireView service must release that port before this host can bind it.
+**MSI PSU** - temperature, fan status and per-pin current for both PSU connectors.
 
-| Endpoint | Purpose |
-|---|---|
-| GET `/health` | Service liveness, uptime, plugin states, effective configuration revision/error |
-| GET `/plugins` | Installed plugins, enablement, availability and supported capabilities |
-| WS `/sensors` | Full typed multi-plugin snapshots, including `configurationRevision` |
-| GET `/configuration` | Effective settings, revision, version/ETag and last rejected-file error |
-| PUT `/configuration` | Apply configuration; optional `If-Match` rejects stale writes with HTTP 412 |
-| GET `/plugins/{pluginId}/settings` | Current options for an installed plugin |
-| PUT `/plugins/{pluginId}/settings` | Apply plugin enablement, polling and freshness options |
-| POST `/restart` | Restart backend service and all enabled plugins through configured Windows Service recovery |
+![RTX Monitor desktop app showing MSI PSU temperatures, fan status and both connectors](assets/screenshots/desktop-msi.png)
 
-A normal GET to the shared `/sensors` route requires a WebSocket upgrade and returns 400 otherwise. Client command messages are not accepted on sensor sockets.
+### Xeneon Edge widget
 
-## WireView endpoint parity
+**ASUS ROG Astral** - pin distribution and GPU status, with PSU current displayed beneath the GPU pins.
 
-Prefix every WireView route below with `/plugins/wireview-pro2`:
+![RTX Monitor Xeneon Edge widget showing ASUS ROG Astral pin distribution and GPU status](assets/screenshots/widget-asus.png)
 
-| Endpoint | Original behavior provided |
-|---|---|
-| GET `/health` | `ok` / `no_device`; additionally `disabled` when explicitly disabled |
-| GET `/sensors` | Original six-pin structured snapshot and field names |
-| WS `/ws` | Original structured WireView payload, including initial latest snapshot |
-| GET `/config` | `{ "pollIntervalMs": 1000 }` |
-| POST `/config` | Update polling interval immediately; preserve original 100-30000 ms clamping |
-| GET `/device/config` | Read parsed device settings, including thresholds, fan settings and fault-enable masks |
-| GET `/device/config/raw` | Read raw configuration as `{ "bytes": "...", "length": ... }` |
-| POST `/faults/clear` | Independently clear requested status/log bits using the original preserve-mask protocol |
-| POST `/restart` | Dispose and recreate only the WireView plugin |
+**MSI PSU and ASUS comparison** - independently configured panels show the PSU connector and GPU-side pin currents together.
 
-Health and configuration remain available while WireView is disabled. Sensor/device operations report 503 while disabled/disconnected. Device read/write failures report an error instead of pretending success. A successful fault-clear response means the command was transmitted; a continuing physical fault can be reported again by the device.
+![RTX Monitor Xeneon Edge widget showing MSI PSU and ASUS ROG Astral pin telemetry side by side](assets/screenshots/widget-msi.png)
 
-The old root aliases `/config`, `/ws`, `/device/config`, and `/faults/clear` are not installed. Existing widgets need their base URL changed to include the plugin prefix. Global health and full-host restart are host responsibilities; the shared `/sensors` WebSocket retains the new typed schema.
+## Supported hardware
 
-## Live settings: JSON only
+| Plugin | Hardware | Available features |
+|---|---|---|
+| WireView | Thermal Grizzly WireView Pro II, including Noctua Edition recognition | Six-pin current, voltage and power; board and external-probe temperatures; cable rating; fault status/log; read-only device settings and fault clearing. |
+| ASUS | Supported ASUS ROG Astral GPUs | Per-pin connector telemetry, power and current totals, clocks, core/VRAM temperatures, fan speeds, GPU usage and VRAM usage. |
+| MSI PSU | MSI MPG Ai1300TS and MPG Ai1600TS | Per-pin current for two PSU connectors, connector current totals, PSU temperature, fan telemetry and optional fan control. |
 
-The authoritative file is `%ProgramData%\Rtx5090Monitoring\appsettings.json`. No registry settings are read, written, or migrated by this host.
+Readings depend on the connected hardware and its available sensors. Generic GPU telemetry can be available without Astral per-pin sensors. The MSI Ai1300TS has been tested on hardware; Ai1600TS and WireView Noctua model recognition do not imply separate hardware verification.
 
-```json
-{
-  "monitoring": {
-    "streamIntervalMs": 1000,
-    "selections": []
-  },
-  "plugins": {
-    "asus-astral": {
-      "enabled": true,
-      "pollIntervalMs": 1000,
-      "staleAfterMs": 5000,
-      "options": {
-        "deviceId": null,
-        "imbalanceAmperageThreshold": 6,
-        "imbalancePercentageThreshold": 30,
-        "imbalanceDurationThresholdMs": 3000,
-        "wireOvercurrentAmperageThreshold": 9.2,
-        "wireOvercurrentThresholdMs": 3000
-      }
-    },
-    "wireview-pro2": {
-      "enabled": true,
-      "pollIntervalMs": 1000,
-      "staleAfterMs": 5000
-    }
-  }
-}
-```
+## Features
 
-The project's `Rtx5090Monitoring.Service/appsettings.json` seeds this file only when it does not exist. Once created, edit the runtime file or use the configuration endpoints. A bootstrap `RuntimeConfiguration:FilePath` setting can select another absolute path for development/testing.
+- Live dashboards with current, power and voltage charts, pin spread, headroom, temperatures and device status.
+- Independent plugin enablement, polling intervals and freshness settings.
+- Optional MSI PSU current beneath WireView or Astral pins, with an independent connector selector for each chart.
+- Plugin-owned warning definitions with shared notification policies, per-warning overrides, optional repeat reminders and recovery confirmation.
+- Desktop tray operation, per-user Start with Windows and start-minimized options.
+- A read-only Xeneon Edge widget supporting S/M/L/XL slots in landscape and portrait, with configurable panel content and order, fonts, sizes, colors, charts and image backgrounds.
+- A separate debug console for telemetry simulation in Debug or explicitly debug-enabled builds.
 
-API writes validate and atomically replace the file, apply changes, then return the effective revision. Failed plugin activation attempts roll back the configuration. Direct edits and atomic file replacements are observed by a file watcher, with a one-second recovery scan for missed events. Invalid live edits retain the previous effective configuration and expose an error through `/configuration` and `/health`. At startup, an invalid persisted file is rejected because no active last-valid configuration exists yet.
+The service continues monitoring when the desktop app is closed. Windows notifications require the desktop app to remain running, including in the tray. The widget connects directly to the service and does not require the desktop app to remain open.
 
-Polling and stream delays have explicit wake signals: changes do not wait for a previous 30-second delay to expire. An active hardware transaction is drained before its plugin is disposed/reconfigured. Enable/disable cycles construct and dispose plugin instances without restarting the service or closing the sensor stream. The WireView-specific stream closes cleanly when that device/plugin becomes unavailable; clients can reconnect after recovery.
+## Install
 
-`PUT /configuration` accepts the **configuration object**, not the surrounding GET response envelope. `PUT /plugins/{pluginId}/settings` accepts a complete plugin settings object:
+Use a release ZIP from [GitHub Releases](https://github.com/Codeh4ck/RTX5090Monitor/releases), or build one from source.
 
-```json
-{ "enabled": false, "pollIntervalMs": 1000, "staleAfterMs": 5000 }
-```
+1. Extract the ZIP and run `RtxMonitor-Setup-<version>-win-x64.exe`.
+2. Install the required monitoring service. The desktop app is optional, but is needed to configure the backend conveniently.
+3. Open RTX Monitor and enable/configure the plugins for your hardware.
+4. To use Xeneon Edge, import the included `rtx5090monitor.icuewidget` into iCUE and assign it to a widget slot.
 
-Polling intervals accept 100-30000 ms; freshness must be at least the polling interval and at most 300000 ms. Source selection, stream cadence and freshness changes also apply live. Configuration must name exactly the installed plugin IDs. The file is the durable authority; command-line/environment defaults do not override its mutable values after initialization.
+The installer targets Windows x64 and accepts Windows 10 build 17763 or later, including Windows 11. Published packages include the .NET and Windows App SDK runtimes and the Microsoft Visual C++ prerequisite. Using the widget additionally requires compatible iCUE software and a Xeneon Edge display.
 
-Device configuration remains on WireView hardware. Its thresholds/fan settings are read from the device, while polling and service/plugin options live in JSON. Device configuration writes and firmware updates are not implemented, matching the original service's scope.
+The backend listens on `localhost:59273` and starts automatically with Windows. Another process using that port must be stopped before the backend can start.
 
-## ASUS endpoint parity
+### Updates and uninstall
 
-The original standalone ASUS service is available under `/plugins/asus-astral`: GET `/sensors`, WS `/ws`, GET/PUT `/config`, and POST `/restart`. Added GET `/health` reports plugin state, and GET `/devices` lists matching hardware identifiers for GPU selection. All routes share port 59273; there is no ASUS listener on 59275.
+Exit the desktop app through its tray menu, then run the newer installer. Installer-managed installations upgrade in place and retain service configuration, desktop preferences and component choices.
 
-ASUS is enabled by default and monitors one GPU, defaulting to the first match of the original 5090/5080 filter. It retains the original 32 sensor mappings and legacy payload fields. Imbalance clears on recovery; overcurrent duration is tracked independently per pin. The common stream includes ASUS readings and typed warning metrics, with identities distinct from WireView.
+Import the newer widget into iCUE separately; the installer does not replace imported widgets. Keep the service, desktop app and widget on matching release versions.
 
-ASUS thresholds and `deviceId` live under its plugin settings' `options` object and reload live. Startup adds defaults for newly installed plugins to an existing runtime file while preserving existing settings. API updates and live file edits still require all installed IDs. See [the ASUS reference](docs/asus-plugin.md) for the complete JSON example, endpoint details, validation bounds and behavior changes.
+Use Windows Settings > Apps > RTX Monitor to modify, repair or uninstall, or rerun the setup executable. The included uninstall script opens the registered uninstaller. Uninstall retains backend settings and desktop preferences; remove the widget separately in iCUE.
 
-## Build and checks
+## Configuration
 
-From this directory:
+Use the desktop app's **Configuration** page for plugin settings, Sensor stream, source selections, warnings and backend maintenance.
+
+- **Sensor stream** controls how often the backend publishes aggregate snapshots. Hardware polling is configured independently for each plugin.
+- **Source selections** define preferred sensor sources and fallback behavior for consumers that request named selections.
+- **Warnings** control initial Windows notifications, optional reminders and clear confirmation, with per-warning overrides. The default reminder interval is five seconds; repeating reminders are off by default.
+- **MSI PSU settings** include fan-control options and desktop PSU pin-comparison preferences. Fan control defaults to leaving the existing device mode untouched.
+
+Backend configuration is stored at `%ProgramData%\Rtx5090Monitoring\appsettings.json`. Desktop preferences are stored under `%LocalAppData%\Rtx5090Monitoring`. Configuration changes apply live through the desktop app or service API.
+
+The widget's iCUE settings affect presentation only. Double tap outside its controls to open the scrollable, read-only backend configuration view. See the included [widget setup instructions](XeneonEdgeWidget/INSTALL.md) for operation and display settings.
+
+## Build from source
+
+Build on Windows with the .NET 10 SDK. Widget builds additionally require Node.js 22.18 or later, npm and the iCUE Widget CLI (`icuewidget`) on `PATH`. Release packaging uses PowerShell 7 and restores the WiX SDK through NuGet.
+
+### Service
 
 ```powershell
-dotnet restore Rtx5090Monitoring.slnx
-dotnet build Rtx5090Monitoring.slnx --no-restore
-dotnet run --project Rtx5090Monitoring.Tests --no-build
+dotnet build Rtx5090Monitoring.Service -c Release
 ```
 
-Tests host Kestrel on ephemeral loopback ports and use fake readers/factories. They cover live configuration, lifecycle, source selection, protocol configuration parsing, serialization, endpoint parity and WebSocket behavior without accessing USB/GPU hardware, restarting installed services or writing ProgramData/registry settings.
-
-To run the real host:
+### Desktop app
 
 ```powershell
-dotnet run --project Rtx5090Monitoring.Service
+dotnet publish UI/Rtx5090Monitoring.App -c Release -p:PublishProfile=Portable -p:EnableTelemetryDebug=false
 ```
 
-WireView and ASUS are enabled by default. Set both plugins to `enabled: false` for a no-hardware session. The Windows Service identity is `Rtx5090MonitoringService`. Actual service installation/recovery configuration is separate; POST `/restart` exits with code 1 after 500 ms so an installed service's recovery policy can relaunch it. An interactive console process exits without relaunching itself.
+The portable app is written to `artifacts/desktop/win-x64/`. Keep that entire directory together, including assets, native libraries and runtime files.
 
-## Architecture and remaining work
+For development, open `Rtx5090Monitoring.slnx` in Rider or Visual Studio. Debug builds include the telemetry debug console; ordinary Release builds exclude simulation and diagnostic functionality. Use the installed backend for live monitoring, or stop it before running another backend on the same port.
 
-See [the architecture reference](docs/plugin-architecture.md) and [ASUS plugin reference](docs/asus-plugin.md). MSI adapters and widget rendering remain future work. Adding a new compiled plugin requires deployment; toggling an already installed plugin does not. The WireView adapter currently identifies a device by COM port and selects one available device; persistent USB identity and multi-device support remain future extensions. No physical hardware validation was performed as part of this implementation.
+### Xeneon Edge widget
+
+```powershell
+cd XeneonEdgeWidget
+npm ci
+npm run build
+npm run verify
+```
+
+`npm run build` type-checks, runs widget tests, generates iCUE metadata, validates and creates the single `.dist/rtx5090monitor.icuewidget` package at the solution root. `npm run verify` checks the generated widget in a browser using simulated telemetry. Browser verification uses Microsoft Edge by default; `PLAYWRIGHT_CHANNEL` can select another installed supported browser channel.
+
+### Complete release ZIP
+
+From the solution root:
+
+```powershell
+./scripts/Build-Release.ps1 -Version 0.4.0
+```
+
+Use the intended release version and keep widget manifest/package versions aligned. The script runs checks, publishes the service and desktop app, packages the widget, builds and inspects the installer, collects third-party notices and produces a ZIP under `.dist/releases/<version>/`. It downloads and verifies the Microsoft Visual C++ prerequisite when needed. Code signing is optional and supported by the release script's certificate parameters.
+
+Building the release does not install it or restart the installed backend.
+
+## Tests
+
+From the solution root:
+
+```powershell
+dotnet run --project Rtx5090Monitoring.Tests -c Release
+dotnet run --project UI/Rtx5090Monitoring.UI.Tests -c Release -p:EnableTelemetryDebug=false
+dotnet run --project Installer/Rtx5090Monitoring.Installer.Tests -c Release
+
+cd XeneonEdgeWidget
+npm ci
+npm run check
+npm test
+```
+
+Normal automated tests use simulated hardware. Explicit hardware verification and installer acceptance are separate operations. `scripts/Test-InstallerVm.ps1` is intended only for a disposable Windows VM because it installs and removes the product.
+
+## Repository layout
+
+| Path | Purpose |
+|---|---|
+| `Rtx5090Monitoring.Service/` | Windows service, configuration persistence and HTTP/WebSocket host. |
+| `Rtx5090Monitoring.Core/`, `Rtx5090Monitoring.Contracts/`, `Rtx5090Monitoring.Warnings/` | Shared contracts, plugin lifecycle, sensor state and warning scheduling. |
+| `Rtx5090Monitoring.Plugins.*/` | Hardware plugins, their contracts and analysis code. |
+| `UI/` | WinUI desktop app, service client, presentation models, debug support and UI tests. |
+| `XeneonEdgeWidget/` | Widget source, resources, tests and build tools. |
+| `Installer/`, `scripts/` | Setup/uninstall implementation and release tooling. |
+| `assets/screenshots/` | Screenshots used by this README. |
+
+## Local API
+
+The desktop app and widget consume the same local service. Main routes include:
+
+| Route | Purpose |
+|---|---|
+| `GET /health` | Service and plugin health. |
+| `GET /plugins` | Installed plugins, capabilities and warning definitions. |
+| `WS /sensors` | Typed snapshots for all reporting plugins, including warning states and notification sequences. |
+| `GET /configuration` | Current configuration, revision and validation status. |
+| `PUT /configuration` | Update configuration; supports `If-Match` concurrency checks. |
+| `GET/PUT /plugins/{pluginId}/settings` | Plugin-specific settings. |
+| `POST /plugins/{pluginId}/restart` | Restart one plugin. |
+| `POST /restart` | Restart the installed backend through Windows Service recovery. |
+
+Plugin IDs are `wireview-pro2`, `asus-astral` and `msi-psu`. Device-specific routes are exposed under each plugin's prefix. The aggregate sensor WebSocket is read-only and does not accept client commands.
+
+## License
+
+See [LICENSE.md](LICENSE.md). Third-party attribution is included in the [installer notices](Installer/Resources/THIRD-PARTY-NOTICES.txt) and [widget notices](XeneonEdgeWidget/THIRD-PARTY-NOTICES.md).
