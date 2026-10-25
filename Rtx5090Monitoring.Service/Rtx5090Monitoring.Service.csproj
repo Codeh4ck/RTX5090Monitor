@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <PublishTrimmed>false</PublishTrimmed>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="../Rtx5090Monitoring.Plugins.Msi/Rtx5090Monitoring.Plugins.Msi.csproj" />
+        <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" />
+        <ProjectReference Include="../Rtx5090Monitoring.Core/Rtx5090Monitoring.Core.csproj" />
+        <ProjectReference Include="../Rtx5090Monitoring.Plugins.Asus/Rtx5090Monitoring.Plugins.Asus.csproj" />
+        <ProjectReference Include="../Rtx5090Monitoring.Plugins.WireView/Rtx5090Monitoring.Plugins.WireView.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+        <InternalsVisibleTo Include="Rtx5090Monitoring.Tests" />
+    </ItemGroup>
+</Project>

@@ -1,0 +1,12 @@
+.icon { display: inline-block; flex: none; width: calc(var(--layout-unit) * 4.4 * var(--icon-scale, 1)); height: calc(var(--layout-unit) * 4.4 * var(--icon-scale, 1)); min-width: 14px; min-height: 14px; background: var(--accent); mask: url('resources/icon.svg') center / contain no-repeat; }
+[data-icon='pin'] { mask-image: url('resources/pin.svg'); }
+[data-icon='12vhpwr'] { mask-image: url('resources/12vhpwr.svg'); }
+[data-icon='asus'] { mask-image: url('resources/asus.svg'); }
+[data-icon='vcore'] { mask-image: url('resources/vcore.svg'); }
+[data-icon='vram'] { mask-image: url('resources/vram.svg'); }
+[data-icon='vramusage'] { mask-image: url('resources/vramusage.svg'); }
+[data-icon='vtemp'] { mask-image: url('resources/vtemp.svg'); }
+[data-icon='vfan'] { mask-image: url('resources/vfan.svg'); }
+[data-icon='voltage'] { mask-image: url('resources/voltage.svg'); }
+[data-icon='imbalance'] { mask-image: url('resources/imbalance.svg'); }
+[data-icon='overcurrent'] { mask-image: url('resources/overcurrent.svg'); }

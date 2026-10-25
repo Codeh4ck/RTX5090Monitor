@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+        <ProjectReference Include="../Rtx5090Monitoring.Warnings/Rtx5090Monitoring.Warnings.csproj" />
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <ProjectReference Include="../Rtx5090Monitoring.Contracts/Rtx5090Monitoring.Contracts.csproj" />
+  </ItemGroup>
+</Project>

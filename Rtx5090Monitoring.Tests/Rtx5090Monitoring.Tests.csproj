@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+        <ProjectReference Include="../Rtx5090Monitoring.Core/Rtx5090Monitoring.Core.csproj" />
+        <ProjectReference Include="../Rtx5090Monitoring.Plugins.Asus.Contracts/Rtx5090Monitoring.Plugins.Asus.Contracts.csproj" />
+        <ProjectReference Include="../Rtx5090Monitoring.Plugins.WireView.Contracts/Rtx5090Monitoring.Plugins.WireView.Contracts.csproj" />
+        <ProjectReference Include="../UI/Rtx5090Monitoring.Client/Rtx5090Monitoring.Client.csproj" />
+        <ProjectReference Include="../Rtx5090Monitoring.Service/Rtx5090Monitoring.Service.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Update="Fixtures/source-selection.example.json"
+              TargetPath="source-selection.example.json"
+              CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
+</Project>

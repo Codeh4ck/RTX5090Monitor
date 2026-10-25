@@ -1,0 +1,23 @@
+<Window x:Class="Rtx5090Monitoring.App.WireView.Windows.WireViewDeviceWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Rtx5090Monitoring.App.Controls"
+    Title="RTX Monitor · WireView device settings">
+    <Grid x:Name="Root" Background="{ThemeResource MonitorBackground}" Padding="20" RowDefinitions="Auto,*" RowSpacing="14">
+        <StackPanel Spacing="8">
+            <TextBlock Text="WireView device settings" Style="{StaticResource MonitorHeading}" />
+            <TextBlock Text="Read only - firmware thresholds and fan settings. Device writes are not supported." Style="{StaticResource MonitorCaption}" />
+        </StackPanel>
+        <controls:SectionPanel Grid.Row="1" Header="Device configuration">
+            <controls:SectionPanel.HeaderActions>
+                <Button x:Name="RefreshButton" Content="Refresh" Click="Refresh_Click" />
+            </controls:SectionPanel.HeaderActions>
+            <Grid RowDefinitions="Auto,*" RowSpacing="12">
+                <TextBlock x:Name="StatusText" Style="{StaticResource MonitorCaption}" />
+                <ScrollViewer x:Name="SettingsScroll" Grid.Row="1" Padding="0,0,20,0" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                    <StackPanel x:Name="RowsHost" Spacing="8" />
+                </ScrollViewer>
+            </Grid>
+        </controls:SectionPanel>
+    </Grid>
+</Window>

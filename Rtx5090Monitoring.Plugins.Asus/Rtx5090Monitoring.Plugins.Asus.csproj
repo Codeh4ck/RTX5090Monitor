@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <ItemGroup>
+        <PackageReference Include="LibreHardwareMonitorLib" />
+        <ProjectReference Include="../Rtx5090Monitoring.Core/Rtx5090Monitoring.Core.csproj" />
+        <ProjectReference Include="../Rtx5090Monitoring.Plugins.Asus.Contracts/Rtx5090Monitoring.Plugins.Asus.Contracts.csproj" />
+        <ProjectReference Include="../Rtx5090Monitoring.Plugins.Asus.Analysis/Rtx5090Monitoring.Plugins.Asus.Analysis.csproj" />
+        <ProjectReference Include="..\Rtx5090Monitoring.Contracts\Rtx5090Monitoring.Contracts.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+        <InternalsVisibleTo Include="Rtx5090Monitoring.Tests" />
+    </ItemGroup>
+</Project>

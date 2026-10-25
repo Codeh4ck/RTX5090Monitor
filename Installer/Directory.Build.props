@@ -1,0 +1,9 @@
+<Project>
+    <Import Project="../Directory.Build.props" />
+    <PropertyGroup>
+        <InstallerVersion Condition="'$(InstallerVersion)' == ''">0.4.0</InstallerVersion>
+        <InstallerPlatform>x64</InstallerPlatform>
+        <AcceptEula>wix7</AcceptEula>
+        <PayloadDirectory Condition="'$(PayloadDirectory)' == ''">$(MSBuildThisFileDirectory)../artifacts/installer-payload</PayloadDirectory>
+    </PropertyGroup>
+</Project>

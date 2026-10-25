@@ -1,0 +1,22 @@
+<ContentDialog
+    x:Class="Rtx5090Monitoring.App.Views.Dialogs.SourceSelectionsHelpDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Source selections" CloseButtonText="Close" DefaultButton="Close">
+    <ScrollViewer MaxHeight="620" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+        <StackPanel Spacing="10" Padding="0,0,12,0">
+            <TextBlock Text="What it does" Style="{StaticResource MonitorSectionHeading}" Margin="0,8,0,0" />
+            <TextBlock Text="A source selection is a named, ordered list of sensor alternatives for one value. The service reports which sensor won, while keeping all original plugin readings separate. It does not average readings or change hardware settings." TextWrapping="Wrap" FontSize="14" LineHeight="21" />
+            <TextBlock Text="Example: choose your preferred power reading" Style="{StaticResource MonitorSectionHeading}" Margin="0,8,0,0" />
+            <TextBlock Text="Create a selection named GPU connector power. Put WireView connector power first and ROG Astral connector power second. With fallback enabled, WireView wins whenever its reading is valid; Astral is used if WireView becomes unavailable, disabled or stale. WireView is preferred again when it recovers." TextWrapping="Wrap" FontSize="14" LineHeight="21" />
+            <TextBlock Text="Example: require one trusted source" Style="{StaticResource MonitorSectionHeading}" Margin="0,8,0,0" />
+            <TextBlock Text="Turn fallback off to use only the first source. If it is unavailable, the selection reports Unavailable instead of silently using a different measurement. This is useful when you want to notice a disconnected device." TextWrapping="Wrap" FontSize="14" LineHeight="21" />
+            <TextBlock Text="Order and measurement scope" Style="{StaticResource MonitorSectionHeading}" Margin="0,8,0,0" />
+            <TextBlock Text="Move sources up or down to set priority. Use sources measuring the same quantity, component and pin/connector. Board power and connector power measure different things. Allow different measurement scopes is an explicit opt-in for those cases; it does not make the measurements equivalent." TextWrapping="Wrap" FontSize="14" LineHeight="21" />
+            <TextBlock Text="Which displays use it?" Style="{StaticResource MonitorSectionHeading}" Margin="0,8,0,0" />
+            <TextBlock Text="A consumer must explicitly use the named selection. The desktop hardware panels and current widget panels show their own plugin readings and do not automatically replace them with the winning source. The selection status shows the chosen source or why no source is available." TextWrapping="Wrap" FontSize="14" LineHeight="21" />
+            <TextBlock Text="Apply changes" Style="{StaticResource MonitorSectionHeading}" Margin="0,8,0,0" />
+            <TextBlock Text="Add sources from the available sensor list, set their order and fallback policy, then Apply changes. Selections are stored on the service and resolved live for all consumers that use them; no restart is required." TextWrapping="Wrap" FontSize="14" LineHeight="21" />
+        </StackPanel>
+    </ScrollViewer>
+</ContentDialog>

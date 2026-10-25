@@ -347,3 +347,39 @@ healthchecksdb
 
 # Backup folder for Package Reference Convert tool in Visual Studio 2017
 MigrationBackup/
+
+# RTX Monitor generated output and local tooling
+/.dist/
+/.idea/
+*.tsbuildinfo
+
+# Unused bundled fonts (the widget uses installed fonts)
+/XeneonEdgeWidget/resources/fonts/
+
+# Personal agent instructions and configuration
+.agents/
+.claude/
+.codex/
+.cursor/
+.github/agents/
+.github/instructions/
+.github/copilot-instructions.md
+AGENTS.md
+AGENTS.override.md
+CLAUDE.md
+GEMINI.md
+
+# Required portable desktop publish profile
+!UI/Rtx5090Monitoring.App/Properties/PublishProfiles/Portable.pubxml
+
+# Local documentation and legacy widget references
+/docs/
+/XeneonEdgeWidget/docs/
+/XeneonEdgeWidget/references/
+
+# Local widget Markdown files
+/XeneonEdgeWidget/**/*.md
+
+# Required widget packaging resources
+!/XeneonEdgeWidget/INSTALL.md
+!/XeneonEdgeWidget/THIRD-PARTY-NOTICES.md

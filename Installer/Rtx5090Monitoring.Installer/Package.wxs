@@ -1,0 +1,90 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util" xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
+    <Package Name="RTX Monitor" Manufacturer="Nikolas Andreou" Version="$(var.InstallerVersion)" UpgradeCode="6C775B30-1A15-487B-8090-456EBB3A3EEA" Scope="perMachine" InstallerVersion="500">
+        <MajorUpgrade DowngradeErrorMessage="A newer version of RTX Monitor is already installed." Schedule="afterInstallInitialize" MigrateFeatures="yes" />
+        <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
+        <Property Id="WINDOWSBUILDNUMBER" Secure="yes">
+            <RegistrySearch Id="WindowsBuildNumberSearch" Root="HKLM" Key="SOFTWARE\Microsoft\Windows NT\CurrentVersion" Name="CurrentBuildNumber" Type="raw" Bitness="always64" />
+        </Property>
+        <Launch Condition="Installed OR (VersionNT64 AND WINDOWSBUILDNUMBER &gt;= 17763)" Message="RTX Monitor requires 64-bit Windows 10 (build 17763+) or Windows 11." />
+        <Property Id="MSIRESTARTMANAGERCONTROL" Value="Disable" />
+        <Property Id="ARPPRODUCTICON" Value="MonitorIcon.exe" />
+        <Icon Id="MonitorIcon.exe" SourceFile="$(var.PayloadDirectory)/Desktop/Rtx5090Monitoring.App.exe" />
+        <Property Id="INSTALLFOLDER" Secure="yes">
+            <RegistrySearch Id="PreviousInstallFolder" Root="HKLM" Key="SOFTWARE\Rtx5090Monitoring" Name="InstallDirectory" Type="raw" Bitness="always64" />
+        </Property>
+        <StandardDirectory Id="ProgramFiles64Folder">
+            <Directory Id="INSTALLFOLDER" Name="Rtx5090Monitoring">
+                <Directory Id="ServiceFolder" Name="Service" />
+                <Directory Id="AppInstallFolder" Name="Desktop" />
+            </Directory>
+        </StandardDirectory>
+        <StandardDirectory Id="ProgramMenuFolder">
+            <Directory Id="MonitorMenuFolder" Name="RTX Monitor" />
+        </StandardDirectory>
+
+        <Feature Id="Service" Title="Monitoring service (required)" Description="Local WireView, ROG Astral and MSI PSU monitoring. Starts with Windows and supplies the widget and app." Level="1" AllowAbsent="no" AllowAdvertise="no" ConfigurableDirectory="INSTALLFOLDER">
+            <ComponentGroupRef Id="ServiceFiles" />
+            <ComponentRef Id="MonitorService" />
+            <ComponentRef Id="InstallationRegistration" />
+        </Feature>
+        <Feature Id="Desktop" Title="Desktop app and configurator" Description="Optional telemetry dashboard and backend service configurator. It does not need to stay open for monitoring." Level="1" AllowAdvertise="no">
+            <ComponentGroupRef Id="DesktopFiles" />
+            <ComponentRef Id="DesktopShortcut" />
+        </Feature>
+
+        <ComponentGroup Id="ServiceFiles" Directory="ServiceFolder">
+            <Files Include="$(var.PayloadDirectory)/Service/**">
+                <Exclude Files="$(var.PayloadDirectory)/Service/Rtx5090Monitoring.Service.exe" />
+            </Files>
+        </ComponentGroup>
+        <ComponentGroup Id="DesktopFiles" Directory="AppInstallFolder">
+            <Files Include="$(var.PayloadDirectory)/Desktop/**">
+                <Exclude Files="$(var.PayloadDirectory)/Desktop/Rtx5090Monitoring.App.exe" />
+            </Files>
+        </ComponentGroup>
+        <Component Id="MonitorService" Directory="ServiceFolder" Guid="D9F18BCA-065A-4A66-B4E2-928F267F8B0E" Bitness="always64">
+            <File Id="ServiceExecutable" Source="$(var.PayloadDirectory)/Service/Rtx5090Monitoring.Service.exe" KeyPath="yes" />
+            <ServiceInstall Id="ServiceRegistration" Name="Rtx5090MonitoringService" DisplayName="RTX Monitor Service" Description="WireView, ASUS Astral and MSI PSU monitoring on localhost:59273." Type="ownProcess" Start="auto" ErrorControl="normal" Account="LocalSystem" Arguments="--contentRoot &quot;[ServiceFolder].&quot;" Vital="yes">
+                <util:ServiceConfig FirstFailureActionType="restart" SecondFailureActionType="restart" ThirdFailureActionType="restart" RestartServiceDelayInSeconds="5" ResetPeriodInDays="1" />
+            </ServiceInstall>
+            <ServiceControl Id="ServiceLifecycle" Name="Rtx5090MonitoringService" Start="install" Stop="both" Remove="uninstall" Wait="yes" />
+        </Component>
+        <Component Id="InstallationRegistration" Directory="INSTALLFOLDER" Guid="D7962864-016B-4534-B07C-CE10DFDC7B62" Bitness="always64">
+            <RegistryValue Root="HKLM" Key="SOFTWARE\Rtx5090Monitoring" Name="InstallDirectory" Type="string" Value="[INSTALLFOLDER]" KeyPath="yes" />
+        </Component>
+        <Component Id="DesktopShortcut" Directory="AppInstallFolder" Guid="16351ECA-0112-45FC-83E5-64162EB84E75" Bitness="always64">
+            <File Id="AppExecutable" Source="$(var.PayloadDirectory)/Desktop/Rtx5090Monitoring.App.exe" KeyPath="yes">
+                <Shortcut Id="StartMenuShortcut" Directory="MonitorMenuFolder" Name="RTX Monitor" Description="Telemetry and service configuration" Advertise="yes" WorkingDirectory="AppInstallFolder" Icon="MonitorIcon.exe" />
+            </File>
+            <RemoveFolder Id="RemoveMenuFolder" Directory="MonitorMenuFolder" On="uninstall" />
+        </Component>
+
+        <Binary Id="InstallerActions" SourceFile="$(var.Rtx5090Monitoring.Installer.Actions.TargetDir)Rtx5090Monitoring.Installer.Actions.CA.dll" />
+        <CustomAction Id="Preflight" BinaryRef="InstallerActions" DllEntry="Preflight" Execute="immediate" Return="check" />
+        <CustomAction Id="PortAvailable" BinaryRef="InstallerActions" DllEntry="PortAvailable" Execute="deferred" Impersonate="no" Return="check" />
+        <CustomAction Id="PrepareConfigurationBackup" BinaryRef="InstallerActions" DllEntry="PrepareConfigurationBackup" Execute="immediate" Return="check" />
+        <CustomAction Id="RestoreConfiguration" BinaryRef="InstallerActions" DllEntry="RestoreConfiguration" Execute="rollback" Impersonate="no" Return="check" />
+        <CustomAction Id="BackupConfiguration" BinaryRef="InstallerActions" DllEntry="BackupConfiguration" Execute="deferred" Impersonate="no" Return="check" />
+        <CustomAction Id="CleanConfigurationBackup" BinaryRef="InstallerActions" DllEntry="CleanConfigurationBackup" Execute="commit" Impersonate="no" Return="ignore" />
+        <CustomAction Id="VerifyServiceHealth" BinaryRef="InstallerActions" DllEntry="VerifyServiceHealth" Execute="deferred" Impersonate="no" Return="check" />
+        <CustomAction Id="ConfigureServiceStartup" BinaryRef="InstallerActions" DllEntry="ConfigureServiceStartup" Execute="deferred" Impersonate="no" Return="check" />
+        <CustomAction Id="PrepareStartupCleanup" BinaryRef="InstallerActions" DllEntry="PrepareStartupCleanup" Execute="immediate" Return="check" />
+        <CustomAction Id="RemoveStartupRegistration" BinaryRef="InstallerActions" DllEntry="RemoveStartupRegistration" Execute="commit" Impersonate="no" Return="ignore" />
+        <InstallExecuteSequence>
+            <Custom Action="Preflight" Before="InstallInitialize" Condition="NOT UPGRADINGPRODUCTCODE" />
+            <Custom Action="PortAvailable" After="StopServices" Condition="NOT (REMOVE~=&quot;ALL&quot;)" />
+            <Custom Action="PrepareConfigurationBackup" After="PortAvailable" Condition="NOT (REMOVE~=&quot;ALL&quot;)" />
+            <Custom Action="RestoreConfiguration" After="PrepareConfigurationBackup" Condition="NOT (REMOVE~=&quot;ALL&quot;)" />
+            <Custom Action="BackupConfiguration" After="RestoreConfiguration" Condition="NOT (REMOVE~=&quot;ALL&quot;)" />
+            <Custom Action="CleanConfigurationBackup" After="BackupConfiguration" Condition="NOT (REMOVE~=&quot;ALL&quot;)" />
+            <Custom Action="VerifyServiceHealth" After="StartServices" Condition="NOT (REMOVE~=&quot;ALL&quot;)" />
+            <Custom Action="ConfigureServiceStartup" Before="StartServices" Condition="NOT (REMOVE~=&quot;ALL&quot;)" />
+            <Custom Action="RemoveStartupRegistration" Before="InstallFinalize" Condition="(&amp;Desktop=2) AND NOT UPGRADINGPRODUCTCODE" />
+            <Custom Action="PrepareStartupCleanup" Before="RemoveStartupRegistration" Condition="(&amp;Desktop=2) AND NOT UPGRADINGPRODUCTCODE" />
+        </InstallExecuteSequence>
+
+        <ui:WixUI Id="WixUI_FeatureTree" />
+        <WixVariable Id="WixUILicenseRtf" Value="../Resources/InstallerNotice.rtf" />
+        <Property Id="WIXUI_EXITDIALOGOPTIONALTEXT" Value="Import rtx5090monitor.icuewidget into iCUE manually. Open the desktop app from the Start menu to configure the service. Windows startup and minimized launch are per-user app settings." />
+    </Package>
+</Wix>

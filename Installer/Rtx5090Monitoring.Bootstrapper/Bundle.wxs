@@ -1,0 +1,12 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+    <Bundle Name="RTX Monitor" Manufacturer="Nikolas Andreou" Version="$(var.InstallerVersion)" UpgradeCode="63498E86-5C62-431A-B173-6DE1B4A9E617" IconSourceFile="../../UI/Rtx5090Monitoring.App/Assets/monitor.ico">
+        <BootstrapperApplication>
+            <bal:WixInternalUIBootstrapperApplication Theme="standard" />
+        </BootstrapperApplication>
+        <util:RegistrySearch Id="FindVcRuntime" Variable="VcRuntimeVersion" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x64" Value="Version" Result="value" Bitness="always64" />
+        <Chain>
+            <ExePackage Id="VcRuntime" SourceFile="$(var.VcRedistPath)" DetectCondition="VcRuntimeVersion &gt;= v$(var.VcRedistVersion)" InstallArguments="/install /quiet /norestart" RepairArguments="/repair /quiet /norestart" PerMachine="yes" Permanent="yes" Compressed="yes" Vital="yes" />
+            <MsiPackage SourceFile="$(var.Rtx5090Monitoring.Installer.TargetPath)" Visible="no" Compressed="yes" bal:PrimaryPackageType="default" />
+        </Chain>
+    </Bundle>
+</Wix>

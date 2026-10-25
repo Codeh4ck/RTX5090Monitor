@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <ItemGroup>
+        <ProjectReference Include="../../Rtx5090Monitoring.Plugins.Msi.Contracts/Rtx5090Monitoring.Plugins.Msi.Contracts.csproj" />
+        <ProjectReference Include="../Rtx5090Monitoring.Client/Rtx5090Monitoring.Client.csproj" />
+        <ProjectReference Include="../../Rtx5090Monitoring.Plugins.Asus.Contracts/Rtx5090Monitoring.Plugins.Asus.Contracts.csproj" />
+        <ProjectReference Include="../../Rtx5090Monitoring.Plugins.WireView.Contracts/Rtx5090Monitoring.Plugins.WireView.Contracts.csproj" />
+    </ItemGroup>
+</Project>

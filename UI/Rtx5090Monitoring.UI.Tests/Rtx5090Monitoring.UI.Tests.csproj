@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup><OutputType>Exe</OutputType></PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="../Rtx5090Monitoring.Presentation/Rtx5090Monitoring.Presentation.csproj" />
+        <ProjectReference Include="../../Rtx5090Monitoring.Plugins.Asus.Contracts/Rtx5090Monitoring.Plugins.Asus.Contracts.csproj" />
+        <ProjectReference Include="../../Rtx5090Monitoring.Plugins.WireView.Contracts/Rtx5090Monitoring.Plugins.WireView.Contracts.csproj" />
+        <Compile Include="../../Rtx5090Monitoring.Tests/Infrastructure/TestRunner.cs" Link="Infrastructure/TestRunner.cs" />
+        <Compile Include="../../Rtx5090Monitoring.Tests/Infrastructure/TestAssert.cs" Link="Infrastructure/TestAssert.cs" />
+    </ItemGroup>
+    <ItemGroup Condition="'$(EnableTelemetryDebug)' == 'true'">
+        <ProjectReference Include="../Rtx5090Monitoring.Debugging/Rtx5090Monitoring.Debugging.csproj" />
+    </ItemGroup>
+    <ItemGroup Condition="'$(EnableTelemetryDebug)' != 'true'">
+        <Compile Remove="Debugging/**/*.cs" />
+    </ItemGroup>
+</Project>

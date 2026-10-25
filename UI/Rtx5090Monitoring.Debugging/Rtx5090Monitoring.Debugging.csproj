@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <ItemGroup Condition="'$(EnableTelemetryDebug)' == 'true'">
+        <ProjectReference Include="../../Rtx5090Monitoring.Plugins.WireView.Analysis/Rtx5090Monitoring.Plugins.WireView.Analysis.csproj" />
+        <ProjectReference Include="../../Rtx5090Monitoring.Warnings/Rtx5090Monitoring.Warnings.csproj" />
+        <ProjectReference Include="../Rtx5090Monitoring.Presentation/Rtx5090Monitoring.Presentation.csproj" />
+        <ProjectReference Include="../../Rtx5090Monitoring.Plugins.Asus.Analysis/Rtx5090Monitoring.Plugins.Asus.Analysis.csproj" />
+        <Compile Include="../../Rtx5090Monitoring.Core/SourceResolver.cs" Link="Processing/SourceResolver.cs" />
+    </ItemGroup>
+    <ItemGroup Condition="'$(EnableTelemetryDebug)' != 'true'">
+        <Compile Remove="**/*.cs" />
+    </ItemGroup>
+</Project>

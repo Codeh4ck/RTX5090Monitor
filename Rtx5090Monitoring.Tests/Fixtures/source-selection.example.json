@@ -1,0 +1,48 @@
+{
+  "Monitoring": {
+    "StreamIntervalMs": 1000,
+    "Selections": [
+      {
+        "Name": "gpu.connector.power",
+        "AllowFallback": true,
+        "AllowDifferentScope": false,
+        "PreferredSources": [
+          {
+            "PluginId": "wireview-pro2",
+            "DeviceId": "com3",
+            "Component": "GpuConnector",
+            "Metric": "Power",
+            "Channel": 1
+          },
+          {
+            "PluginId": "asus-astral",
+            "DeviceId": "gpu0",
+            "Component": "GpuConnector",
+            "Metric": "Power",
+            "Channel": 1
+          }
+        ]
+      },
+      {
+        "Name": "gpu.power.display",
+        "AllowFallback": false,
+        "AllowDifferentScope": true,
+        "PreferredSources": [
+          {
+            "PluginId": "asus-astral",
+            "DeviceId": "gpu0",
+            "Component": "GpuBoard",
+            "Metric": "Power"
+          },
+          {
+            "PluginId": "wireview-pro2",
+            "DeviceId": "com3",
+            "Component": "GpuConnector",
+            "Metric": "Power",
+            "Channel": 1
+          }
+        ]
+      }
+    ]
+  }
+}

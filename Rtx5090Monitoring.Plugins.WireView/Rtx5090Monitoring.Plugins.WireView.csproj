@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="System.IO.Ports" />
+    <ProjectReference Include="../Rtx5090Monitoring.Plugins.WireView.Analysis/Rtx5090Monitoring.Plugins.WireView.Analysis.csproj" />
+    <ProjectReference Include="../Rtx5090Monitoring.Core/Rtx5090Monitoring.Core.csproj" />
+    <ProjectReference Include="../Rtx5090Monitoring.Plugins.WireView.Contracts/Rtx5090Monitoring.Plugins.WireView.Contracts.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Using Include="Microsoft.Extensions.Logging" />
+    <InternalsVisibleTo Include="Rtx5090Monitoring.Tests" />
+  </ItemGroup>
+</Project>

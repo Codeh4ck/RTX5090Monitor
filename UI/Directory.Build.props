@@ -1,0 +1,8 @@
+<Project>
+    <Import Project="../Directory.Build.props" />
+    <PropertyGroup>
+        <EnableTelemetryDebug Condition="'$(EnableTelemetryDebug)' == '' and ('$(Configuration)' == 'Debug' or '$(Configuration)' == '')">true</EnableTelemetryDebug>
+        <EnableTelemetryDebug Condition="'$(EnableTelemetryDebug)' == ''">false</EnableTelemetryDebug>
+        <DefineConstants Condition="'$(EnableTelemetryDebug)' == 'true'">$(DefineConstants);TELEMETRY_DEBUG</DefineConstants>
+    </PropertyGroup>
+</Project>

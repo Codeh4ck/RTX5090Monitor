@@ -1,0 +1,47 @@
+<Solution>
+    <Folder Name="/Plugins/">
+        <Project Path="Rtx5090Monitoring.Plugins.Asus.Analysis/Rtx5090Monitoring.Plugins.Asus.Analysis.csproj" />
+        <Project Path="Rtx5090Monitoring.Plugins.Msi/Rtx5090Monitoring.Plugins.Msi.csproj" />
+        <Project Path="Rtx5090Monitoring.Plugins.Msi.Contracts/Rtx5090Monitoring.Plugins.Msi.Contracts.csproj" />
+        <Project Path="Rtx5090Monitoring.Plugins.Asus/Rtx5090Monitoring.Plugins.Asus.csproj" />
+        <Project Path="Rtx5090Monitoring.Plugins.Asus.Contracts/Rtx5090Monitoring.Plugins.Asus.Contracts.csproj" />
+        <Project Path="Rtx5090Monitoring.Plugins.WireView/Rtx5090Monitoring.Plugins.WireView.csproj" />
+        <Project Path="Rtx5090Monitoring.Plugins.WireView.Analysis/Rtx5090Monitoring.Plugins.WireView.Analysis.csproj" />
+        <Project Path="Rtx5090Monitoring.Plugins.WireView.Contracts/Rtx5090Monitoring.Plugins.WireView.Contracts.csproj" />
+    </Folder>
+    <Folder Name="/UI/">
+        <Project Path="UI/Rtx5090Monitoring.Debugging/Rtx5090Monitoring.Debugging.csproj" />
+        <Project Path="UI/Rtx5090Monitoring.App/Rtx5090Monitoring.App.csproj" />
+        <Project Path="UI/Rtx5090Monitoring.Client/Rtx5090Monitoring.Client.csproj" />
+        <Project Path="UI/Rtx5090Monitoring.Presentation/Rtx5090Monitoring.Presentation.csproj" />
+        <Project Path="UI/Rtx5090Monitoring.UI.Tests/Rtx5090Monitoring.UI.Tests.csproj" />
+    </Folder>
+    <Folder Name="/Installer/">
+        <Project Path="Installer/Rtx5090Monitoring.Installer.Actions/Rtx5090Monitoring.Installer.Actions.csproj" />
+        <Project Path="Installer/Rtx5090Monitoring.Installer.Tests/Rtx5090Monitoring.Installer.Tests.csproj" />
+        <File Path="Installer/Rtx5090Monitoring.Installer/Rtx5090Monitoring.Installer.wixproj" />
+        <File Path="Installer/Rtx5090Monitoring.Installer/Package.wxs" />
+        <File Path="Installer/Rtx5090Monitoring.Bootstrapper/Rtx5090Monitoring.Bootstrapper.wixproj" />
+        <File Path="Installer/Rtx5090Monitoring.Bootstrapper/Bundle.wxs" />
+        <File Path="scripts/Build-Release.ps1" />
+        <File Path="uninstall.ps1" />
+        <File Path="docs/releases.md" />
+    </Folder>
+    <Project Path="Rtx5090Monitoring.Warnings/Rtx5090Monitoring.Warnings.csproj" />
+    <Project Path="Rtx5090Monitoring.Contracts/Rtx5090Monitoring.Contracts.csproj" />
+    <Project Path="Rtx5090Monitoring.Core/Rtx5090Monitoring.Core.csproj" />
+    <Project Path="Rtx5090Monitoring.Service/Rtx5090Monitoring.Service.csproj" />
+    <Project Path="Rtx5090Monitoring.Tests/Rtx5090Monitoring.Tests.csproj" />
+    <Folder Name="/Solution Items/">
+        <File Path="Directory.Build.props" />
+        <File Path="Directory.Packages.props" />
+        <File Path=".editorconfig" />
+    </Folder>
+    <Folder Name="/Xeneon Edge/">
+        <File Path="XeneonEdgeWidget/README.md" />
+        <File Path="XeneonEdgeWidget/INSTALL.md" />
+        <File Path="XeneonEdgeWidget/package.json" />
+        <File Path="XeneonEdgeWidget/manifest.json" />
+        <File Path="XeneonEdgeWidget/tsconfig.json" />
+    </Folder>
+</Solution>

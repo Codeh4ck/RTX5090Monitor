@@ -1,0 +1,13 @@
+RTX Monitor includes third-party software with its own license terms.
+
+.NET runtime and libraries - .NET Foundation / Microsoft, MIT and component licenses.
+Windows App SDK / WinUI - Microsoft, applicable package/runtime terms reproduced below.
+LibreHardwareMonitor - Mozilla Public License 2.0.
+HidSharp - Apache License 2.0.
+WiX Toolset / DTF / Burn runtime components - Microsoft Reciprocal License and component notices.
+Microsoft Visual C++ Redistributable - Microsoft redistributable license terms.
+CORSAIR iCUE widget SDK resources - see widget THIRD-PARTY-NOTICES.md.
+
+Dependency license texts and source references resolved from the pinned NuGet packages follow below.
+Microsoft Visual C++ runtime terms: https://visualstudio.microsoft.com/license-terms/vs2022-cruntime/
+WiX 7 build tooling is subject to its OSMF EULA; build-time terms do not replace runtime/component licenses.

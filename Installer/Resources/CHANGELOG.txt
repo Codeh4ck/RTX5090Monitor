@@ -1,0 +1,21 @@
+0.4.0 - Shared warning policies and coordinated component update
+- New service, desktop and iCUE widget version 0.4.0; update all three together.
+- Plugin-owned warning definitions and detection, with a service-built catalogue.
+- Configurable initial notifications, five-second default reminders, recovery confirmation and per-warning overrides.
+- Stable warning episodes prevent reading changes from causing notification spam.
+- ASUS temperature thresholds are configured in the ASUS plugin settings; existing warning policies migrate automatically.
+- Desktop panels, WireView read-only settings window, fault presentation and debug simulation improvements.
+- Widget chart radius, enforced decimal places, comparison badges and shared warning flyouts.
+- Installer-managed service and app upgrade in place while retaining settings; import the new widget manually in iCUE.
+
+0.3.1 - Windows version detection fix
+- Read the actual Windows build from the 64-bit registry instead of MSI's compatibility build value.
+- Accept supported Windows 10 and Windows 11 builds while retaining the minimum build and architecture checks.
+- Add packaged OS detection tests, including evaluation on the build machine without executing an installation.
+
+0.3.0 - Initial Windows installer release candidate
+- Required local monitoring service with optional WinUI desktop app/configurator.
+- Offline x64 setup, automatic delayed service start and recovery.
+- Modify, repair, upgrade rollback and uninstall support.
+- Configuration/preferences retained; installed startup entries cleaned on removal.
+- iCUE widget distributed separately in the release ZIP.

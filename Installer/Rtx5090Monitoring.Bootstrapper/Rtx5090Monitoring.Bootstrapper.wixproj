@@ -1,0 +1,22 @@
+<Project Sdk="WixToolset.Sdk/7.0.0">
+    <PropertyGroup>
+        <OutputType>Bundle</OutputType>
+        <OutputName>RtxMonitor-Setup-$(InstallerVersion)-win-x64</OutputName>
+        <OutputPath>bin/x64/$(Configuration)/</OutputPath>
+        <DefineConstants>$(DefineConstants);InstallerVersion=$(InstallerVersion);VcRedistPath=$(VcRedistPath);VcRedistVersion=$(VcRedistVersion)</DefineConstants>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="WixToolset.BootstrapperApplications.wixext" />
+        <PackageReference Include="WixToolset.Util.wixext" />
+        <ProjectReference Include="../Rtx5090Monitoring.Installer/Rtx5090Monitoring.Installer.wixproj" />
+    </ItemGroup>
+    <PropertyGroup Condition="'$(SigningCertificateThumbprint)' != ''">
+        <SignOutput>true</SignOutput>
+    </PropertyGroup>
+    <Target Name="SignBundleEngine" Condition="'$(SigningCertificateThumbprint)' != ''">
+        <Exec Command="&quot;$(SignToolPath)&quot; sign /sha1 $(SigningCertificateThumbprint) /fd SHA256 /tr &quot;$(TimestampUrl)&quot; /td SHA256 &quot;%(SignBundleEngine.FullPath)&quot;" />
+    </Target>
+    <Target Name="SignBundle" Condition="'$(SigningCertificateThumbprint)' != ''">
+        <Exec Command="&quot;$(SignToolPath)&quot; sign /sha1 $(SigningCertificateThumbprint) /fd SHA256 /tr &quot;$(TimestampUrl)&quot; /td SHA256 &quot;%(SignBundle.FullPath)&quot;" />
+    </Target>
+</Project>
