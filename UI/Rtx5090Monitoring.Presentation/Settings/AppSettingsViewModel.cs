@@ -44,6 +44,19 @@ public sealed class AppSettingsViewModel(AppPreferences preferences) : Observabl
     public bool CloseToTray { get => _value.CloseToTray; set => Update(_value with { CloseToTray = value }); }
     public bool StartWithWindows { get => _value.StartWithWindows; set => Update(_value with { StartWithWindows = value }); }
     public bool StartMinimized { get => _value.StartMinimized; set => Update(_value with { StartMinimized = value }); }
+    public bool AutomaticallyCheckForUpdates { get => _value.AutomaticallyCheckForUpdates; set => Update(_value with { AutomaticallyCheckForUpdates = value }); }
+    public int UpdateFrequencyIndex
+    {
+        get => (int)_value.UpdateFrequency;
+        set
+        {
+            if (value is >= 0 and <= 2)
+            {
+                Update(_value with { UpdateFrequency = (Updates.UpdateFrequency)value });
+            }
+        }
+    }
+
     public bool WarningNotifications { get => _value.WarningNotifications; set => Update(_value with { WarningNotifications = value }); }
     public double CoreTemperatureWarningC { get => _value.CoreTemperatureWarningC; set => Update(_value with { CoreTemperatureWarningC = value }); }
     public double MemoryTemperatureWarningC { get => _value.MemoryTemperatureWarningC; set => Update(_value with { MemoryTemperatureWarningC = value }); }

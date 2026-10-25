@@ -36,3 +36,12 @@ Double tap the widget outside buttons to view backend configuration. Mouse doubl
 Under Panels and telemetry, Warning flyout preview selects simulated individual warnings or combined electrical/temperature examples. Previews are labelled SIMULATED and do not change real sensor data or service settings. Select Off to close the preview, or change the selection to show another example. Active live warnings are separately labelled during previews. Live warning flyouts can be dismissed; they reopen on a new incident or after recovery and recurrence. Show service alerts controls automatic live flyouts and the banner.
 
 GPU usage has reserved width through 100%. Clocks and fan RPM show no thousands separator. Hidden panels and disabled chart/status features are not mounted; dashboard updates pause behind a flyout while telemetry stays connected.
+
+
+## Software updates
+
+Automatically check for updates defaults to enabled, with Daily scheduling. Weekly and Monthly are also available. When enabled, the widget checks on startup and while running at the selected interval. Disabling the setting stops automatic checks; manual checks remain available by double tapping the widget and choosing Check for software updates.
+
+An update badge opens a separate update page with installed/available versions, View release, Remind me later (24 hours) and Skip this version. These notices do not use the hardware warning policy. Schedule state and dismissals are saved per widget instance when local storage is available.
+
+View release opens the system browser using the required iCUE Link Provider. Download and import the new widget manually. Update checks resolve the latest published stable GitHub release and read version.json from its tag; they do not poll development branches. Offline checks never block telemetry.

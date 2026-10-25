@@ -16,6 +16,9 @@ namespace Rtx5090Monitoring.Debugging.Api;
 
 public sealed class DebugMonitoringApi(DebugSession session, TimeProvider clock) : IMonitoringApi
 {
+    public Task<Rtx5090Monitoring.Contracts.Updates.ServiceVersionResponse?> GetVersionAsync(CancellationToken token) =>
+        Task.FromResult<Rtx5090Monitoring.Contracts.Updates.ServiceVersionResponse?>(new(1, "1.0.0"));
+
     public Uri Address { get; } = new("http://debug.invalid/");
     private DebugFrame Current => session.Compose(clock.GetUtcNow());
 

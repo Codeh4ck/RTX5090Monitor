@@ -1,3 +1,13 @@
+1.0.0 - Component versions and update checks
+- Desktop, backend service and iCUE widget start at version 1.0.0.
+- version.json is the shared build and published release manifest.
+- Desktop and widget can check at startup and daily, weekly or monthly.
+- Manual checks, 24-hour reminders and skip-version actions link to the matching GitHub release.
+- Desktop checks its own version and the running backend version through GET /version.
+- Offline checks do not interrupt live monitoring; updates and widget import remain manual.
+- Installer includes the required .NET, Windows App SDK and Visual C++ runtimes.
+- Run setup to upgrade an installer-managed installation while retaining settings.
+
 0.4.0 - Shared warning policies and coordinated component update
 - New service, desktop and iCUE widget version 0.4.0; update all three together.
 - Plugin-owned warning definitions and detection, with a service-built catalogue.

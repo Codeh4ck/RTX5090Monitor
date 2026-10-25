@@ -5,6 +5,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { chromium } from 'playwright';
 import { fixture, catalog, configuration } from '../tests/fixtures.mjs';
 import { verifyFlyouts } from './verification/verifyFlyouts.mjs';
+import { verifyUpdates } from './verification/verifyUpdates.mjs';
 import { verifyBars } from './verification/verifyBars.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -24,6 +25,8 @@ let configuredKeys = [];
 let metadata = configuration(1200);
 let pluginCatalog = catalog();
 let configurationError = false;
+let updateManifest = { schemaVersion: 1, releaseTag: 'v1.0.0', desktop: '1.0.0', service: '1.0.0', widget: '1.0.0' };
+let updateFailure = false;
 const page = await browser.newPage({ reducedMotion: 'no-preference', hasTouch: true });
 page.setDefaultTimeout(6000);
 page.on('pageerror', error => errors.push(error.message));
@@ -68,7 +71,14 @@ await page.route('**/*', async route => {
     const url = new URL(request.url());
     if (url.protocol === 'file:' || url.protocol === 'data:') return route.continue();
     requests.push({ url: request.url(), method: request.method() });
-    if (url.hostname !== 'localhost' || url.port !== '59273' || request.method() !== 'GET') return route.abort();
+    if (request.url() === 'https://api.github.com/repos/Codeh4ck/RTX5090Monitor/releases/latest') {
+        return route.fulfill({ status: updateFailure ? 503 : 200,
+            json: { tag_name: updateManifest.releaseTag, draft: false, prerelease: false }, headers: { 'Access-Control-Allow-Origin': '*' } });
+    }
+    if (request.url() === `https://raw.githubusercontent.com/Codeh4ck/RTX5090Monitor/${updateManifest.releaseTag}/version.json`) {
+        return route.fulfill({ json: updateManifest, headers: { 'Access-Control-Allow-Origin': '*' } });
+    }
+    if (url.hostname !== 'localhost'  || url.port !== '59273' || request.method() !== 'GET') return route.abort();
     let value;
     if (url.pathname === '/health') value = { status: 'ok' };
     if (url.pathname === '/plugins') value = pluginCatalog;
@@ -342,7 +352,7 @@ try {
     paused = true;
 
     const runtimeHtml=await readFile(join(latest.runtime,'index.html'),'utf8');
-    const reader=runtimeHtml.slice(runtimeHtml.indexOf('function readRtxProperty(name)'),runtimeHtml.indexOf('function configureRtxMonitor()'));
+    const reader=runtimeHtml.slice(runtimeHtml.indexOf('function readRtxProperty(name)'),runtimeHtml.indexOf('function configureRtxMonitor('));
     const lexicalProperty=await page.evaluate(source=>{
         delete window.panel1;
         const read=Function('panel1',source+'; return readRtxProperty;')('msiConnector2');
@@ -351,8 +361,13 @@ try {
     assert.equal(lexicalProperty.namedElement,true,'test exercises the DOM named-property collision');
     assert.equal(lexicalProperty.value,'msiConnector2','iCUE sandbox-local settings win over DOM named properties');
 
+    await verifyUpdates(page, base, properties, value => { updateManifest = value; }, value => { updateFailure = value; }, requests, output);
+
     assert.equal(messages.length, 0, 'No commands sent through the telemetry socket');
-    assert.ok(requests.every(request=>request.method==='GET'&&request.url.startsWith('http://localhost:59273/')));
+    assert.ok(requests.every(request => request.method === 'GET' && (
+        request.url.startsWith('http://localhost:59273/')
+        || request.url === 'https://api.github.com/repos/Codeh4ck/RTX5090Monitor/releases/latest'
+        || /^https:\/\/raw\.githubusercontent\.com\/Codeh4ck\/RTX5090Monitor\/v\d+\.\d+\.\d+\/version\.json$/.test(request.url))));
     assert.deepEqual(errors, []);
     const overflow = reports.filter(report=>report.overflow.length || report.barHeights.some(height=>height<20));
     await writeFile(join(output, 'report.json'), JSON.stringify({ reports, voltage, errors, requests, clientSocketMessages:messages }, null, 2));

@@ -13,6 +13,8 @@
                     <TextBlock x:Name="ModeLabel" Text="POWER · PINS · PROTECTION" Style="{StaticResource MonitorCaption}"/></StackPanel>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right" VerticalAlignment="Center">
+                <Button Content="{x:Bind Updates.Summary, Mode=OneWay}" Click="Settings_Click"
+                    Visibility="{x:Bind WarningVisibility(Updates.HasUpdates), Mode=OneWay}" />
                 <TextBlock Text="{x:Bind Model.Summary, Mode=OneWay}" VerticalAlignment="Center" Style="{StaticResource MonitorCaption}"/>
                 <Button x:Name="PluginWarningButton" Background="Transparent" BorderThickness="0" Padding="6" Click="Configuration_Click"
                     Visibility="{x:Bind WarningVisibility(Model.HasPluginWarning), Mode=OneWay}"

@@ -4,7 +4,7 @@
 .widget-flyout::backdrop { background: color-mix(in srgb, var(--bg) 94%, transparent); }
 .flyout-header { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 20px; border-bottom: 1px solid var(--border); }
 .flyout-header h2 { margin: 0; font-size: max(22px, calc(var(--title-base) * var(--title-scale, 1))); }
-.flyout-close, .flyout-retry { min-width: 48px; min-height: 44px; padding: 6px 14px; }
+.flyout-close, .flyout-retry, .check-updates { min-width: 48px; min-height: 44px; padding: 6px 14px; }
 .flyout-body { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; padding: 0 20px 16px; scrollbar-color: var(--accent) var(--bg); }
 .configuration-section { padding: 14px 0 20px; border-bottom: 1px solid var(--accent); }
 .configuration-section h3 { margin: 0 0 14px; font-size: 1.1em; color: var(--accent); }
@@ -19,3 +19,6 @@
 .warning-card h3 { margin: 0 0 10px; color: var(--error); font-size: max(22px, 1.2em); }
 .warning-card p { margin: 0; line-height: 1.5; overflow-wrap: anywhere; }
 @media (max-height: 480px) { .flyout-header { padding-block: 6px; } .configuration-row { padding: 10px 12px; } }
+
+.update-notice { flex: none; align-self: flex-end; max-width: 100%; min-height: 32px; padding: 6px 12px; color: var(--accent); border-color: var(--accent); font-size: max(14px, calc(var(--label-base) * var(--label-scale, 1))); }
+.update-actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 18px 0; }

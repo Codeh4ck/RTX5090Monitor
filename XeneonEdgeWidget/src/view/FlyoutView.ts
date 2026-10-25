@@ -1,3 +1,4 @@
+import { UpdateChecker } from '../updates/UpdateChecker.ts';
 import { ReadOnlyApi } from '../transport/ReadOnlyApi.ts';
 import type { ConfigurationSnapshot } from '../contracts/ConfigurationSnapshot.ts';
 import type { WarningNotice } from '../warnings/WarningNotice.ts';
@@ -7,15 +8,17 @@ import type { ConfigurationRow } from '../configuration/ConfigurationRow.ts';
 export class FlyoutView {
     private root: HTMLElement;
     private changed: () => void;
+    private showUpdates: () => void;
     private dialog: HTMLDialogElement | null = null;
     private body: HTMLElement | null = null;
     private controller: AbortController | null = null;
     private signature = '';
-    mode: 'configuration' | 'warnings' | 'preview' | null = null;
+    mode: 'configuration' | 'warnings' | 'preview' | 'updates' | null = null;
 
-    constructor(root: HTMLElement, changed: () => void) {
+    constructor(root: HTMLElement, changed: () => void, showUpdates: () => void = () => {}) {
         this.root = root;
         this.changed = changed;
+        this.showUpdates = showUpdates;
     }
 
     get open(): boolean {
@@ -51,6 +54,13 @@ export class FlyoutView {
 
     async configuration(): Promise<void> {
         const body = this.show('configuration', 'Backend configuration');
+        const updates = document.createElement('button');
+        updates.type = 'button';
+        updates.className = 'check-updates';
+        updates.textContent = 'Check for software updates';
+        updates.addEventListener('click', this.showUpdates);
+        body.append(updates);
+
         const controller = new AbortController();
         this.controller = controller;
 
@@ -132,6 +142,64 @@ export class FlyoutView {
         if (!controller.signal.aborted) {
             this.notice(body);
         }
+    }
+
+    updates(checker: UpdateChecker, openRelease: (url: string) => boolean): void {
+        const body = this.mode === 'updates' && this.body ? this.body : this.show('updates', 'Software updates');
+        body.replaceChildren();
+        this.section(body, 'Installed widget', [
+            { label: 'Widget version', value: checker.installedVersion },
+            { label: 'Last checked', value: checker.lastChecked }
+        ]);
+
+        const status = document.createElement('p');
+        status.textContent = checker.status;
+        body.append(status);
+
+        const check = document.createElement('button');
+        check.type = 'button';
+        check.className = 'flyout-retry';
+        check.textContent = checker.checking ? 'Checking...' : 'Check now';
+        check.disabled = checker.checking;
+        check.addEventListener('click', () => void checker.check(true));
+        body.append(check);
+
+        const version = checker.availableVersion;
+        const url = checker.releaseUrl;
+
+        if (version && url) {
+            this.section(body, 'Widget update available', [
+                { label: 'Installed', value: checker.installedVersion },
+                { label: 'Available', value: version }
+            ]);
+
+            const actions = document.createElement('div');
+            actions.className = 'update-actions';
+
+            for (const [label, action] of [
+                ['View release', () => {
+                    if (!openRelease(url)) {
+                        checker.status = 'The release page could not be opened. Check that the iCUE Link Provider is available.';
+                        this.updates(checker, openRelease);
+                    }
+                }],
+                ['Remind me later', () => checker.dismiss(false)],
+                ['Skip this version', () => checker.dismiss(true)]
+            ] as [string, () => void][]) {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'flyout-retry';
+                button.textContent = label;
+                button.addEventListener('click', action);
+                actions.append(button);
+            }
+
+            body.append(actions);
+        }
+
+        const note = document.createElement('p');
+        note.textContent = 'Update checks run at startup and at the selected interval when enabled in iCUE. Remind me later postpones this version for 24 hours. Import the downloaded widget through iCUE.';
+        body.append(note);
     }
 
     warnings(warnings: WarningNotice[], preview = false): void {

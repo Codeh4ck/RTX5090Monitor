@@ -75,6 +75,7 @@ internal sealed partial class AppRuntime
         _startupEnabled = Settings.Value.StartWithWindows;
         Settings.Message = _store.LastError ?? string.Empty;
         Settings.Changed += PreferencesChanged;
+        InitializeUpdates(directory);
         _liveConfiguration = new ConfigurationEditorViewModel(() => _api);
         _timer = dispatcher.CreateTimer();
         _timer.Interval = TimeSpan.FromMilliseconds(250);
@@ -104,6 +105,7 @@ internal sealed partial class AppRuntime
 
         await ConnectAsync();
         _timer.Start();
+        StartUpdates();
     }
 
     public void Reconnect() => _session?.Reconnect();
@@ -142,6 +144,8 @@ internal sealed partial class AppRuntime
     {
         try
         {
+            ConfigureUpdates();
+            _ = Updates.CheckAsync(false, StopToken);
             _window?.ApplyAppearance(preferences);
             _wireViewWindow?.ApplyAppearance(preferences);
 #if TELEMETRY_DEBUG
@@ -189,7 +193,14 @@ internal sealed partial class AppRuntime
             _session = session;
             session.StatusChanged += status => Dispatch(session, () =>
             {
+                var connectedNow = status.Connected && !_connected;
                 _connected = status.Connected;
+
+                if (connectedNow)
+                {
+                    _ = Updates.RefreshServiceAsync(StopToken);
+                }
+
                 _liveDashboard.Connection = status.Message;
                 _tray?.SetStatus(status.Message);
                 if (!status.Connected && _rendering)
@@ -445,6 +456,9 @@ internal sealed partial class AppRuntime
     public async Task StopAsync()
     {
         _timer.Stop();
+        _updateTimer?.Stop();
+        Updates.Cancel();
+        _updateHttp.Dispose();
         _wireViewWindow?.Close();
 #if TELEMETRY_DEBUG
         StopDebugging();

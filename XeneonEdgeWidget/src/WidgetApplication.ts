@@ -1,3 +1,6 @@
+import { UpdateChecker } from './updates/UpdateChecker.ts';
+import { UpdateStateStore } from './updates/UpdateStateStore.ts';
+import { widgetVersion } from './updates/WidgetVersion.ts';
 import { Settings } from './settings/Settings.ts';
 import { applyAppearance } from './settings/applyAppearance.ts';
 import { TelemetryStore } from './telemetry/TelemetryStore.ts';
@@ -39,12 +42,37 @@ export class WidgetApplication {
     private observer: ResizeObserver;
     private nodes: Record<string, HTMLElement> = {};
     private destroyed = false;
-    private visibilityChanged = (): void => this.requestRender();
+    private updates: UpdateChecker;
+    private updateTimer: ReturnType<typeof setInterval>;
+    private openRelease: (url: string) => boolean;
+    private updateInstance: string;
+    private visibilityChanged = (): void => {
+        this.requestRender();
+        void this.updates.check();
+    };
 
-    constructor(root: HTMLElement) {
+    constructor(root: HTMLElement, instance = 'default', openRelease: (url: string) => boolean = () => false) {
         this.root = root;
         this.nodes['service-alert'] = document.getElementById('service-alert')!;
-        this.flyout = new FlyoutView(root, () => this.requestRender());
+        this.openRelease = openRelease;
+        this.updateInstance = instance;
+        this.flyout = new FlyoutView(root, () => this.requestRender(), () => {
+            this.showUpdates();
+            void this.updates.check(true);
+        });
+
+        let storage: Storage | null = null;
+
+        try {
+            storage = window.localStorage;
+        } catch {
+            // Some embedded web views do not permit persistent storage.
+        }
+
+        this.updates = new UpdateChecker(widgetVersion(), new UpdateStateStore(`rtx-monitor-updates/${instance}`, storage),
+            () => this.updatesChanged());
+        this.updates.configure(false, 'Daily');
+        this.updateTimer = setInterval(() => void this.updates.check(), 60000);
         this.doubleTap = new DoubleTap(root, () => {
             if (!this.flyout.open) {
                 void this.flyout.configuration();
@@ -84,11 +112,34 @@ export class WidgetApplication {
         window.addEventListener('pagehide', () => this.destroy(), { once: true });
     }
 
-    updateSettings(read: (name: string) => unknown, defaultTemperatureUnit: string): void {
+    setUpdateIdentity(instance: string): void {
+        if (this.updateInstance === instance) {
+            return;
+        }
+
+        this.updates.stop();
+        this.updateInstance = instance;
+        let storage: Storage | null = null;
+
+        try {
+            storage = window.localStorage;
+        } catch {
+            // Persistent storage is optional in the embedded host.
+        }
+
+        this.updates = new UpdateChecker(widgetVersion(), new UpdateStateStore(`rtx-monitor-updates/${instance}`, storage),
+            () => this.updatesChanged());
+        this.updates.configure(false, 'Daily');
+        this.updatesChanged();
+    }
+
+    updateSettings(read: (name: string) => unknown, defaultTemperatureUnit: string, updatesReady = true): void {
         const oldPage = this.settings.text('smallPanel');
         const oldPeak = this.settings.enabled('showPeak');
         const oldPreview = this.settings.text('warningPreview');
         this.settings.update(read);
+        this.updates.configure(updatesReady && this.settings.enabled('checkUpdates'), this.settings.text('updateFrequency'));
+        void this.updates.check();
 
         if (oldPage !== this.settings.text('smallPanel')) {
             this.active = this.settings.number('smallPanel') - 1;
@@ -112,6 +163,35 @@ export class WidgetApplication {
         this.media.loadMedia(normalizeMediaConfig(this.settings.raw('backgroundMedia')));
         this.client.start(59273);
         this.requestRender();
+    }
+
+    private showUpdates(): void {
+        this.flyout.updates(this.updates, this.openRelease);
+    }
+
+    private updatesChanged(): void {
+        const version = this.updates.availableVersion;
+
+        if (version) {
+            let badge = this.nodes['update-notice'];
+
+            if (!badge) {
+                badge = document.createElement('button');
+                badge.className = 'update-notice';
+                badge.addEventListener('click', () => this.showUpdates());
+                this.root.querySelector('.main-content')!.prepend(badge);
+                this.nodes['update-notice'] = badge;
+            }
+
+            setText(badge, `Widget ${version} available - view update`);
+        } else {
+            this.nodes['update-notice']?.remove();
+            delete this.nodes['update-notice'];
+        }
+
+        if (this.flyout.mode === 'updates') {
+            this.showUpdates();
+        }
     }
 
     private assigned(): number[] {
@@ -276,6 +356,8 @@ export class WidgetApplication {
         this.destroyed = true;
         this.client.stop();
         clearInterval(this.timer);
+        clearInterval(this.updateTimer);
+        this.updates.stop();
 
         if (this.frame) {
             cancelAnimationFrame(this.frame);

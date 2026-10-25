@@ -1,5 +1,13 @@
 <Project>
     <PropertyGroup>
+        <VersionManifestPath>$(MSBuildThisFileDirectory)version.json</VersionManifestPath>
+        <VersionManifestJson>$([System.IO.File]::ReadAllText('$(VersionManifestPath)'))</VersionManifestJson>
+        <DesktopVersion>$([System.Text.RegularExpressions.Regex]::Match('$(VersionManifestJson)', '&quot;desktop&quot;\s*:\s*&quot;([^&quot;]+)&quot;').Groups[1].Value)</DesktopVersion>
+        <ServiceVersion>$([System.Text.RegularExpressions.Regex]::Match('$(VersionManifestJson)', '&quot;service&quot;\s*:\s*&quot;([^&quot;]+)&quot;').Groups[1].Value)</ServiceVersion>
+        <ReleaseTag>$([System.Text.RegularExpressions.Regex]::Match('$(VersionManifestJson)', '&quot;releaseTag&quot;\s*:\s*&quot;([^&quot;]+)&quot;').Groups[1].Value)</ReleaseTag>
+        <ReleaseVersion>$(ReleaseTag.Substring(1))</ReleaseVersion>
+        <Version>$(ServiceVersion)</Version>
+        <Version Condition="'$(MSBuildProjectName)' == 'Rtx5090Monitoring.App'">$(DesktopVersion)</Version>
         <TargetFramework>net10.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>

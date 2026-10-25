@@ -8,6 +8,7 @@ namespace Rtx5090Monitoring.Service;
 [JsonSourceGenerationOptions(PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase, UseStringEnumConverter = true)]
 [JsonSerializable(typeof(SensorSnapshot))]
 [JsonSerializable(typeof(HealthResponse))]
+[JsonSerializable(typeof(Rtx5090Monitoring.Contracts.Updates.ServiceVersionResponse))]
 [JsonSerializable(typeof(PluginCatalog))]
 [JsonSerializable(typeof(Rtx5090Monitoring.Contracts.Configuration.ConfigurationSnapshot))]
 [JsonSerializable(typeof(Rtx5090Monitoring.Contracts.Configuration.ServiceConfiguration))]

@@ -23,6 +23,16 @@ public sealed class PreferencesStore(string path)
             {
                 value = value with { WindowHeight = Math.Max(value.WindowHeight, AppPreferences.DefaultWindowHeight), WindowLayoutVersion = 1 };
             }
+            if (!document.RootElement.TryGetProperty("automaticallyCheckForUpdates", out _))
+            {
+                value = value with { AutomaticallyCheckForUpdates = true };
+            }
+
+            if (!document.RootElement.TryGetProperty("updateFrequency", out _))
+            {
+                value = value with { UpdateFrequency = Updates.UpdateFrequency.Daily };
+            }
+
             value.Validate();
             return value;
         }

@@ -1,7 +1,8 @@
 <UserControl x:Class="Rtx5090Monitoring.App.Views.SettingsView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:controls="using:Rtx5090Monitoring.App.Controls">
+    xmlns:controls="using:Rtx5090Monitoring.App.Controls"
+    xmlns:updates="using:Rtx5090Monitoring.Presentation.Updates">
     <ScrollViewer>
         <StackPanel Spacing="20" Padding="4,8,4,24" MaxWidth="850" HorizontalAlignment="Stretch">
             <TextBlock Text="Make it yours" Style="{StaticResource MonitorHeading}"/>
@@ -29,6 +30,41 @@
                     <ToggleSwitch Header="Windows warning notifications on this PC" IsOn="{x:Bind Model.WarningNotifications, Mode=TwoWay}"/>
                     <TextBlock Text="Shared warning thresholds and reminder policies are configured under Configuration > Warnings. This switch only controls Windows notifications on this PC." Style="{StaticResource MonitorCaption}"/>
                     <TextBlock Text="Monitoring continues in the background. Panels stop rendering while hidden." TextWrapping="Wrap" Style="{StaticResource MonitorCaption}"/>
+                </StackPanel>
+            </controls:SectionPanel>
+            <controls:SectionPanel Header="Software updates">
+                <StackPanel Spacing="16">
+                    <ToggleSwitch Header="Automatically check for updates" IsOn="{x:Bind Model.AutomaticallyCheckForUpdates, Mode=TwoWay}" />
+                    <ComboBox Header="Check frequency" SelectedIndex="{x:Bind Model.UpdateFrequencyIndex, Mode=TwoWay}" MinWidth="240">
+                        <ComboBoxItem Content="Daily" />
+                        <ComboBoxItem Content="Weekly" />
+                        <ComboBoxItem Content="Monthly" />
+                    </ComboBox>
+                    <TextBlock Text="When enabled, checks at startup and at the selected interval. Updates are installed manually from GitHub Releases. Remind me later postpones a version for 24 hours."
+                        TextWrapping="Wrap" Style="{StaticResource MonitorCaption}" />
+                    <TextBlock><Run Text="Desktop app: " /><Run Text="{x:Bind Updates.DesktopVersion, Mode=OneWay}" /></TextBlock>
+                    <TextBlock><Run Text="Backend service: " /><Run Text="{x:Bind Updates.ServiceVersion, Mode=OneWay}" /></TextBlock>
+                    <TextBlock Text="{x:Bind Updates.Status, Mode=OneWay}" TextWrapping="Wrap" />
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <Button Content="Check now" Click="CheckUpdates_Click" />
+                        <TextBlock VerticalAlignment="Center"><Run Text="Last checked: " /><Run Text="{x:Bind Updates.LastChecked, Mode=OneWay}" /></TextBlock>
+                    </StackPanel>
+                    <ItemsControl ItemsSource="{x:Bind Updates.Available}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="updates:UpdateNotice">
+                                <Border BorderBrush="{ThemeResource MonitorAccent}" BorderThickness="1" CornerRadius="8" Padding="16" Margin="0,0,0,12">
+                                    <StackPanel Spacing="12">
+                                        <TextBlock Text="{x:Bind Description}" TextWrapping="Wrap" FontWeight="SemiBold" />
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <Button Content="View release" Tag="{x:Bind Component}" Click="ViewRelease_Click" />
+                                            <Button Content="Remind me later" Tag="{x:Bind Component}" Click="RemindUpdate_Click" />
+                                            <Button Content="Skip this version" Tag="{x:Bind Component}" Click="SkipUpdate_Click" />
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
                 </StackPanel>
             </controls:SectionPanel>
             <controls:SectionPanel Header="Service connection">

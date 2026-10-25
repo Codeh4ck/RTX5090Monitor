@@ -17,6 +17,7 @@ public sealed partial class MainWindow : Window
     private string _page = "hardware";
     private string? _panelId;
     private bool _rendering = true;
+    public Rtx5090Monitoring.Presentation.Updates.UpdateViewModel Updates => _runtime.Updates;
     public DashboardViewModel Model { get; private set; }
     internal FrameworkElement ThemeRoot => Root;
     internal object? CurrentView => PageHost.Content;

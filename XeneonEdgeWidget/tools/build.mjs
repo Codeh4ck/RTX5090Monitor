@@ -53,14 +53,28 @@ function readRtxProperty(name) {
     var globalValue = window[name];
     return globalValue instanceof Element ? undefined : globalValue;
 }
-function configureRtxMonitor() {
+function openRtxRelease(url) {
+    try {
+        var providers = typeof plugins !== 'undefined' ? plugins : window.plugins;
+        if (providers && providers.Linkprovider && typeof providers.Linkprovider.open === 'function') {
+            providers.Linkprovider.open(url);
+            return true;
+        }
+    } catch (_) {}
+    return false;
+}
+function configureRtxMonitor(ready) {
     var temperature = '°C';
     try { if (typeof iCUE !== 'undefined' && typeof iCUE.defaultTemperatureUnit === 'function') temperature = iCUE.defaultTemperatureUnit(); } catch (_) {}
-    RtxMonitorRuntime.initialize(readRtxProperty, temperature);
+    var instance = typeof uniqueId !== 'undefined' ? String(uniqueId) : 'default';
+    RtxMonitorRuntime.initialize(readRtxProperty, temperature, instance, openRtxRelease, typeof iCUE === 'undefined' || ready === true);
 }
 if (typeof icueEvents === 'undefined') globalThis.icueEvents = {};
-icueEvents = { onICUEInitialized: configureRtxMonitor, onDataUpdated: configureRtxMonitor };
-configureRtxMonitor();`;
+icueEvents = {
+    onICUEInitialized: function () { configureRtxMonitor(true); },
+    onDataUpdated: function () { configureRtxMonitor(true); }
+};
+configureRtxMonitor(false);`;
 }
 
 try {
@@ -76,10 +90,18 @@ try {
     const name = 'rtx5090monitor';
     const stage = join(output, name);
     const packagePath = join(output, `${name}.icuewidget`);
-    const version = manifest.version;
+    const versions = JSON.parse(await readFile(join(root, '../version.json'), 'utf8'));
+
+    if (versions.schemaVersion !== 1 || !/^v\d+\.\d+\.\d+$/.test(versions.releaseTag)
+        || !['desktop', 'service', 'widget'].every(component => /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/.test(versions[component]))) {
+        throw new Error('Unsupported version.json release manifest.');
+    }
+
+    const version = versions.widget;
     const pendingPackage = join(output, `${name}.building.icuewidget`);
     await mkdir(stage, { recursive: true });
     const bundle = await build({ entryPoints: [join(root, 'src/main.ts')], bundle: true, write: false,
+        define: { RTX_WIDGET_VERSION: JSON.stringify(version) },
         target: 'chrome130', format: 'iife', globalName: 'RtxMonitorRuntime', minify: false, legalComments: 'inline' });
     const styles = await Promise.all(['tokens', 'panels', 'charts', 'icons', 'flyouts'].map(name => readFile(join(root, `src/styles/${name}.css`), 'utf8')));
     let stylesheet = styles.join('\n');

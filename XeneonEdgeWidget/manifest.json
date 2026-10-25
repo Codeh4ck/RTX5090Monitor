@@ -3,7 +3,7 @@
   "id": "com.nikolasandreou.rtx5090monitor",
   "name": "RTX Monitor",
   "description": "Read-only WireView Pro 2, ROG Astral and MSI MPG Ai1300TS/Ai1600TS telemetry. Configure the monitoring service in the RTX Monitor desktop app.",
-  "version": "0.4.0",
+  "version": "1.0.0",
   "preview_icon": "resources/icon.svg",
   "min_framework_version": "1.0.0",
   "os": [
@@ -19,5 +19,8 @@
       ]
     }
   ],
-  "interactive": true
+  "interactive": true,
+  "required_plugins": [
+    "widgetbuilder.linkprovider:Url:1.0"
+  ]
 }

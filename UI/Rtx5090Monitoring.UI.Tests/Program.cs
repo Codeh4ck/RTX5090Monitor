@@ -22,6 +22,7 @@ DeviceRefreshTests.Run(runner);
 await EditorTests.RunAsync(runner);
 await LegacyConfigurationTests.RunAsync(runner);
 await PreferenceTests.RunAsync(runner);
+await Rtx5090Monitoring.UI.Tests.Updates.UpdateTests.RunAsync(runner);
 await SessionTests.RunAsync(runner);
 await FrameReaderTests.RunAsync(runner);
 #if TELEMETRY_DEBUG

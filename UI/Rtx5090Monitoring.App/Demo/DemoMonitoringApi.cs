@@ -19,6 +19,9 @@ namespace Rtx5090Monitoring.App.Demo;
 
 internal sealed class DemoMonitoringApi : IMonitoringApi
 {
+    public Task<Rtx5090Monitoring.Contracts.Updates.ServiceVersionResponse?> GetVersionAsync(CancellationToken token) =>
+        Task.FromResult<Rtx5090Monitoring.Contracts.Updates.ServiceVersionResponse?>(new(1, "1.0.0"));
+
     private readonly Lock _gate = new();
     private readonly DateTimeOffset _started = DateTimeOffset.UtcNow;
     private ConfigurationSnapshot _configuration = new(1, new ServiceConfiguration

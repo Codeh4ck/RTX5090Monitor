@@ -20,6 +20,22 @@ public sealed class MonitoringApiClient(HttpClient http) : IMonitoringApi
 {
     public Uri Address => http.BaseAddress ?? throw new InvalidOperationException("Service base address is required.");
 
+    public async Task<Rtx5090Monitoring.Contracts.Updates.ServiceVersionResponse?> GetVersionAsync(CancellationToken token)
+    {
+        using var response = await http.GetAsync("version", token);
+
+        if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            return null;
+        }
+
+        await EnsureSuccessAsync(response, token);
+        var value = await response.Content.ReadFromJsonAsync(ClientJsonContext.Default.ServiceVersionResponse, token);
+
+        return value is { SchemaVersion: 1 }
+            && Rtx5090Monitoring.Contracts.Updates.SemanticVersion.TryParse(value.Version, out _) ? value : null;
+    }
+
     public Task<HealthResponse> GetHealthAsync(CancellationToken token) => GetAsync("health", ClientJsonContext.Default.HealthResponse, token);
     public Task<PluginCatalog> GetPluginsAsync(CancellationToken token) => GetAsync("plugins", ClientJsonContext.Default.PluginCatalog, token);
     public async Task<ConfigurationSnapshot> GetConfigurationAsync(CancellationToken token) =>

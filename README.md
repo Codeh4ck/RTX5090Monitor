@@ -118,12 +118,22 @@ npm run verify
 From the solution root:
 
 ```powershell
-./scripts/Build-Release.ps1 -Version 0.4.0
+./scripts/Build-Release.ps1 -Version 1.0.0
 ```
 
 Use the intended release version and keep widget manifest/package versions aligned. The script runs checks, publishes the service and desktop app, packages the widget, builds and inspects the installer, collects third-party notices and produces a ZIP under `.dist/releases/<version>/`. It downloads and verifies the Microsoft Visual C++ prerequisite when needed. Code signing is optional and supported by the release script's certificate parameters.
 
 Building the release does not install it or restart the installed backend.
+
+## Update checks
+
+The desktop app and widget can check for updates automatically at startup and on a Daily, Weekly or Monthly schedule. Turning automatic checks off leaves manual checks available. Updates open the matching GitHub release in the system browser; installation and iCUE import remain manual.
+
+The desktop app compares its own version and the running backend's `GET /version` response. The widget compares its bundled version and uses iCUE's Link Provider to open release links. Older backends without the version endpoint remain usable and display an unavailable version.
+
+Use **Settings > Software updates** in the desktop app. Widget scheduling is under **Panels and telemetry**; double tap the widget and choose **Check for software updates** for manual checks. Remind me later suppresses that component/version for 24 hours, while Skip this version suppresses it until another version is published. Saved update notices are separate from hardware warnings.
+
+`version.json` is the authoritative JSON manifest for desktop, service and widget versions. Builds embed those versions. Publish the matching Git tag and upload `version.json` alongside the release ZIP. The desktop reads the latest release's manifest asset; the widget resolves the latest stable published tag and reads that tag's manifest to support browser cross-origin restrictions. Do not advertise an unreleased development manifest as the latest release.
 
 ## Tests
 
@@ -161,6 +171,7 @@ The desktop app and widget consume the same local service. Main routes include:
 | Route | Purpose |
 |---|---|
 | `GET /health` | Service and plugin health. |
+| `GET /version` | Schema version and the running backend binary version. |
 | `GET /plugins` | Installed plugins, capabilities and warning definitions. |
 | `WS /sensors` | Typed snapshots for all reporting plugins, including warning states and notification sequences. |
 | `GET /configuration` | Current configuration, revision and validation status. |

@@ -12,6 +12,7 @@ namespace Rtx5090Monitoring.Client.Http;
 public interface IMonitoringApi
 {
     Uri Address { get; }
+    Task<Rtx5090Monitoring.Contracts.Updates.ServiceVersionResponse?> GetVersionAsync(CancellationToken token);
     Task<HealthResponse> GetHealthAsync(CancellationToken token);
     Task<PluginCatalog> GetPluginsAsync(CancellationToken token);
     Task<ConfigurationSnapshot> GetConfigurationAsync(CancellationToken token);

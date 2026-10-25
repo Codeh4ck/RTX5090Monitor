@@ -2,7 +2,7 @@
 <# Builds local release artifacts; never executes the installer or changes an installed service. #>
 [CmdletBinding()]
 param(
-    [ValidatePattern('^\d+\.\d+\.\d+$')][string] $Version = '0.4.0',
+    [ValidatePattern('^\d+\.\d+\.\d+$')][string] $Version,
     [string] $VcRedistPath,
 
     [ValidatePattern('^[A-Fa-f0-9]{40}$')][string] $SigningCertificateThumbprint,
@@ -16,6 +16,30 @@ Set-StrictMode -Version Latest
 Import-Module (Join-Path $PSScriptRoot 'Release.psm1') -Force
 
 $solution = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
+$manifestPath = Join-Path $solution 'version.json'
+$versions = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
+
+if ($versions.schemaVersion -ne 1 -or $versions.releaseTag -notmatch '^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$')
+{
+    throw 'version.json contains an unsupported release tag or schema.'
+}
+
+foreach ($component in @('desktop', 'service', 'widget'))
+{
+    if ($versions.$component -isnot [string] -or $versions.$component -notmatch '^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$')
+    {
+        throw "Invalid $component version in version.json."
+    }
+}
+
+$manifestVersion = $versions.releaseTag.Substring(1)
+
+if ($Version -and $Version -ne $manifestVersion)
+{
+    throw 'The release version must match version.json. Update the manifest before packaging.'
+}
+
+$Version = $manifestVersion
 $work = Join-Path $solution ('.dist\build\' + [Guid]::NewGuid().ToString('N'))
 $payload = Join-Path $work 'payload'
 $release = Join-Path $solution ".dist\releases\$Version"
@@ -41,10 +65,10 @@ try
     Invoke-ReleaseCommand dotnet @('run', '--project', 'Installer/Rtx5090Monitoring.Installer.Tests', '-c', 'Release')
 
     Invoke-ReleaseCommand dotnet @('publish', 'Rtx5090Monitoring.Service', '-c', 'Release', '-r', 'win-x64', '--self-contained', 'true',
-        '-p:PublishSingleFile=false', '-p:PublishTrimmed=false', "-p:Version=$Version", '-o', (Join-Path $payload 'Service'))
+        '-p:PublishSingleFile=false', '-p:PublishTrimmed=false', '-o', (Join-Path $payload 'Service'))
 
     Invoke-ReleaseCommand dotnet @('publish', 'UI/Rtx5090Monitoring.App', '-c', 'Release', '-p:PublishProfile=Portable',
-        '-p:EnableTelemetryDebug=false', "-p:Version=$Version", '-o', (Join-Path $payload 'Desktop'), '-m:1')
+        '-p:EnableTelemetryDebug=false', '-o', (Join-Path $payload 'Desktop'), '-m:1')
 
     Invoke-ReleaseCommand dotnet @('run', '--project', 'UI/Rtx5090Monitoring.UI.Tests', '-c', 'Release', '-p:EnableTelemetryDebug=false',
         '--', '--verify-release', (Join-Path $payload 'Desktop'))
@@ -101,6 +125,7 @@ try
 
     New-Item -ItemType Directory -Path $release -Force | Out-Null
 
+    Copy-Item -LiteralPath $manifestPath -Destination (Join-Path $release 'version.json') -Force
     Copy-Item -LiteralPath $setup -Destination $release -Force
     Copy-Item -LiteralPath (Join-Path $solution '.dist\rtx5090monitor.icuewidget') -Destination $release -Force
     Copy-Item -LiteralPath (Join-Path $solution 'Installer\Resources\ReleaseReadme.txt') -Destination (Join-Path $release 'README.txt') -Force
@@ -139,8 +164,8 @@ try
         vcRedistSha256 = (Get-FileHash -LiteralPath $VcRedistPath -Algorithm SHA256).Hash
         builtAt = [DateTime]::UtcNow.ToString('o')
         cleanMachineAcceptance = 'pending'
-        serviceVersion = $Version
-        desktopVersion = $Version
+        serviceVersion = $versions.service
+        desktopVersion = $versions.desktop
     }
 
     $metadata | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $release 'release.json') -Encoding UTF8

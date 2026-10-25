@@ -76,6 +76,9 @@ for (let panel = 1; panel <= 3; panel++) {
     add(group, `panel${panel}Hero`, 'Show summary metrics', 'switch', true);
 }
 
+add(layout, 'checkUpdates', 'Automatically check for updates (startup and scheduled)', 'switch', true);
+add(layout, 'updateFrequency', 'Update check frequency', 'combobox', 'Daily', { options: options('Daily', 'Weekly', 'Monthly') });
+
 const sources = layout;
 
 for (const prefix of ['asus', 'wireview']) {

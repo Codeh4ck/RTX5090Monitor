@@ -20,6 +20,8 @@ public sealed record AppPreferences
     public bool CloseToTray { get; init; }
     public bool StartWithWindows { get; init; }
     public bool StartMinimized { get; init; }
+    public bool AutomaticallyCheckForUpdates { get; init; } = true;
+    public Updates.UpdateFrequency UpdateFrequency { get; init; } = Updates.UpdateFrequency.Daily;
     public bool WarningNotifications { get; init; } = true;
     public double CoreTemperatureWarningC { get; init; } = 84;
     public double MemoryTemperatureWarningC { get; init; } = 95;
@@ -31,7 +33,7 @@ public sealed record AppPreferences
 
     public void Validate()
     {
-        if (WindowLayoutVersion < 1 || !Enum.IsDefined(Theme) || !Enum.IsDefined(PinMetric) || TextScale is < 0.85 or > 1.5 || !double.IsFinite(TextScale)
+        if (!Enum.IsDefined(UpdateFrequency) || WindowLayoutVersion < 1 || !Enum.IsDefined(Theme) || !Enum.IsDefined(PinMetric) || TextScale is < 0.85 or > 1.5 || !double.IsFinite(TextScale)
             || WireViewPsuConnector is < 1 or > 2 || AsusPsuConnector is < 1 or > 2
             || !double.IsFinite(CoreTemperatureWarningC) || CoreTemperatureWarningC is < 30 or > 120
             || !double.IsFinite(MemoryTemperatureWarningC) || MemoryTemperatureWarningC is < 30 or > 120

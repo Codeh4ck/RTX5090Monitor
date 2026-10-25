@@ -15,6 +15,9 @@ namespace Rtx5090Monitoring.UI.Tests.TestDoubles;
 
 internal sealed class FakeMonitoringApi : IMonitoringApi
 {
+    public Task<Rtx5090Monitoring.Contracts.Updates.ServiceVersionResponse?> GetVersionAsync(CancellationToken token) =>
+        Task.FromResult<Rtx5090Monitoring.Contracts.Updates.ServiceVersionResponse?>(new(1, "1.0.0"));
+
     public Task<Rtx5090Monitoring.Plugins.Msi.Contracts.Devices.MsiDeviceInfo[]> GetMsiDevicesAsync(CancellationToken token) =>
         Task.FromResult<Rtx5090Monitoring.Plugins.Msi.Contracts.Devices.MsiDeviceInfo[]>([]);
     public Uri Address { get; } = new("http://localhost:59273/");

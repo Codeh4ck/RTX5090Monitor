@@ -18,7 +18,7 @@ Exit RTX Monitor from its tray menu, then run the new setup EXE. An installer-ma
 service and previously selected desktop app upgrade in place; feature choices and
 settings are retained. There is no need to uninstall the previous version first.
 Import the included widget into iCUE separately; setup does not update imported widgets.
-Version 0.4.0 changes the shared warning contract, so update service, app and widget together.
+For version 1.0.0, update the service, desktop app and widget together to enable component update checks.
 
 MODIFY / REPAIR / UNINSTALL
 Use Windows Settings > Apps > RTX Monitor, or run the same setup EXE again.
@@ -36,3 +36,14 @@ Offline package: .NET and Windows App SDK are bundled; a signed Microsoft Visual
 An unsigned development build is a release candidate, not a publicly signed release.
 See release.json for component versions, source commit, signing status and build timestamp.
 SHA256SUMS.txt verifies the extracted ZIP contents.
+
+
+UPDATE CHECKS AND PUBLICATION
+Desktop Settings and widget iCUE settings offer automatic update checks at startup
+and Daily, Weekly or Monthly intervals. Checks open a release page; they do not
+install automatically. Widget import remains manual. The service reports its own
+running version at GET /version and does not poll GitHub.
+
+Publish the release using the tag in version.json. Upload version.json as a separate
+release asset alongside the ZIP. Keep the tagged repository manifest and uploaded
+manifest identical; clients only advertise published stable releases.

@@ -17,6 +17,8 @@ namespace Rtx5090Monitoring.Client.Serialization;
     PropertyNameCaseInsensitive = true, UseStringEnumConverter = true, WriteIndented = true)]
 [JsonSerializable(typeof(SensorSnapshot))]
 [JsonSerializable(typeof(HealthResponse))]
+[JsonSerializable(typeof(Rtx5090Monitoring.Contracts.Updates.ServiceVersionResponse))]
+[JsonSerializable(typeof(Rtx5090Monitoring.Contracts.Updates.ReleaseManifest))]
 [JsonSerializable(typeof(PluginCatalog))]
 [JsonSerializable(typeof(ConfigurationSnapshot))]
 [JsonSerializable(typeof(ServiceConfiguration))]
