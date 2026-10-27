@@ -60,8 +60,10 @@ internal sealed class MonitoringTestHost : IAsyncDisposable
     public static Task<MonitoringTestHost> StartWithoutPluginsAsync() => StartAsync(registerTestPlugins: false);
     public static Task<MonitoringTestHost> StartWithMsiAsync(MsiTestState state) => StartAsync(false, msi: state);
     public static Task<MonitoringTestHost> StartWithMsiHardwareAsync() => StartAsync(false, useMsiHardware: true);
-    public static Task<MonitoringTestHost> StartWithInstalledPluginsDisabledAsync() => StartAsync(registerTestPlugins: false,
-        useInstalledFactories: true, bootstrapOverrides: new Dictionary<string, string?>
+    public static Task<MonitoringTestHost> StartWithInstalledPluginsDisabledAsync(bool useShippedDefaults = false) => StartAsync(registerTestPlugins: false,
+        useInstalledFactories: true,
+        bootstrapFile: useShippedDefaults ? Path.Combine(AppContext.BaseDirectory, "Fixtures", "service-appsettings.json") : null,
+        bootstrapOverrides: new Dictionary<string, string?>
         {
             ["Plugins:wireview-pro2:Enabled"] = "false",
             ["Plugins:asus-astral:Enabled"] = "false",
@@ -164,19 +166,31 @@ internal sealed class MonitoringTestHost : IAsyncDisposable
 
     private static async Task<MonitoringTestHost> StartAsync(bool registerTestPlugins, WireViewTestState? device = null,
         int initialPollMs = 1000, AsusTestState? asus = null, ServiceConfiguration? existingConfiguration = null,
-        Dictionary<string, string?>? bootstrapOverrides = null, bool useInstalledFactories = false, MsiTestState? msi = null, bool useMsiHardware = false)
+        Dictionary<string, string?>? bootstrapOverrides = null, bool useInstalledFactories = false, MsiTestState? msi = null,
+        bool useMsiHardware = false, string? bootstrapFile = null)
     {
         var builder = WebApplication.CreateSlimBuilder();
-        // Test hosts use only explicit settings, never inherited JSON files or environment variables.
+        // Test hosts use only explicit settings and requested fixtures, never inherited
+        // JSON files or environment variables.
         builder.Configuration.Sources.Clear();
+
+        if (bootstrapFile is not null)
+        {
+            builder.Configuration.AddJsonFile(bootstrapFile, optional: false, reloadOnChange: false);
+        }
+
         builder.Logging.ClearProviders();
         var configurationPath = Path.Combine(AppContext.BaseDirectory, "TestData", Guid.NewGuid().ToString("N"), "appsettings.json");
 
         var settings = new Dictionary<string, string?>
         {
-            ["Monitoring:StreamIntervalMs"] = "100",
             ["RuntimeConfiguration:FilePath"] = configurationPath
         };
+
+        if (bootstrapFile is null)
+        {
+            settings["Monitoring:StreamIntervalMs"] = "100";
+        }
 
         if (device is not null)
         {

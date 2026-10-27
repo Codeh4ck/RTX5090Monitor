@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Configuration;
 using Rtx5090Monitoring.Plugins.WireView.Contracts.Warnings;
 using Rtx5090Monitoring.Plugins.Asus.Contracts.Warnings;
 using System.Text.Json;
@@ -20,7 +21,57 @@ internal static class WarningConfigurationTests
         await runner.RunAsync(DiscoversInstalledDefinitionsWhilePluginsAreDisabledAsync);
         await runner.RunAsync(MigratesPersistedLegacyWarningSettingsOnStartupAsync);
         await runner.RunAsync(MigratesLegacyBootstrapThresholdsAsync);
+        await runner.RunAsync(StartsFreshWithShippedBootstrapAndPersistsDefaultsAsync);
+        runner.Run(ReadsEmptyBootstrapWarningObjects);
+        runner.Run(KeepsInvalidWarningPoliciesInvalid);
     }
+
+    private static async Task StartsFreshWithShippedBootstrapAndPersistsDefaultsAsync()
+    {
+        await using var host = await MonitoringTestHost.StartWithInstalledPluginsDisabledAsync(useShippedDefaults: true);
+        var health = await host.GetHealthAsync();
+        var loaded = await host.GetConfigurationAsync();
+        var persisted = RuntimeJson.Deserialize(await File.ReadAllTextAsync(host.ConfigurationPath));
+
+        TestAssert.Equal("running", health.GetProperty("status").GetString());
+        TestAssert.True(health.GetProperty("configurationRevision").GetInt64() > 0,
+            "Fresh installation must satisfy the installer's health check.");
+        TestAssert.Equal(1000, loaded.Configuration.Monitoring.StreamIntervalMs);
+        TestAssert.Equal(3, loaded.Configuration.Plugins.Count);
+        TestAssert.True(loaded.Configuration.Plugins.Values.All(plugin => !plugin.Enabled),
+            "The fresh-install test must not access hardware.");
+        TestAssert.True(persisted.Warnings.IsValid(), "Fresh defaults must be persisted as valid warning options.");
+        TestAssert.Equal(0, persisted.Warnings.Overrides.Count);
+        TestAssert.Equal(5, persisted.Warnings.Defaults.RepeatIntervalSeconds);
+        TestAssert.True(persisted.Warnings.Defaults.NotifyOnStart, "Default notifications must remain enabled.");
+    }
+
+    private static void ReadsEmptyBootstrapWarningObjects()
+    {
+        using var stream = new MemoryStream(Encoding.UTF8.GetBytes(
+            """{"Warnings":{"Defaults":{},"Overrides":{},"CoreTemperatureC":82}}"""));
+        using var bootstrap = (ConfigurationRoot)new ConfigurationBuilder().AddJsonStream(stream).Build();
+        var warnings = RuntimeJson.ReadWarningOptions(bootstrap.GetSection("Warnings"));
+
+        TestAssert.True(warnings.IsValid(), "Empty bootstrap objects must preserve valid initialized defaults.");
+        TestAssert.Equal(0, warnings.Overrides.Count);
+        TestAssert.Equal(5, warnings.Defaults.RepeatIntervalSeconds);
+        TestAssert.Equal(82, warnings.AdditionalSettings!["CoreTemperatureC"].GetInt32());
+    }
+
+    private static void KeepsInvalidWarningPoliciesInvalid()
+    {
+        using var stream = new MemoryStream(Encoding.UTF8.GetBytes(
+            """{"Warnings":{"Defaults":{"RepeatIntervalSeconds":1},"Overrides":{}}}"""));
+        using var bootstrap = (ConfigurationRoot)new ConfigurationBuilder().AddJsonStream(stream).Build();
+        var warnings = RuntimeJson.ReadWarningOptions(bootstrap.GetSection("Warnings"));
+
+        TestAssert.False(warnings.IsValid(), "Invalid bootstrap intervals must still be rejected.");
+
+        var persisted = RuntimeJson.Deserialize("""{"warnings":{"overrides":null}}""");
+        TestAssert.False(persisted.Warnings.IsValid(), "Malformed saved configurations must not be silently reset.");
+    }
+
     private static async Task PersistsAndPublishesFiveSecondRemindersWithASlowStreamAsync()
     {
         await using var host = await MonitoringTestHost.StartWithWireViewAsync(new WireViewTestState(), 100);

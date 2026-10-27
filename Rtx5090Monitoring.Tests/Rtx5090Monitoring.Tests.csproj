@@ -13,8 +13,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <None Update="Fixtures/source-selection.example.json"
-              TargetPath="source-selection.example.json"
-              CopyToOutputDirectory="PreserveNewest" />
+        <None Update="Fixtures/source-selection.example.json" TargetPath="source-selection.example.json" CopyToOutputDirectory="PreserveNewest" />
+        <None Include="../Rtx5090Monitoring.Service/appsettings.json" Link="Fixtures/service-appsettings.json" CopyToOutputDirectory="PreserveNewest" />
     </ItemGroup>
 </Project>

@@ -15,8 +15,16 @@ internal static class RuntimeJson
         Converters = { new JsonStringEnumConverter() }
     };
 
-    public static WarningOptions ReadWarningOptions(IConfigurationSection section) =>
-        SectionNode(section)?.Deserialize<WarningOptions>(Options) ?? new WarningOptions();
+    public static WarningOptions ReadWarningOptions(IConfigurationSection section)
+    {
+        var warnings = SectionNode(section)?.Deserialize<WarningOptions>(Options) ?? new WarningOptions();
+
+        return warnings with
+        {
+            Defaults = warnings.Defaults ?? new WarningPolicy(),
+            Overrides = warnings.Overrides ?? new Dictionary<string, WarningPolicy>(StringComparer.Ordinal)
+        };
+    }
 
     private static JsonNode? SectionNode(IConfigurationSection section)
     {
