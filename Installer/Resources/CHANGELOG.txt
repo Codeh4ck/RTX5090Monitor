@@ -1,3 +1,8 @@
+1.0.1 - Fresh-install configuration fix
+- Fix fresh installations failing with Invalid service configuration and the 30-second /health timeout.
+- Preserve default warning settings when bootstrap configuration contains empty objects.
+- Add regression coverage for fresh startup using the shipped configuration.
+
 1.0.0 - Component versions and update checks
 - Desktop, backend service and iCUE widget start at version 1.0.0.
 - version.json is the shared build and published release manifest.
