@@ -10,6 +10,7 @@ namespace Rtx5090Monitoring.Core.Plugins;
 public sealed class PluginRuntimeManager : IHostedService, IAsyncDisposable
 {
     private readonly Dictionary<string, PluginWorker> _workers;
+    private readonly ISensorPluginFactory[] _factories;
 
     private readonly Lock _shutdownLock = new();
     private Task? _shutdown;
@@ -19,6 +20,7 @@ public sealed class PluginRuntimeManager : IHostedService, IAsyncDisposable
     public PluginRuntimeManager(IEnumerable<ISensorPluginFactory> factories, SensorStateStore store, TimeProvider clock, ILogger<PluginRuntimeManager> logger)
     {
         var installed = factories.ToArray();
+        _factories = installed;
         if (installed.Any(factory => factory.WarningSource is { } source && source.PluginId != factory.Id))
         {
             throw new ArgumentException("A warning source must belong to its plugin factory.");
@@ -47,6 +49,16 @@ public sealed class PluginRuntimeManager : IHostedService, IAsyncDisposable
         {
             Plugins = _workers.ToDictionary(pair => pair.Key, pair => pair.Value.CreateDefaultSettings(bootstrap?.GetSection(pair.Key)), StringComparer.Ordinal)
         };
+    }
+
+    public ServiceConfiguration MigrateConfiguration(ServiceConfiguration configuration)
+    {
+        foreach (var factory in _factories)
+        {
+            configuration = factory.MigrateConfiguration(configuration);
+        }
+
+        return configuration;
     }
 
     public void Validate(ServiceConfiguration configuration)

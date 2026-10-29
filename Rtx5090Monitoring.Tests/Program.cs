@@ -9,6 +9,7 @@ if (args.Contains("--verify-msi-hardware"))
     return 0;
 }
 
+GenericNvidiaTests.Run(runner);
 WarningEngineTests.Run(runner);
 WarningRegistryTests.Run(runner);
 SourceSelectionTests.Run(runner);

@@ -1,5 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <ItemGroup Condition="'$(EnableTelemetryDebug)' == 'true'">
+        <ProjectReference Include="../../Rtx5090Monitoring.Plugins.GenericNvidia.Analysis/Rtx5090Monitoring.Plugins.GenericNvidia.Analysis.csproj" />
         <ProjectReference Include="../../Rtx5090Monitoring.Plugins.WireView.Analysis/Rtx5090Monitoring.Plugins.WireView.Analysis.csproj" />
         <ProjectReference Include="../../Rtx5090Monitoring.Warnings/Rtx5090Monitoring.Warnings.csproj" />
         <ProjectReference Include="../Rtx5090Monitoring.Presentation/Rtx5090Monitoring.Presentation.csproj" />

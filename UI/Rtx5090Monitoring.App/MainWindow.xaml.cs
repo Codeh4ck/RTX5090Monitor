@@ -17,6 +17,9 @@ public sealed partial class MainWindow : Window
     private string _page = "hardware";
     private string? _panelId;
     private bool _rendering = true;
+    private bool _startupTabPending = true;
+    private bool _rememberWindowSize;
+    private readonly Microsoft.UI.Dispatching.DispatcherQueueTimer _sizeSaveTimer;
     public Rtx5090Monitoring.Presentation.Updates.UpdateViewModel Updates => _runtime.Updates;
     public DashboardViewModel Model { get; private set; }
     internal FrameworkElement ThemeRoot => Root;
@@ -47,16 +50,26 @@ public sealed partial class MainWindow : Window
         _windowHandle = WinRT.Interop.WindowNative.GetWindowHandle(this);
         if (AppWindow.Presenter is OverlappedPresenter presenter)
         {
-            presenter.IsMaximizable = false;
+            presenter.IsMaximizable = true;
+            presenter.IsResizable = true;
         }
+
+        _sizeSaveTimer = DispatcherQueue.CreateTimer();
+        _sizeSaveTimer.Interval = TimeSpan.FromMilliseconds(400);
+        _sizeSaveTimer.IsRepeating = false;
+        _sizeSaveTimer.Tick += (_, _) => SaveNormalWindowSize();
 
         AppWindow.Changed += (_, args) =>
         {
-            if (args.DidSizeChange || args.DidPositionChange)
+            if (args.DidSizeChange && _rememberWindowSize
+                && AppWindow.Presenter is OverlappedPresenter { State: OverlappedPresenterState.Restored })
             {
-                ConstrainWindowSize();
+                _sizeSaveTimer.Stop();
+                _sizeSaveTimer.Start();
             }
         };
+
+        Closed += (_, _) => _sizeSaveTimer.Stop();
         runtime.OperationCompleted += message =>
         {
             OperationStatus.Text = message;
@@ -84,14 +97,34 @@ public sealed partial class MainWindow : Window
         RenderPage();
     }
 
-    private void ConstrainWindowSize()
+    internal void EnableWindowSizePersistence() => _rememberWindowSize = true;
+
+    internal void SaveNormalWindowSize()
     {
-        var maximum = WindowSizeLimits.GetMaximumPixels(_windowHandle);
-        var size = AppWindow.Size;
-        if (size.Width > maximum.Width || size.Height > maximum.Height)
+        if (!_rememberWindowSize || AppWindow.Presenter is not OverlappedPresenter { State: OverlappedPresenterState.Restored })
         {
-            AppWindow.Resize(new Windows.Graphics.SizeInt32(Math.Min(size.Width, maximum.Width), Math.Min(size.Height, maximum.Height)));
+            return;
         }
+
+        var scale = Math.Max(96, Platform.Interop.NativeMethods.GetDpiForWindow(_windowHandle)) / 96d;
+        var size = AppWindow.Size;
+        _runtime.Settings.SaveWindowSize(
+            Math.Clamp(size.Width / scale, WindowSizeLimits.MinimumWidth, WindowSizeLimits.MaximumWidth),
+            Math.Clamp(size.Height / scale, WindowSizeLimits.MinimumHeight, WindowSizeLimits.MaximumHeight));
+    }
+
+    internal void ApplyWindowSize()
+    {
+        if (AppWindow.Presenter is OverlappedPresenter presenter)
+        {
+            presenter.Restore();
+        }
+
+        var scale = Math.Max(96, Platform.Interop.NativeMethods.GetDpiForWindow(_windowHandle)) / 96d;
+        var maximum = WindowSizeLimits.GetMaximumPixels(_windowHandle);
+        AppWindow.Resize(new Windows.Graphics.SizeInt32(
+            Math.Min(maximum.Width, (int)(_runtime.Preferences.WindowWidth * scale)),
+            Math.Min(maximum.Height, (int)(_runtime.Preferences.WindowHeight * scale))));
     }
 
     private void SelectInitialPanel()
@@ -103,7 +136,15 @@ public sealed partial class MainWindow : Window
 
         if (Model.ReportingPanels.Count > 0)
         {
-            var selected = Model.ReportingPanels.FirstOrDefault(panel => panel.Id == _panelId) ?? Model.ReportingPanels[0];
+            var preferred = _startupTabPending
+                ? Model.ReportingPanels.FirstOrDefault(panel => panel.Id == _runtime.Preferences.StartupTabId) : null;
+            var selected = preferred ?? Model.ReportingPanels.FirstOrDefault(panel => panel.Id == _panelId) ?? Model.ReportingPanels[0];
+
+            if (preferred is not null)
+            {
+                _startupTabPending = false;
+            }
+
             if (_panelId != selected.Id || Model.SelectedPanel != selected)
             {
                 ShowPanel(selected.Id);
@@ -119,6 +160,7 @@ public sealed partial class MainWindow : Window
 
     private void HardwareTab_Click(object sender, RoutedEventArgs args)
     {
+        _startupTabPending = false;
         var button = (ToggleButton)sender;
         ShowPanel((string)button.Tag);
         button.IsChecked = true;

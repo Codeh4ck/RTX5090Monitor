@@ -1,6 +1,8 @@
 using Microsoft.Extensions.Hosting.WindowsServices;
 using Microsoft.Extensions.Logging.EventLog;
 using Rtx5090Monitoring.Plugins.Msi;
+using Rtx5090Monitoring.Plugins.GenericNvidia;
+using Rtx5090Monitoring.Plugins.GenericNvidia.Endpoints;
 using Rtx5090Monitoring.Plugins.Msi.Endpoints;
 using Rtx5090Monitoring.Plugins.Asus;
 using Rtx5090Monitoring.Plugins.Asus.Endpoints;
@@ -29,6 +31,7 @@ if (!WindowsServiceHelpers.IsWindowsService())
 
 builder.Services.AddMonitoringCore(builder.Configuration);
 
+builder.Services.AddGenericNvidiaPlugin();
 builder.Services.AddWireViewPlugin();
 builder.Services.AddAsusPlugin();
 builder.Services.AddMsiPlugin();
@@ -43,6 +46,7 @@ app.UseCors().UseWebSockets();
 app.MapMonitoringEndpoints();
 app.MapWireViewEndpoints();
 app.MapAsusEndpoints();
+app.MapGenericNvidiaEndpoints();
 app.MapMsiEndpoints();
 
 await app.RunAsync();

@@ -61,8 +61,8 @@ internal static class AsusPluginTests
         var sample = await plugin.PollAsync(CancellationToken.None);
 
         TestAssert.Equal(32, plugin.Latest!.Sensors.Count);
-        TestAssert.Equal(40, sample.Sensors.Length);
-        TestAssert.Equal(40, sample.Sensors.Select(sensor => sensor.Identity.Key).Distinct().Count());
+        TestAssert.Equal(41, sample.Sensors.Length);
+        TestAssert.Equal(41, sample.Sensors.Select(sensor => sensor.Identity.Key).Distinct().Count());
         TestAssert.True(sample.Sensors.All(sensor => sensor.Identity.DeviceId == AsusTestData.FirstDeviceId), "Only one GPU may contribute readings.");
         var boardPower = sample.Sensors.Single(sensor => sensor.Identity.Component == SensorComponent.GpuBoard);
         var connectorPower = sample.Sensors.Single(sensor => sensor.Identity.Component == SensorComponent.GpuConnector && sensor.Identity.Metric == SensorMetric.Power);

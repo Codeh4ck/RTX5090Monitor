@@ -3,7 +3,10 @@ import { TelemetryStore } from '../telemetry/TelemetryStore.ts';
 import type { PanelBinding } from './PanelBinding.ts';
 
 export function resolvePanel(slot: number, settings: Settings, store: TelemetryStore, now: number): PanelBinding {
-    const content = settings.text(`panel${slot}`);
+    const storedContent = settings.text(`panel${slot}`);
+    const content = storedContent === 'asusStatus' ? 'nvidiaStatus' : storedContent;
+    const nvidiaInstalled = store.catalog.some(plugin => plugin.id === 'generic-nvidia')
+        || store.snapshot?.plugins.some(plugin => plugin.pluginId === 'generic-nvidia') === true;
     const automatic = content.startsWith('auto');
     const available = (id: string) => {
         if (content !== 'autoPins') {
@@ -20,8 +23,11 @@ export function resolvePanel(slot: number, settings: Settings, store: TelemetryS
     };
 
     const pluginId = automatic
-        ? (['asus-astral', 'wireview-pro2', 'msi-psu'].find(available) ?? 'asus-astral')
-        : content.startsWith('wireview')
+        ? ((content === 'autoStatus' && nvidiaInstalled ? ['generic-nvidia'] : ['asus-astral', 'wireview-pro2', 'msi-psu']).find(available)
+            ?? (content === 'autoStatus' && nvidiaInstalled ? 'generic-nvidia' : 'asus-astral'))
+        : content === 'nvidiaStatus'
+          ? nvidiaInstalled ? 'generic-nvidia' : 'asus-astral'
+          : content.startsWith('wireview')
           ? 'wireview-pro2'
           : content.startsWith('msi')
             ? 'msi-psu'

@@ -4,6 +4,7 @@
 param(
     [ValidatePattern('^\d+\.\d+\.\d+$')][string] $Version,
     [string] $VcRedistPath,
+    [switch] $SkipChecks,
 
     [ValidatePattern('^[A-Fa-f0-9]{40}$')][string] $SigningCertificateThumbprint,
     [string] $TimestampUrl = 'http://timestamp.digicert.com'
@@ -58,11 +59,14 @@ Push-Location $solution
 
 try
 {
-    Invoke-ReleaseCommand dotnet @('run', '--project', 'Rtx5090Monitoring.Tests', '-c', 'Release')
+    if (-not $SkipChecks)
+    {
+        Invoke-ReleaseCommand dotnet @('run', '--project', 'Rtx5090Monitoring.Tests', '-c', 'Release')
 
-    Invoke-ReleaseCommand dotnet @('run', '--project', 'UI/Rtx5090Monitoring.UI.Tests', '-c', 'Release', '-p:EnableTelemetryDebug=false')
+        Invoke-ReleaseCommand dotnet @('run', '--project', 'UI/Rtx5090Monitoring.UI.Tests', '-c', 'Release', '-p:EnableTelemetryDebug=false')
 
-    Invoke-ReleaseCommand dotnet @('run', '--project', 'Installer/Rtx5090Monitoring.Installer.Tests', '-c', 'Release')
+        Invoke-ReleaseCommand dotnet @('run', '--project', 'Installer/Rtx5090Monitoring.Installer.Tests', '-c', 'Release')
+    }
 
     Invoke-ReleaseCommand dotnet @('publish', 'Rtx5090Monitoring.Service', '-c', 'Release', '-r', 'win-x64', '--self-contained', 'true',
         '-p:PublishSingleFile=false', '-p:PublishTrimmed=false', '-o', (Join-Path $payload 'Service'))
@@ -70,8 +74,11 @@ try
     Invoke-ReleaseCommand dotnet @('publish', 'UI/Rtx5090Monitoring.App', '-c', 'Release', '-p:PublishProfile=Portable',
         '-p:EnableTelemetryDebug=false', '-o', (Join-Path $payload 'Desktop'), '-m:1')
 
-    Invoke-ReleaseCommand dotnet @('run', '--project', 'UI/Rtx5090Monitoring.UI.Tests', '-c', 'Release', '-p:EnableTelemetryDebug=false',
-        '--', '--verify-release', (Join-Path $payload 'Desktop'))
+    if (-not $SkipChecks)
+    {
+        Invoke-ReleaseCommand dotnet @('run', '--project', 'UI/Rtx5090Monitoring.UI.Tests', '-c', 'Release', '-p:EnableTelemetryDebug=false',
+            '--', '--verify-release', (Join-Path $payload 'Desktop'))
+    }
 
     Push-Location (Join-Path $solution 'XeneonEdgeWidget')
 
@@ -82,8 +89,19 @@ try
             Invoke-ReleaseCommand npm.cmd @('ci')
         }
 
-        Invoke-ReleaseCommand npm.cmd @('run', 'build')
-        Invoke-ReleaseCommand npm.cmd @('run', 'verify')
+        $widgetBuild = @('run', 'build')
+
+        if ($SkipChecks)
+        {
+            $widgetBuild += @('--', '--skip-checks')
+        }
+
+        Invoke-ReleaseCommand npm.cmd $widgetBuild
+
+        if (-not $SkipChecks)
+        {
+            Invoke-ReleaseCommand npm.cmd @('run', 'verify')
+        }
     }
     finally
     {
@@ -113,7 +131,10 @@ try
         Invoke-ReleaseCommand $signTool @('sign', '/sha1', $SigningCertificateThumbprint, '/fd', 'SHA256', '/tr', $TimestampUrl, '/td', 'SHA256', $msi)
     }
 
-    Invoke-ReleaseCommand dotnet @('run', '--project', 'Installer/Rtx5090Monitoring.Installer.Tests', '-c', 'Release', '--', '--msi', $msi, $payload)
+    if (-not $SkipChecks)
+    {
+        Invoke-ReleaseCommand dotnet @('run', '--project', 'Installer/Rtx5090Monitoring.Installer.Tests', '-c', 'Release', '--', '--msi', $msi, $payload)
+    }
 
     Invoke-ReleaseCommand dotnet (@('build', 'Installer/Rtx5090Monitoring.Bootstrapper/Rtx5090Monitoring.Bootstrapper.wixproj') + $buildProperties +
         @('-p:BuildProjectReferences=false', "-p:VcRedistPath=$VcRedistPath", "-p:VcRedistVersion=$vcVersion",
@@ -121,7 +142,10 @@ try
 
     $setup = Join-Path $solution "Installer\Rtx5090Monitoring.Bootstrapper\bin\x64\Release\RtxMonitor-Setup-$Version-win-x64.exe"
 
-    & (Join-Path $PSScriptRoot 'Verify-Setup.ps1') -SetupPath $setup -MsiPath $msi -VcRedistPath $VcRedistPath -OutputDirectory (Join-Path $work 'extracted-setup')
+    if (-not $SkipChecks)
+    {
+        & (Join-Path $PSScriptRoot 'Verify-Setup.ps1') -SetupPath $setup -MsiPath $msi -VcRedistPath $VcRedistPath -OutputDirectory (Join-Path $work 'extracted-setup')
+    }
 
     New-Item -ItemType Directory -Path $release -Force | Out-Null
 
@@ -164,6 +188,7 @@ try
         vcRedistSha256 = (Get-FileHash -LiteralPath $VcRedistPath -Algorithm SHA256).Hash
         builtAt = [DateTime]::UtcNow.ToString('o')
         cleanMachineAcceptance = 'pending'
+        checksSkipped = [bool]$SkipChecks
         serviceVersion = $versions.service
         desktopVersion = $versions.desktop
     }

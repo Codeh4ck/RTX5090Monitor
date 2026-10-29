@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Configuration;
+using Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.Warnings;
 using Rtx5090Monitoring.Plugins.WireView.Contracts.Warnings;
 using Rtx5090Monitoring.Plugins.Asus.Contracts.Warnings;
 using System.Text.Json;
@@ -37,7 +38,7 @@ internal static class WarningConfigurationTests
         TestAssert.True(health.GetProperty("configurationRevision").GetInt64() > 0,
             "Fresh installation must satisfy the installer's health check.");
         TestAssert.Equal(1000, loaded.Configuration.Monitoring.StreamIntervalMs);
-        TestAssert.Equal(3, loaded.Configuration.Plugins.Count);
+        TestAssert.Equal(4, loaded.Configuration.Plugins.Count);
         TestAssert.True(loaded.Configuration.Plugins.Values.All(plugin => !plugin.Enabled),
             "The fresh-install test must not access hardware.");
         TestAssert.True(persisted.Warnings.IsValid(), "Fresh defaults must be persisted as valid warning options.");
@@ -105,7 +106,8 @@ internal static class WarningConfigurationTests
         using var document = JsonDocument.Parse(await host.Client.GetStringAsync("/plugins"));
         var plugins = document.RootElement.GetProperty("plugins").EnumerateArray().ToArray();
         TestAssert.True(plugins.All(plugin => !plugin.GetProperty("enabled").GetBoolean()), "Catalogue discovery must work without enabling hardware.");
-        TestAssert.Equal(6, plugins.Single(plugin => plugin.GetProperty("id").GetString() == "asus-astral").GetProperty("warnings").GetArrayLength());
+        TestAssert.Equal(2, plugins.Single(plugin => plugin.GetProperty("id").GetString() == "generic-nvidia").GetProperty("warnings").GetArrayLength());
+        TestAssert.Equal(4, plugins.Single(plugin => plugin.GetProperty("id").GetString() == "asus-astral").GetProperty("warnings").GetArrayLength());
         TestAssert.Equal(6, plugins.Single(plugin => plugin.GetProperty("id").GetString() == "wireview-pro2").GetProperty("warnings").GetArrayLength());
         TestAssert.Equal(0, plugins.Single(plugin => plugin.GetProperty("id").GetString() == "msi-psu").GetProperty("warnings").GetArrayLength());
     }
@@ -121,7 +123,7 @@ internal static class WarningConfigurationTests
         };
         await using var host = await MonitoringTestHost.StartWithAsusAsync(new AsusTestState(), new WireViewTestState(), legacy);
         var loaded = await host.GetConfigurationAsync();
-        TestAssert.True(loaded.Configuration.Warnings.Overrides.ContainsKey(AsusWarningIds.CoreTemperature), "Startup must expose migrated stable IDs.");
+        TestAssert.True(loaded.Configuration.Warnings.Overrides.ContainsKey(GenericNvidiaWarningIds.CoreTemperature), "Startup must expose migrated stable IDs.");
         var persisted = await File.ReadAllTextAsync(host.ConfigurationPath);
         TestAssert.False(persisted.Contains("AsusCoreTemperature", StringComparison.Ordinal), "Startup must persist migrated aliases.");
     }
@@ -132,9 +134,9 @@ internal static class WarningConfigurationTests
             ["Warnings:CoreTemperatureC"] = "81", ["Warnings:MemoryTemperatureC"] = "85"
         });
         var loaded = await host.GetConfigurationAsync();
-        var options = loaded.Configuration.Plugins["asus-astral"].Options!.Value.Deserialize<Rtx5090Monitoring.Plugins.Asus.Contracts.Configuration.AsusOptions>(new JsonSerializerOptions(JsonSerializerDefaults.Web))!;
-        TestAssert.Equal(81d, options.EffectiveCoreTemperatureWarningC);
-        TestAssert.Equal(85d, options.EffectiveMemoryTemperatureWarningC);
+        var options = loaded.Configuration.Plugins["generic-nvidia"].Options!.Value.Deserialize<Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.Configuration.GenericNvidiaOptions>(new JsonSerializerOptions(JsonSerializerDefaults.Web))!;
+        TestAssert.Equal<double?>(81, options.CoreTemperatureWarningC);
+        TestAssert.Equal<double?>(85, options.MemoryTemperatureWarningC);
     }
     private static async Task RejectsInvalidWarningOptionsWithoutChangingTheFileAsync()
     {

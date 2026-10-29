@@ -6,7 +6,7 @@
     <UserControl.Resources><converters:BooleanVisibilityConverter x:Key="BoolVisibility" /></UserControl.Resources>
     <ScrollViewer HorizontalScrollBarVisibility="Disabled" Padding="12,12">
         <StackPanel Spacing="12">
-            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+            <Grid x:Name="DeviceHeader" ColumnDefinitions="*,Auto" ColumnSpacing="16">
                 <StackPanel Orientation="Horizontal" Spacing="12">
                     <controls:WidgetIcon IconName="{x:Bind DeviceIconName}" Width="42" Height="42" VerticalAlignment="Center" />
                     <StackPanel Spacing="3">
@@ -40,20 +40,6 @@
                         <StackPanel Orientation="Horizontal" Spacing="8"><controls:WidgetIcon IconName="voltage" Width="20" Height="20" />
                             <TextBlock Text="VOLTAGE" Style="{StaticResource MonitorCaption}" VerticalAlignment="Center" /></StackPanel>
                         <TextBlock Text="{x:Bind Model.VoltageText, Mode=OneWay}" FontSize="26" FontWeight="SemiBold" />
-                    </StackPanel>
-                </Border>
-                <Border Style="{StaticResource MonitorCard}" Padding="14,12" Visibility="{x:Bind Model.IsAsus, Converter={StaticResource BoolVisibility}}">
-                    <StackPanel Spacing="4">
-                        <StackPanel Orientation="Horizontal" Spacing="8"><controls:WidgetIcon IconName="voltage" Width="20" Height="20" />
-                            <TextBlock Text="GPU BOARD POWER" Style="{StaticResource MonitorCaption}" VerticalAlignment="Center" /></StackPanel>
-                        <TextBlock Text="{x:Bind Model.BoardPowerText, Mode=OneWay}" FontSize="26" FontWeight="SemiBold" />
-                    </StackPanel>
-                </Border>
-                <Border Style="{StaticResource MonitorCard}" Padding="14,12" Visibility="{x:Bind Model.IsAsus, Converter={StaticResource BoolVisibility}}">
-                    <StackPanel Spacing="4">
-                        <StackPanel Orientation="Horizontal" Spacing="8"><controls:WidgetIcon IconName="vcore" Width="20" Height="20" />
-                            <TextBlock Text="GPU USAGE" Style="{StaticResource MonitorCaption}" VerticalAlignment="Center" /></StackPanel>
-                        <TextBlock Text="{x:Bind Model.GpuUsageText, Mode=OneWay}" FontSize="26" FontWeight="SemiBold" />
                     </StackPanel>
                 </Border>
             </Grid>
@@ -100,7 +86,8 @@
                 </Border>
                 <Border x:Name="DetailsCard" Grid.Row="1" Style="{StaticResource MonitorCard}" VerticalAlignment="Top">
                     <StackPanel Spacing="14">
-                        <StackPanel Orientation="Horizontal" Spacing="9">
+                        <StackPanel x:Name="GpuStatusHost" />
+                        <StackPanel x:Name="NativeStatusHeading" Orientation="Horizontal" Spacing="9">
                             <controls:WidgetIcon x:Name="DetailsIcon" IconName="{x:Bind DetailsIconName}" Width="28" Height="28" />
                             <TextBlock Text="{x:Bind DetailsHeading}" Style="{StaticResource MonitorSectionHeading}" VerticalAlignment="Center" />
                         </StackPanel>

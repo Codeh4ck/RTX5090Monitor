@@ -1,4 +1,4 @@
-using Rtx5090Monitoring.Plugins.Asus.Contracts.Warnings;
+using Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.Warnings;
 using Microsoft.UI.Xaml.Controls;
 using Rtx5090Monitoring.App.Services;
 using Rtx5090Monitoring.App.Views;
@@ -26,7 +26,7 @@ internal static class WarningPolicySmokeTests
         }
         var policy = VisualTreeQuery.Descendants<WarningPolicyView>(view).First();
         VisualTreeQuery.Descendants<CheckBox>(policy).Single(box => box.Content as string == "Repeat while warning remains active").IsChecked = true;
-        runtime.Configuration.Plugins.Single(plugin => plugin.Id == "asus-astral").Asus.CoreTemperatureWarningC = 80;
+        runtime.Configuration.Plugins.Single(plugin => plugin.Id == "generic-nvidia").Nvidia.CoreTemperatureWarningC = 80;
         if (!runtime.Configuration.IsDirty || !view.IsFooterVisible)
         {
             throw new InvalidOperationException("Native policy edits must participate in the configuration draft.");
@@ -37,9 +37,9 @@ internal static class WarningPolicySmokeTests
             throw new InvalidOperationException("Apply must retain the acknowledged reminder policy.");
         }
         var selector = VisualTreeQuery.Descendants<ComboBox>(view).Single(box => box.Header as string == "Warning type");
-        selector.SelectedItem = model.Overrides.Single(item => item.TypeId == AsusWarningIds.CoreTemperature);
+        selector.SelectedItem = model.Overrides.Single(item => item.TypeId == GenericNvidiaWarningIds.CoreTemperature);
         await Task.Delay(100);
-        var special = model.Overrides.Single(item => item.TypeId == AsusWarningIds.CoreTemperature);
+        var special = model.Overrides.Single(item => item.TypeId == GenericNvidiaWarningIds.CoreTemperature);
         var custom = VisualTreeQuery.Descendants<CheckBox>(view).Single(box => box.Content as string == "Use global defaults");
         custom.IsChecked = false;
         special.Policy.NotifyOnStart = false;
@@ -77,7 +77,7 @@ internal static class WarningPolicySmokeTests
         }
 
         runtime.Debug.Enabled = true;
-        var temperature = runtime.Debug.Plugins.Single(plugin => plugin.Id == "asus-astral").Metrics.Single(metric => metric.Definition is
+        var temperature = runtime.Debug.Plugins.Single(plugin => plugin.Id == "generic-nvidia").Metrics.Single(metric => metric.Definition is
             { Component: SensorComponent.GpuCore, Metric: SensorMetric.Temperature });
         runtime.Settings.WarningNotifications = true;
         var baseline = runtime.DebugNotificationCount;

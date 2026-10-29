@@ -1,4 +1,6 @@
 using System.Text.Json.Serialization;
+using Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.Configuration;
+using Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.Devices;
 using Rtx5090Monitoring.Plugins.Msi.Contracts.Configuration;
 using Rtx5090Monitoring.Plugins.Msi.Contracts.Devices;
 using Rtx5090Monitoring.Plugins.Asus.Contracts.Configuration;
@@ -24,6 +26,8 @@ namespace Rtx5090Monitoring.Client.Serialization;
 [JsonSerializable(typeof(ServiceConfiguration))]
 [JsonSerializable(typeof(PluginSettings))]
 [JsonSerializable(typeof(AsusOptions))]
+[JsonSerializable(typeof(GenericNvidiaOptions))]
+[JsonSerializable(typeof(NvidiaDeviceInfo[]))]
 [JsonSerializable(typeof(MsiOptions))]
 [JsonSerializable(typeof(MsiDeviceInfo[]))]
 [JsonSerializable(typeof(AsusDeviceInfo[]))]

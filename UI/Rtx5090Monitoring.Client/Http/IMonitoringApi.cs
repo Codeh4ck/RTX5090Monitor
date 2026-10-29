@@ -1,3 +1,4 @@
+using Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.Devices;
 using Rtx5090Monitoring.Plugins.Asus.Contracts.Common;
 using Rtx5090Monitoring.Plugins.Msi.Contracts.Devices;
 using Rtx5090Monitoring.Contracts.Configuration;
@@ -19,6 +20,7 @@ public interface IMonitoringApi
     Task<ConfigurationSnapshot> SetConfigurationAsync(ServiceConfiguration configuration, string version, CancellationToken token);
     Task<DeviceConfig> GetWireViewConfigurationAsync(CancellationToken token);
     Task<AsusDeviceInfo[]> GetAsusDevicesAsync(CancellationToken token);
+    Task<NvidiaDeviceInfo[]> GetNvidiaDevicesAsync(CancellationToken token) => Task.FromResult(Array.Empty<NvidiaDeviceInfo>());
     Task<MsiDeviceInfo[]> GetMsiDevicesAsync(CancellationToken token);
     Task ClearWireViewFaultsAsync(ClearFaultsRequest request, CancellationToken token);
     Task RestartPluginAsync(string pluginId, CancellationToken token);

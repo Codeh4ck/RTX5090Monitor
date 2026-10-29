@@ -23,6 +23,8 @@ public sealed class HardwarePanelViewModel : ObservableObject
     public string Name { get; }
     public bool IsWireView => Id == "wireview-pro2";
     public bool IsAsus => Id == "asus-astral";
+    public bool IsNvidia => Id == "generic-nvidia";
+    public bool HasGpuStatus => IsAsus || IsWireView || IsNvidia;
     public bool IsMsi => Id == "msi-psu";
     public MsiPanelViewModel Msi { get; } = new();
     public bool Enabled
@@ -160,7 +162,7 @@ public sealed class HardwarePanelViewModel : ObservableObject
     public HardwarePanelViewModel(PluginInfo plugin)
     {
         Id = plugin.Id;
-        Name = Id switch { "wireview-pro2" => "WireView", "asus-astral" => "ROG Astral", "msi-psu" => "MSI PSU", _ => plugin.Name };
+        Name = Id switch { "wireview-pro2" => "WireView", "asus-astral" => "ROG Astral", "msi-psu" => "MSI PSU", "generic-nvidia" => "GPU status", _ => plugin.Name };
         _capabilities = plugin.Capabilities;
         Enabled = plugin.Enabled;
         State = plugin.State.ToString();
@@ -168,7 +170,7 @@ public sealed class HardwarePanelViewModel : ObservableObject
         var labels = IsWireView
             ? new[] { "Cable rating", "Board Temp In/Out", "External Temp 1/2", "Fault Status", "Fault Log Status" }
             : new[] { "Core clock", "Memory clock", "VRAM usage", "Core / VRAM temp", "Fan 1 / Fan 2" };
-        foreach (var label in IsWireView || IsAsus ? labels : [])
+        foreach (var label in IsWireView ? labels : [])
         {
             Metrics.Add(new MetricViewModel(label));
         }
@@ -251,12 +253,16 @@ public sealed class HardwarePanelViewModel : ObservableObject
             return;
         }
 
+        if (IsNvidia)
+        {
+            return;
+        }
+
         var power = Value(SensorComponent.GpuConnector, SensorMetric.Power, 1);
         var current = Value(SensorComponent.GpuConnector, SensorMetric.Current, 1);
         PowerText = Format(power, "W", 1);
         CurrentText = Format(current, "A", 2);
-        VoltageText = Format(Value(SensorComponent.GpuConnector, SensorMetric.Voltage, 1)
-            ?? (current is > 0 && power is not null ? power / current : null), "V", 2);
+        VoltageText = Format(Value(SensorComponent.GpuConnector, SensorMetric.Voltage, 1), "V", 2);
         var cableRatingW = Value(SensorComponent.GpuConnector, SensorMetric.PowerCapability, 1) is > 0 and var rating ? rating : 600;
         foreach (var pin in Pins)
         {
@@ -291,39 +297,18 @@ public sealed class HardwarePanelViewModel : ObservableObject
         }
         else if (IsAsus)
         {
-            SetMetrics([Format(Value(SensorComponent.GpuCore, SensorMetric.Clock), "MHz", 0),
-                Format(Value(SensorComponent.GpuMemory, SensorMetric.Clock), "MHz", 0),
-                MemoryUsage(Value(SensorComponent.GpuMemory, SensorMetric.MemoryUsed), Value(SensorComponent.GpuMemory, SensorMetric.MemoryTotal),
-                    Value(SensorComponent.GpuMemory, SensorMetric.Utilization)),
-                Pair(Temperature(Value(SensorComponent.GpuCore, SensorMetric.Temperature), preferences), Temperature(Value(SensorComponent.GpuMemory, SensorMetric.Temperature), preferences)),
-                Pair(Format(Value(SensorComponent.GpuFan, SensorMetric.FanSpeed, 1), "RPM", 0), Format(Value(SensorComponent.GpuFan, SensorMetric.FanSpeed, 2), "RPM", 0))]);
-            BoardPowerText = Format(Value(SensorComponent.GpuBoard, SensorMetric.Power), "W", 1);
-            GpuUsageText = Format(Value(SensorComponent.GpuCore, SensorMetric.Utilization), "%", 0);
             var warnings = snapshot.Alerts.Where(alert => alert.PluginId == Id).Select(alert =>
                 $"{alert.Kind}: {string.Join(", ", alert.Pins.Select(pin => $"P{pin.Channel} {pin.CurrentA:F2} A"))}"
-                + (alert.PercentageDifference is { } percentage ? $" · {percentage:F0}% difference" : string.Empty)
-                + $" · {alert.ReportedAt.ToLocalTime():HH:mm:ss}").ToList();
+                + (alert.PercentageDifference is { } percentage ? $" - {percentage:F0}% difference" : string.Empty)).ToList();
+
             if (Pins.Any(pin => pin.Voltage is > 0 and <= 11.5 or >= 12.5))
             {
-                warnings.Add("Pin voltage outside 11.5–12.5 V");
-            }
-
-            var coreWarning = Value(SensorComponent.GpuCore, SensorMetric.Temperature) >= preferences.CoreTemperatureWarningC;
-            var memoryWarning = Value(SensorComponent.GpuMemory, SensorMetric.Temperature) >= preferences.MemoryTemperatureWarningC;
-            Metrics[3].IsWarning = coreWarning || memoryWarning;
-            if (coreWarning)
-            {
-                warnings.Add($"GPU core temperature reached {preferences.CoreTemperatureWarningC:F0} °C");
-            }
-
-            if (memoryWarning)
-            {
-                warnings.Add($"VRAM temperature reached {preferences.MemoryTemperatureWarningC:F0} °C");
+                warnings.Add("Pin voltage outside 11.5-12.5 V");
             }
 
             WarningText = string.Join(Environment.NewLine, warnings);
         }
-        else
+        else if (!IsNvidia)
         {
             var keys = readings.Select(reading => reading.Identity.Key).ToArray();
             if (!_genericKeys.SequenceEqual(keys))

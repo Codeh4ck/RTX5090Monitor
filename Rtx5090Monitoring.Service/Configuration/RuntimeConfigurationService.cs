@@ -29,7 +29,9 @@ public sealed class RuntimeConfigurationService(PluginRuntimeManager runtime, Ru
         if (File.Exists(file.Path))
         {
             _observedContents = await ReadContentsAsync(cancellationToken);
-            configuration = RuntimeJson.Deserialize(_observedContents);
+            var original = RuntimeJson.Deserialize(_observedContents);
+            configuration = runtime.MigrateConfiguration(original);
+            persistDefaults |= RuntimeJson.Serialize(original) != RuntimeJson.Serialize(configuration);
             if (configuration.Plugins is not null)
             {
                 foreach (var (id, settings) in runtime.CreateDefaults().Plugins)
@@ -143,7 +145,7 @@ public sealed class RuntimeConfigurationService(PluginRuntimeManager runtime, Ru
                 return;
             }
 
-            var candidate = runtime.WarningRegistry.Migrate(RuntimeJson.Deserialize(contents));
+            var candidate = runtime.WarningRegistry.Migrate(runtime.MigrateConfiguration(RuntimeJson.Deserialize(contents)));
             runtime.Validate(candidate);
             var previous = Current;
 

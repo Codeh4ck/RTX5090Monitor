@@ -150,7 +150,7 @@ internal static class AsusEndpointTests
         using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(5));
         using var client = await host.ConnectSensorClientAsync(timeout.Token);
         var snapshot = await WebSocketMessageReader.ReadUntilAsync(client, frame => frame.GetProperty("plugins").EnumerateArray()
-            .All(plugin => plugin.GetProperty("state").GetString() == "Ready"), timeout.Token);
+            .Where(plugin => plugin.GetProperty("pluginId").GetString() != "generic-nvidia").All(plugin => plugin.GetProperty("state").GetString() == "Ready"), timeout.Token);
         var readings = snapshot.GetProperty("sensors").EnumerateArray().ToArray();
         var connectorPower = readings.Where(sensor => sensor.GetProperty("identity").GetProperty("component").GetString() == "GpuConnector"
             && sensor.GetProperty("identity").GetProperty("metric").GetString() == "Power").ToArray();
@@ -268,7 +268,7 @@ internal static class AsusEndpointTests
         await using var host = await MonitoringTestHost.StartWithAsusAsync(device, new WireViewTestState(), existing);
         var persisted = RuntimeJson.Deserialize(await File.ReadAllTextAsync(host.ConfigurationPath));
 
-        TestAssert.Equal(2, persisted.Plugins.Count);
+        TestAssert.Equal(3, persisted.Plugins.Count);
         TestAssert.False(persisted.Plugins["wireview-pro2"].Enabled, "Existing enablement must survive deployment.");
         TestAssert.Equal(250, persisted.Plugins["wireview-pro2"].PollIntervalMs);
         TestAssert.True(persisted.Plugins[AsusPlugin.PluginId].Enabled, "The newly installed ASUS plugin is enabled by default.");
@@ -296,7 +296,7 @@ internal static class AsusEndpointTests
         var configuration = await host.GetConfigurationAsync();
         var health = await host.GetHealthAsync();
 
-        TestAssert.Equal(3, configuration.Configuration.Plugins.Count);
+        TestAssert.Equal(4, configuration.Configuration.Plugins.Count);
         TestAssert.True(health.GetProperty("plugins").EnumerateArray().All(plugin => plugin.GetProperty("state").GetString() == "Disabled"),
             "All installed factories must register without constructing hardware readers.");
         using var asus = await host.Client.GetAsync(Prefix + "/config");

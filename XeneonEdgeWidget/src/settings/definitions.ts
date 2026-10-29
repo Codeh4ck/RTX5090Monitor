@@ -8,7 +8,7 @@ const panelOptions: SettingOption[] = [
     ['autoPins', 'Automatic pin source'],
     ['autoStatus', 'Automatic status source'],
     ['asusPins', 'ROG Astral pins'],
-    ['asusStatus', 'ROG Astral GPU status'],
+    ['nvidiaStatus', 'GPU status (GenericNvidia)'],
     ['wireviewPins', 'WireView pins'],
     ['wireviewStatus', 'WireView temperatures and faults'],
     ['msiConnector1', 'MSI PSU connector 1'],
@@ -88,8 +88,12 @@ for (const prefix of ['asus', 'wireview']) {
     add(sources, `${prefix}Connector`, `${label}: PSU comparison connector`, 'combobox', '1', { options: options('1', '2') });
 }
 
+const gpuStatus = 'GPU Status settings';
+add(gpuStatus, 'showHotspot', 'Show hotspot alongside core and VRAM temperatures (when reported)', 'switch', false);
+add(gpuStatus, 'showFanDuty', 'Show reported fan duty after RPM', 'switch', true);
+
 const charts = layout;
-add(charts, 'temperatureUnit', 'Temperature unit', 'combobox', 'iCUE', { options: options('iCUE', '°C', '°F') });
+add(gpuStatus, 'temperatureUnit', 'Temperature unit', 'combobox', 'iCUE', { options: options('iCUE', '°C', '°F') });
 add(charts, 'numberLocale', 'Number locale (blank follows system)', 'textfield', '');
 add(charts, 'showUnits', 'Show units', 'switch', true);
 add(charts, 'showAxis', 'Show left axis', 'switch', true);

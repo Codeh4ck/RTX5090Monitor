@@ -24,6 +24,27 @@ public sealed partial class HardwareView : UserControl
         Model = model;
         _runtime = runtime;
         InitializeComponent();
+
+        if (Model.HasGpuStatus)
+        {
+            GpuStatusHost.Children.Add(new GpuStatusView(runtime.Dashboard.GpuStatus, Model.IsNvidia));
+            if (!Model.IsWireView)
+            {
+                NativeStatusHeading.Visibility = Visibility.Collapsed;
+                MetricsHost.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        if (Model.IsNvidia)
+        {
+            DeviceHeader.Visibility = Visibility.Collapsed;
+            HeadlineGrid.Visibility = Visibility.Collapsed;
+            DetailsCard.Style = null;
+            DetailsCard.Padding = new Thickness(0);
+            DetailsCard.BorderThickness = new Thickness(0);
+            DetailsCard.Background = null;
+        }
+
         PinHost.Children.Add(new PinAxis(Model.Pins[0]));
         foreach (var pin in Model.Pins)
         {
@@ -49,7 +70,7 @@ public sealed partial class HardwareView : UserControl
 
     private void LayoutHeadlines()
     {
-        var columns = ActualWidth >= 1000 && Model.IsAsus ? 5 : ActualWidth >= 650 ? 3 : 2;
+        var columns = ActualWidth >= 650 ? 3 : 2;
         var cards = HeadlineGrid.Children.OfType<FrameworkElement>().Where(card => card.Visibility == Visibility.Visible).ToArray();
         HeadlineGrid.ColumnDefinitions.Clear();
         HeadlineGrid.RowDefinitions.Clear();

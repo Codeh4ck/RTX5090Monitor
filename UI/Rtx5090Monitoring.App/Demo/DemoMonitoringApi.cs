@@ -30,7 +30,8 @@ internal sealed class DemoMonitoringApi : IMonitoringApi
         {
             ["wireview-pro2"] = new(),
             ["msi-psu"] = new() { Enabled = false, Options = JsonSerializer.SerializeToElement(new MsiOptions(), ClientJsonContext.Default.MsiOptions) },
-            ["asus-astral"] = new() { Options = JsonSerializer.SerializeToElement(new AsusOptions(), ClientJsonContext.Default.AsusOptions) }
+            ["asus-astral"] = new() { Options = JsonSerializer.SerializeToElement(new AsusOptions(), ClientJsonContext.Default.AsusOptions) },
+            ["generic-nvidia"] = new() { Options = JsonSerializer.SerializeToElement(new Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.Configuration.GenericNvidiaOptions(), ClientJsonContext.Default.GenericNvidiaOptions) }
         }
     }, Version: "demo:1");
     private long _sequence;
@@ -63,7 +64,7 @@ internal sealed class DemoMonitoringApi : IMonitoringApi
         {
             return Task.FromResult(new PluginCatalog(1, [
                 .. _configuration.Configuration.Plugins.Select(pair => new PluginInfo(pair.Key,
-                    pair.Key == "wireview-pro2" ? "WireView Pro 2" : pair.Key == "msi-psu" ? "MSI MPG Ai1300TS" : "ASUS ROG Astral",
+                    pair.Key == "wireview-pro2" ? "WireView Pro 2" : pair.Key == "msi-psu" ? "MSI MPG Ai1300TS" : pair.Key == "generic-nvidia" ? "GenericNvidia" : "ASUS ROG Astral",
                     pair.Value.Enabled,
                     pair.Value.Enabled ? PluginState.Ready : PluginState.Disabled, DateTimeOffset.UtcNow, "Simulated hardware",
                     pair.Key == "wireview-pro2"
@@ -111,6 +112,9 @@ internal sealed class DemoMonitoringApi : IMonitoringApi
     public Task<MsiDeviceInfo[]> GetMsiDevicesAsync(CancellationToken token) => Task.FromResult<MsiDeviceInfo[]>([new MsiDeviceInfo("demo-psu", "MPG Ai1300TS · DEMO")]);
     public Task ClearWireViewFaultsAsync(ClearFaultsRequest request, CancellationToken token) => Task.CompletedTask;
     public Task RestartPluginAsync(string pluginId, CancellationToken token) => Task.CompletedTask;
+    public Task<Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.Devices.NvidiaDeviceInfo[]> GetNvidiaDevicesAsync(CancellationToken token) =>
+        Task.FromResult<Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.Devices.NvidiaDeviceInfo[]>([new("demo-gpu0", "DEMO GeForce RTX GPU", "demo-gpu0")]);
+
     public Task RestartServiceAsync(CancellationToken token) => Task.CompletedTask;
 
     public async IAsyncEnumerable<SensorSnapshot> ReadSensorsAsync([EnumeratorCancellation] CancellationToken token)
@@ -167,7 +171,7 @@ internal sealed class DemoMonitoringApi : IMonitoringApi
 
                 var device = id == "wireview-pro2" ? "demo-com3" : "demo-gpu0";
                 var total = 0d;
-                for (var pin = 1; pin <= 6; pin++)
+                for (var pin = 1; id != "generic-nvidia" && pin <= 6; pin++)
                 {
                     var current = 5.8 + pin * 0.09 + wave * 0.8;
                     total += current;
@@ -175,6 +179,8 @@ internal sealed class DemoMonitoringApi : IMonitoringApi
                     Add(SensorComponent.GpuPin, SensorMetric.Voltage, 12.02 - pin * 0.005, pin);
                     Add(SensorComponent.GpuPin, SensorMetric.Power, current * 12, pin);
                 }
+                if (id == "generic-nvidia") total = 36;
+                Add(SensorComponent.GpuConnector, SensorMetric.Voltage, 12, 1);
                 Add(SensorComponent.GpuConnector, SensorMetric.Power, total * 12, 1);
                 Add(SensorComponent.GpuConnector, SensorMetric.Current, total, 1);
                 if (id == "wireview-pro2")
@@ -188,6 +194,13 @@ internal sealed class DemoMonitoringApi : IMonitoringApi
                 }
                 else
                 {
+                    if (id == "generic-nvidia")
+                    {
+                        Add(SensorComponent.GpuCore, SensorMetric.Voltage, 0.925);
+                        Add(SensorComponent.GpuFan, SensorMetric.FanDuty, 50, 1);
+                        Add(SensorComponent.GpuFan, SensorMetric.FanDuty, 45, 2);
+                    }
+
                     Add(SensorComponent.GpuCore, SensorMetric.Clock, 2780 + wave * 50);
                     Add(SensorComponent.GpuMemory, SensorMetric.Clock, 14000);
                     Add(SensorComponent.GpuCore, SensorMetric.Temperature, 67 + wave * 2);
@@ -199,7 +212,7 @@ internal sealed class DemoMonitoringApi : IMonitoringApi
                     Add(SensorComponent.GpuMemory, SensorMetric.MemoryUsed, 15900);
                     Add(SensorComponent.GpuMemory, SensorMetric.MemoryFree, 16868);
                     Add(SensorComponent.GpuMemory, SensorMetric.MemoryTotal, 32768);
-                    Add(SensorComponent.GpuBoard, SensorMetric.Power, total * 12 + 38);
+                    if (id == "asus-astral") Add(SensorComponent.GpuBoard, SensorMetric.Power, total * 12 + 38);
                 }
 
                 continue;

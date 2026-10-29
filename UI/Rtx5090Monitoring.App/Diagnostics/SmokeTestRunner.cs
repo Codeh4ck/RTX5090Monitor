@@ -37,7 +37,13 @@ internal static class SmokeTestRunner
         {
             throw new InvalidOperationException("No demo telemetry received.");
         }
-        await WaitUntilAsync(() => runtime.Dashboard.ReportingPanels.Count == 2 && runtime.Dashboard.SelectedPanel is not null);
+        await WaitUntilAsync(() => runtime.Dashboard.ReportingPanels.Count == 3 && runtime.Dashboard.SelectedPanel is not null);
+        if (Environment.GetCommandLineArgs().Contains("--gpu-status-only"))
+        {
+            await GenericNvidiaSmokeTests.RunAsync(window, runtime, output);
+            return;
+        }
+
         if (Environment.GetCommandLineArgs().Contains("--warning-policy-only"))
         {
             await WarningPolicySmokeTests.RunAsync(window, runtime, output);

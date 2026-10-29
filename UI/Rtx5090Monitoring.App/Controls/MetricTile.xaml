@@ -23,7 +23,7 @@
         </VisualStateManager.VisualStateGroups>
         <Border x:Name="Frame" Style="{StaticResource MonitorCard}" BorderBrush="{ThemeResource MonitorAccent}" Padding="10,9" MinHeight="56">
             <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="9">
-                <controls:WidgetIcon x:Name="MetricIcon" x:Load="{x:Bind ShowIcon}" IconName="{x:Bind Model.IconName}" Width="26" Height="26" VerticalAlignment="Center" />
+                <controls:WidgetIcon x:Name="MetricIcon" x:Load="{x:Bind ShowIcon}" IconName="{x:Bind Model.IconName}" Tone="{x:Bind Model.Tone, Mode=OneWay}" Width="26" Height="26" VerticalAlignment="Center" />
                 <TextBlock x:Name="MetricLabel" Grid.Column="1" Text="{x:Bind DisplayLabel}" Foreground="{ThemeResource MonitorForeground}" FontSize="15" VerticalAlignment="Center"
                     TextWrapping="Wrap" ToolTipService.ToolTip="{x:Bind Model.Label}" />
                 <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="7" VerticalAlignment="Center">

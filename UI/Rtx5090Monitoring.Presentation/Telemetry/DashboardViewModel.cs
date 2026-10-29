@@ -19,7 +19,9 @@ public sealed class DashboardViewModel : ObservableObject
     public ObservableCollection<Contracts.Warnings.WarningState> CurrentWarnings { get; } = [];
     public string WarningSummary { get; private set; } = "Waiting for shared warning state";
     public ObservableCollection<HardwarePanelViewModel> Panels { get; } = [];
+    public GpuStatusViewModel GpuStatus { get; } = new();
     public ObservableCollection<HardwarePanelViewModel> ReportingPanels { get; } = [];
+    public bool HasAlternativeGpuStatus { get; private set; }
     public string PluginWarning
     {
         get;
@@ -131,6 +133,7 @@ public sealed class DashboardViewModel : ObservableObject
         WarningSummary = snapshot.Warnings is null ? "Update the backend service to enable shared warning policies."
             : states.Length == 0 ? "No active warnings" : $"{states.Length} warning conditions - shared service state";
         Raise(nameof(WarningSummary));
+        GpuStatus.Apply(snapshot, _configuration, preferences, now);
         _lastSnapshot = snapshot;
         _preferences = preferences;
         foreach (var panel in Panels)
@@ -144,6 +147,7 @@ public sealed class DashboardViewModel : ObservableObject
 
     public void RefreshFreshness(DateTimeOffset now, AppPreferences preferences)
     {
+        GpuStatus.MarkExpired(now);
         _preferences = preferences;
         foreach (var panel in Panels)
         {
@@ -155,6 +159,7 @@ public sealed class DashboardViewModel : ObservableObject
 
     public void Disconnect(AppPreferences preferences)
     {
+        GpuStatus.Clear();
         CurrentWarnings.Clear();
         WarningSummary = "Service unavailable - warning recovery cannot be evaluated.";
         Raise(nameof(WarningSummary));
@@ -191,7 +196,11 @@ public sealed class DashboardViewModel : ObservableObject
 
     private void RefreshReportingPanels()
     {
-        var reporting = Panels.Where(panel => panel.Enabled && panel.IsReporting).ToArray();
+        var available = Panels.Where(panel => panel.Enabled && panel.IsReporting).ToArray();
+        HasAlternativeGpuStatus = available.Any(panel => panel.IsWireView || panel.IsAsus);
+        var reporting = available.Where(panel => !panel.IsNvidia || _preferences.ShowSeparateGpuStatusTab || !HasAlternativeGpuStatus)
+            .OrderBy(panel => panel.IsMsi ? 3 : panel.IsNvidia ? 2 : panel.IsAsus ? 1 : 0)
+            .ThenBy(panel => panel.Id, StringComparer.Ordinal).ToArray();
         if (SelectedPanel is not null && !reporting.Contains(SelectedPanel))
         {
             SelectedPanel = null;
@@ -214,7 +223,7 @@ public sealed class DashboardViewModel : ObservableObject
                 ReportingPanels.Move(currentIndex, index);
             }
         }
-        Summary = $"{Panels.Count} plugins installed · {ReportingPanels.Count} reporting";
+        Summary = $"{Panels.Count} plugins installed · {available.Length} reporting";
         PluginWarning = string.Join(Environment.NewLine, Panels.Where(panel => panel.Enabled && panel.State != "Disabled" && !panel.IsReporting)
             .Select(panel => $"{panel.Name}: {panel.State} · {panel.Message}"));
     }

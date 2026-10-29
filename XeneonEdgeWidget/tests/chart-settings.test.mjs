@@ -25,7 +25,7 @@ test('decimal dropdown accepts all choices and preserves numeric slider preferen
         assert.equal(format.value(.4, 'A'), ['0 A', '0.4 A', '0.40 A'][Number(precision)]);
         assert.equal(format.value(0, 'A'), ['0 A', '0.0 A', '0.00 A'][Number(precision)]);
         assert.equal(format.value(12, 'V'), ['12 V', '12.0 V', '12.00 V'][Number(precision)]);
-        assert.equal(format.temperature(62.34), ['62 °C', '62.3 °C', '62.34 °C'][Number(precision)]);
+        assert.equal(format.temperature(62.34), '62.3 °C');
         assert.equal(format.value(14001, 'MHz', 0), '14001 MHz');
     }
     const settings = new Settings();

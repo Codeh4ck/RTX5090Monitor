@@ -33,7 +33,7 @@ public sealed class DebugSession : ObservableObject
     public event Action<bool>? Changed;
 
     public string LastNotification { get; private set => Set(ref field, value); } = "No debug notifications yet.";
-    public DebugPluginViewModel[] Plugins { get; } = [new("wireview-pro2", "WireView"), new("asus-astral", "ROG Astral"), new("msi-psu", "MSI PSU")];
+    public DebugPluginViewModel[] Plugins { get; } = [new("wireview-pro2", "WireView"), new("asus-astral", "ROG Astral"), new("msi-psu", "MSI PSU"), new("generic-nvidia", "GenericNvidia")];
 
     public void ReportNotification(string title, string message) => LastNotification = "DEBUG · " + title + " · " + message;
 
@@ -357,6 +357,7 @@ public sealed class DebugSession : ObservableObject
         Options = id switch
         {
             "asus-astral" => JsonSerializer.SerializeToElement(new AsusOptions(), ClientJsonContext.Default.AsusOptions),
+            "generic-nvidia" => JsonSerializer.SerializeToElement(new Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.Configuration.GenericNvidiaOptions(), ClientJsonContext.Default.GenericNvidiaOptions),
             "msi-psu" => JsonSerializer.SerializeToElement(new MsiOptions(), ClientJsonContext.Default.MsiOptions),
             _ => null
         }

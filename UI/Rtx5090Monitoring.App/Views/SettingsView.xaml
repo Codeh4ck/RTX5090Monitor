@@ -22,6 +22,18 @@
             </controls:SectionPanel>
             <controls:SectionPanel Header="Desktop behavior">
                 <StackPanel Spacing="16">
+                    <ComboBox Header="Startup tab" SelectedIndex="{x:Bind Model.StartupTabIndex, Mode=TwoWay}" MinWidth="240">
+                        <ComboBoxItem Content="First reporting plugin" />
+                        <ComboBoxItem Content="WireView" />
+                        <ComboBoxItem Content="ROG Astral" />
+                        <ComboBoxItem Content="GPU status" />
+                        <ComboBoxItem Content="MSI PSU" />
+                    </ComboBox>
+                    <TextBlock Text="Opens the selected tab at startup when it is reporting. Otherwise, opens the first available tab." Style="{StaticResource MonitorCaption}" TextWrapping="Wrap" />
+                    <NumberBox Header="Window width" Value="{x:Bind Model.WindowWidth, Mode=TwoWay}" Minimum="720" Maximum="7680" SmallChange="10" SpinButtonPlacementMode="Compact" Width="240" HorizontalAlignment="Left" />
+                    <NumberBox Header="Window height" Value="{x:Bind Model.WindowHeight, Mode=TwoWay}" Minimum="550" Maximum="4320" SmallChange="10" SpinButtonPlacementMode="Compact" Width="240" HorizontalAlignment="Left" />
+                    <Button Content="Apply window size" Click="ApplyWindowSize_Click" />
+                    <TextBlock Text="You can also resize or maximize the window. Its normal size is remembered automatically." Style="{StaticResource MonitorCaption}" TextWrapping="Wrap" />
                     <ToggleSwitch Header="Minimize to system tray" IsOn="{x:Bind Model.MinimizeToTray, Mode=TwoWay}"/>
                     <ToggleSwitch Header="Close to system tray" IsOn="{x:Bind Model.CloseToTray, Mode=TwoWay}"/>
                     <ToggleSwitch x:Name="StartupToggle" Header="Start with Windows" IsOn="{x:Bind Model.StartWithWindows, Mode=TwoWay}"/>

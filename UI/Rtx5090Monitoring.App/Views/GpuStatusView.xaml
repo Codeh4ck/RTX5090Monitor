@@ -1,0 +1,71 @@
+<UserControl
+    x:Class="Rtx5090Monitoring.App.Views.GpuStatusView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Rtx5090Monitoring.App.Controls"
+    xmlns:converters="using:Rtx5090Monitoring.App.Converters">
+    <UserControl.Resources>
+        <converters:BooleanVisibilityConverter x:Key="BoolVisibility" />
+    </UserControl.Resources>
+    <StackPanel Spacing="14">
+        <Grid x:Name="ElectricalSummary" x:Load="{x:Bind ShowSummary}" ColumnDefinitions="*,*,*" ColumnSpacing="12">
+            <Border Style="{StaticResource MonitorCard}" Padding="14,12" BorderBrush="{ThemeResource MonitorAccent}">
+                <StackPanel Spacing="4">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <controls:WidgetIcon IconName="pin" Width="20" Height="20" />
+                        <TextBlock Text="CONNECTOR POWER" Style="{StaticResource MonitorCaption}" VerticalAlignment="Center" />
+                    </StackPanel>
+                    <TextBlock Text="{x:Bind Model.PowerText, Mode=OneWay}" FontSize="26" FontWeight="SemiBold" />
+                </StackPanel>
+            </Border>
+            <Border Grid.Column="1" Style="{StaticResource MonitorCard}" Padding="14,12">
+                <StackPanel Spacing="4">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <controls:WidgetIcon IconName="overcurrent" Width="20" Height="20" />
+                        <TextBlock Text="TOTAL CURRENT" Style="{StaticResource MonitorCaption}" VerticalAlignment="Center" />
+                    </StackPanel>
+                    <TextBlock Text="{x:Bind Model.CurrentText, Mode=OneWay}" FontSize="26" FontWeight="SemiBold" />
+                </StackPanel>
+            </Border>
+            <Border Grid.Column="2" Style="{StaticResource MonitorCard}" Padding="14,12">
+                <StackPanel Spacing="4">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <controls:WidgetIcon IconName="voltage" Width="20" Height="20" />
+                        <TextBlock Text="VOLTAGE" Style="{StaticResource MonitorCaption}" VerticalAlignment="Center" />
+                    </StackPanel>
+                    <TextBlock Text="{x:Bind Model.VoltageText, Mode=OneWay}" FontSize="26" FontWeight="SemiBold" />
+                </StackPanel>
+            </Border>
+        </Grid>
+        <Border x:Name="StatusFrame">
+            <StackPanel Spacing="12">
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+            <StackPanel Spacing="4">
+                <StackPanel Orientation="Horizontal" Spacing="9">
+                    <controls:WidgetIcon IconName="vcore" Width="28" Height="28" />
+                    <TextBlock Text="GPU status" Style="{StaticResource MonitorSectionHeading}" VerticalAlignment="Center" />
+                </StackPanel>
+                <TextBlock Text="{x:Bind Model.DeviceText, Mode=OneWay}" Style="{StaticResource MonitorCaption}" TextWrapping="Wrap" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <Border BorderBrush="{ThemeResource MonitorAccent}" BorderThickness="1" CornerRadius="5" Padding="8" MinWidth="105">
+                    <StackPanel Orientation="Horizontal" Spacing="7">
+                        <TextBlock Text="GPU" Foreground="{ThemeResource MonitorMuted}" />
+                        <TextBlock Text="{x:Bind Model.GpuUsageText, Mode=OneWay}" FontWeight="SemiBold" MinWidth="35" TextAlignment="Right" />
+                    </StackPanel>
+                </Border>
+                <Border BorderBrush="{ThemeResource MonitorAccent}" BorderThickness="1" CornerRadius="5" Padding="8" MinWidth="125">
+                    <StackPanel Orientation="Horizontal" Spacing="7">
+                        <TextBlock Text="C. VLT" Foreground="{ThemeResource MonitorMuted}" />
+                        <TextBlock Text="{x:Bind Model.CoreVoltageText, Mode=OneWay}" FontWeight="SemiBold" />
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </Grid>
+                <InfoBar IsOpen="{x:Bind Model.IsUnavailable, Mode=OneWay}" IsClosable="False" Severity="Warning"
+                    Title="GPU status unavailable" Message="{x:Bind Model.State, Mode=OneWay}" />
+                <StackPanel x:Name="MetricsHost" Spacing="8" />
+            </StackPanel>
+        </Border>
+    </StackPanel>
+</UserControl>

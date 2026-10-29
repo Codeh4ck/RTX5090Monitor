@@ -8,7 +8,7 @@ const template = `
     <header class="panel-header">
         <div class="panel-heading"><span class="icon panel-icon" data-icon="pin" aria-hidden="true"></span>
             <div class="heading-text"><h1 class="panel-title"></h1><p class="panel-source"></p></div></div>
-        <div class="panel-actions"><span class="gpu-usage" aria-label="GPU usage"><span>GPU</span><b class="gpu-usage-value"></b></span>
+        <div class="panel-actions"><span class="gpu-usage" aria-label="GPU usage"><span>GPU</span><b class="gpu-usage-value"></b></span><span class="core-voltage" aria-label="GPU core voltage">C. VLT <b class="core-voltage-value"></b></span>
             <span class="status-pill" role="status"></span>
             <nav class="page-controls" aria-label="Hidden panels"><button type="button" class="previous-panel" aria-label="Previous panel">‹</button><button type="button" class="next-panel" aria-label="Next panel">›</button></nav></div>
     </header>
@@ -59,6 +59,7 @@ export class PanelView {
     private signature = '';
     private settings: Settings;
     private usage: MetricText | null;
+    private coreVoltage: MetricText | null;
     private spread: MetricText | null;
 
     constructor(
@@ -78,8 +79,9 @@ export class PanelView {
         const pins = data.kind === 'pins';
         const psu = data.pluginId === 'msi-psu';
 
-        if (pins || data.pluginId !== 'asus-astral') {
+        if (pins || !['asus-astral', 'generic-nvidia'].includes(data.pluginId)) {
             element.querySelector('.gpu-usage')!.remove();
+            element.querySelector('.core-voltage')!.remove();
         }
 
         if (!settings.enabled('showSource')) {
@@ -144,6 +146,7 @@ export class PanelView {
         }
 
         this.usage = element.querySelector('.gpu-usage-value') ? new MetricText(element.querySelector('.gpu-usage-value')!) : null;
+        this.coreVoltage = element.querySelector('.core-voltage-value') ? new MetricText(element.querySelector('.core-voltage-value')!) : null;
         this.spread = this.nodes['spread-value'] ? new MetricText(this.nodes['spread-value']) : null;
 
         for (let index = 0; index < (pins && settings.enabled('showAxis') ? 5 : 0); index++) {
@@ -175,7 +178,7 @@ export class PanelView {
             this.rows.push({
                 element: row,
                 label: row.querySelector('.row-label span:last-child')!,
-                text: new MetricText(row.querySelector('.row-value')!),
+                text: new MetricText(row.querySelector('.row-value')!, data.rows[index]?.id === 'fans'),
                 icon: row.querySelector('.icon')!
             });
         }
@@ -231,12 +234,17 @@ export class PanelView {
         }
 
         this.usage?.set(data.gpuUsage);
+        this.coreVoltage?.set(data.coreVoltage);
+        const voltageBadge = this.element.querySelector<HTMLElement>('.core-voltage');
+        if (voltageBadge) voltageBadge.hidden = !data.coreVoltage;
 
         if (this.nodes['gpu-usage']) {
             this.nodes['gpu-usage'].hidden = !data.gpuUsage;
         }
 
-        setText(this.nodes['status-pill']!, data.state === 'Ready' ? 'Connected' : data.state.replace(/([a-z])([A-Z])/g, '$1 $2'));
+        const disconnected = !['Ready', 'Alert'].includes(data.state);
+        this.nodes['status-pill']!.hidden = !disconnected;
+        if (disconnected) setText(this.nodes['status-pill']!, data.state.replace(/([a-z])([A-Z])/g, '$1 $2'));
         this.element.dataset.kind = data.kind;
         this.element.dataset.tone = data.tone;
         this.element.dataset.comparison = data.comparisonLabel ? 'true' : 'false';
@@ -253,7 +261,7 @@ export class PanelView {
         }
 
         if (data.kind === 'status') {
-            const rows = data.pluginId === 'asus-astral' ? data.rows.slice(0, 5) : data.rows;
+            const rows = ['asus-astral', 'generic-nvidia'].includes(data.pluginId) ? data.rows.slice(0, 5) : data.rows;
             this.writeMetrics(this.rows, rows);
         }
 

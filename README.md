@@ -73,6 +73,7 @@ Use Windows Settings > Apps > RTX Monitor to modify, repair or uninstall, or rer
 
 Use the desktop app's **Configuration** page for plugin settings, Sensor stream, source selections, warnings and backend maintenance.
 
+- **GenericNvidia** provides GPU status for a selected desktop GeForce RTX GPU, shared by its own tab and the ASUS and WireView views. It reports driver-exposed clocks, VRAM, temperatures, fans and core voltage. Fresh installations warn at 81 °C core / 85 °C VRAM; upgrades retain existing thresholds and notification overrides. Electrical readings are measured; associate WireView explicitly when it monitors the selected GPU.
 - **Sensor stream** controls how often the backend publishes aggregate snapshots. Hardware polling is configured independently for each plugin.
 - **Source selections** define preferred sensor sources and fallback behavior for consumers that request named selections.
 - **Warnings** control initial Windows notifications, optional reminders and clear confirmation, with per-warning overrides. The default reminder interval is five seconds; repeating reminders are off by default.

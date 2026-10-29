@@ -19,8 +19,6 @@ public sealed class AsusWarningSource : IWarningSource
         new(AsusWarningIds.Imbalance, PluginId, "Current imbalance", "imbalance") { LegacyIds = ["AsusImbalance"] },
         new(AsusWarningIds.LowVoltage, PluginId, "Low pin voltage", "voltage") { LegacyIds = ["AsusLowVoltage"] },
         new(AsusWarningIds.HighVoltage, PluginId, "High pin voltage", "voltage") { LegacyIds = ["AsusHighVoltage"] },
-        new(AsusWarningIds.CoreTemperature, PluginId, "Core temperature", "temperature") { LegacyIds = ["AsusCoreTemperature"] },
-        new(AsusWarningIds.MemoryTemperature, PluginId, "VRAM temperature", "temperature") { LegacyIds = ["AsusMemoryTemperature"] },
     ];
 
     public WarningObservation[] Observe(SensorSnapshot snapshot, PluginSettings settings)
@@ -61,22 +59,13 @@ public sealed class AsusWarningSource : IWarningSource
             Voltage(AsusWarningIds.LowVoltage, [.. voltages.Where(sensor => sensor.Value is > 0 and <= 11.5)]);
             Voltage(AsusWarningIds.HighVoltage, [.. voltages.Where(sensor => sensor.Value >= 12.5)]);
 
-            Temperature(AsusWarningIds.CoreTemperature, SensorComponent.GpuCore, options.EffectiveCoreTemperatureWarningC);
-            Temperature(AsusWarningIds.MemoryTemperature, SensorComponent.GpuMemory, options.EffectiveMemoryTemperatureWarningC);
-
             continue;
 
             void Voltage(string typeId, SensorReading[] offending) => observations.Add(new WarningObservation(PluginId, device.Key, typeId,
                 offending.Length > 0 || voltages.Length == 6, offending.Length > 0,
                 string.Join(" / ", offending.Select(pin => $"P{pin.Identity.Channel}: {Number(pin.Value!.Value)} V"))));
 
-            void Temperature(string typeId, SensorComponent component, double threshold)
-            {
-                var temperature = sensors.FirstOrDefault(sensor => sensor.Identity.Component == component && sensor.Identity.Metric == SensorMetric.Temperature)?.Value;
 
-                observations.Add(new WarningObservation(PluginId, device.Key, typeId, temperature is not null, temperature >= threshold,
-                    temperature is null ? string.Empty : $"{Number(temperature.Value)} °C - threshold {Number(threshold)} °C"));
-            }
         }
 
         return [.. observations];

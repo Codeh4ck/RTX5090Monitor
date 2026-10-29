@@ -7,6 +7,11 @@ public static class DebugMetricCatalog
 {
     public static DebugMetricDefinition[] For(string pluginId)
     {
+        if (pluginId == "generic-nvidia")
+        {
+            return GenericNvidiaDebugMetrics.Create();
+        }
+
         var metrics = new List<DebugMetricDefinition>();
         if (pluginId == "msi-psu")
         {

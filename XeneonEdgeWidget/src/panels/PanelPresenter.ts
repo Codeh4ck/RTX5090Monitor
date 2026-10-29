@@ -25,6 +25,7 @@ export class PanelPresenter {
         const { pluginId, deviceId, connectorId } = binding;
         const isPsu = pluginId === 'msi-psu';
         const isWire = pluginId === 'wireview-pro2';
+        const isNvidia = pluginId === 'generic-nvidia';
         const source = isPsu
             ? /pid_808c/i.test(deviceId ?? '')
                 ? 'MSI MPG Ai1600TS'
@@ -33,7 +34,9 @@ export class PanelPresenter {
                   : this.store.msiName
             : isWire
               ? this.store.wireName || 'WireView Pro 2'
-              : 'ROG Astral';
+              : isNvidia
+                ? this.store.snapshot?.plugins.find(plugin => plugin.pluginId === pluginId)?.message || 'NVIDIA GeForce RTX'
+                : 'ROG Astral';
 
         let state = this.store.state(pluginId, now);
 
@@ -64,6 +67,7 @@ export class PanelPresenter {
             source: (binding.automatic ? 'Auto · ' : '') + source,
             state,
             gpuUsage: '',
+            coreVoltage: '',
             tone: state === 'Ready' ? 'good' : ['Error'].includes(state) ? 'error' : state === 'Disabled' ? 'neutral' : 'warning',
             summary: [],
             rows: [],
@@ -129,10 +133,16 @@ export class PanelPresenter {
             }
         } else {
             if (showSummary && binding.kind === 'status') {
-                const power = value('GpuConnector', 'Power', 1);
-                const current = value('GpuConnector', 'Current', 1);
-                const voltage =
-                    value('GpuConnector', 'Voltage', 1) ?? (power !== null && current !== null && current > 0 ? power / current : null);
+                const selectedSource = isNvidia
+                    ? this.store.configuration?.configuration.plugins[pluginId]?.options?.electricalSource
+                    : 'Automatic';
+                const electricalPlugin = selectedSource === 'WireView' ? 'wireview-pro2' : pluginId;
+                const electricalDevice = electricalPlugin === pluginId ? deviceId : this.store.device(electricalPlugin, '', now);
+                const electrical = (metric: string) => selectedSource === 'None' ? null
+                    : this.store.value(electricalPlugin, electricalDevice, 'GpuConnector', metric, now, 1);
+                const power = electrical('Power');
+                const current = electrical('Current');
+                const voltage = electrical('Voltage');
                 data.summary = [
                     metric('power', 'Power', this.format.value(power, 'W'), '12vhpwr'),
                     metric('current', 'Total current', this.format.value(current, 'A'), 'pin'),
@@ -168,12 +178,28 @@ export class PanelPresenter {
                     data.alerts.push(`WireView: ${faultDescription(value('MonitorBoard', 'FaultStatus'))}`);
                 }
             } else if (binding.kind === 'status') {
-                if (binding.kind === 'status') {
-                    data.gpuUsage = this.format.value(value('GpuCore', 'Utilization'), '%', 0);
-                }
+                data.gpuUsage = this.format.value(value('GpuCore', 'Utilization'), '%', 0);
+                const coreVoltage = value('GpuCore', 'Voltage');
+                data.coreVoltage = this.format.value(coreVoltage === null ? null : coreVoltage * 1000, 'mV');
 
                 const coreTemperature = value('GpuCore', 'Temperature');
                 const memoryTemperature = value('GpuMemory', 'Temperature');
+                const hotspot = value('GpuHotspot', 'Temperature');
+                const showHotspot = this.settings.enabled('showHotspot') && hotspot !== null;
+                const temperatures = [coreTemperature, memoryTemperature];
+                if (showHotspot) temperatures.push(hotspot);
+
+                const channels = this.store.snapshot?.sensors.filter(reading => reading.identity.pluginId === pluginId
+                    && reading.identity.deviceId === deviceId && reading.identity.component === 'GpuFan'
+                    && reading.identity.metric === 'FanSpeed' && reading.identity.channel !== null)
+                    .map(reading => reading.identity.channel!).sort((left, right) => left - right).slice(0, 2) ?? [];
+                const fanLabels = channels.length ? 'Fan ' + channels.map((_, index) => index + 1).join(' / ') : 'Fans';
+                const fans = channels.map(channel => {
+                    const rpm = this.format.value(value('GpuFan', 'FanSpeed', channel), 'RPM', 0);
+                    const duty = value('GpuFan', 'FanDuty', channel);
+                    return this.settings.enabled('showFanDuty') && duty !== null
+                        ? `${rpm} (${this.format.value(duty, '%', 0)})` : rpm;
+                }).join(' / ') || '-';
                 const temperatureWarning =
                     this.store.snapshot?.warnings?.states.some(
                         (state) =>
@@ -197,15 +223,15 @@ export class PanelPresenter {
                     ),
                     metric(
                         'temperatures',
-                        'Core / VRAM temp',
-                        `${this.format.temperature(coreTemperature)} / ${this.format.temperature(memoryTemperature)}`,
+                        showHotspot ? 'Core / VRAM / HS' : 'Core / VRAM temp',
+                        temperatures.map(temperature => this.format.temperature(temperature)).join(' / '),
                         'vtemp',
                         temperatureWarning
                     ),
                     metric(
                         'fans',
-                        'Fan 1 / Fan 2',
-                        `${this.format.value(value('GpuFan', 'FanSpeed', 1), 'RPM', 0)} / ${this.format.value(value('GpuFan', 'FanSpeed', 2), 'RPM', 0)}`,
+                        fanLabels,
+                        fans,
                         'vfan'
                     )
                 ];

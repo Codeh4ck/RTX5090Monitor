@@ -11,11 +11,12 @@ public sealed partial class MetricTile : UserControl
     public bool ShowIcon { get; }
     public string DisplayLabel => Model.Label switch { "Core temperature" => "Core temp", "VRAM temperature" => "VRAM temp", _ => Model.Label };
 
-    public MetricTile(MetricViewModel model, bool showIcon = true)
+    public MetricTile(MetricViewModel model, bool showIcon = true, double valueMaxWidth = 210)
     {
         Model = model;
         ShowIcon = showIcon;
         InitializeComponent();
+        ValueText.MaxWidth = valueMaxWidth;
         if (!ShowIcon)
         {
             Grid.SetColumn(MetricLabel, 0);
@@ -31,6 +32,12 @@ public sealed partial class MetricTile : UserControl
 
     private void OnModelChanged(object? sender, PropertyChangedEventArgs args)
     {
+        if (args.PropertyName == nameof(Model.Label))
+        {
+            MetricLabel.Text = DisplayLabel;
+            ToolTipService.SetToolTip(MetricLabel, Model.Label);
+        }
+
         if (args.PropertyName == nameof(Model.Tone))
         {
             UpdateTone();
@@ -39,10 +46,6 @@ public sealed partial class MetricTile : UserControl
 
     private void UpdateTone()
     {
-        if (ShowIcon)
-        {
-            MetricIcon.Tone = Model.Tone;
-        }
         VisualStateManager.GoToState(this, Model.Tone.ToString(), false);
     }
 }

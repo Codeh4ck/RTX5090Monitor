@@ -1,3 +1,4 @@
+using Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.Devices;
 using System.Collections.ObjectModel;
 using Rtx5090Monitoring.Client.Http;
 using Rtx5090Monitoring.Plugins.Asus.Contracts.Common;
@@ -16,6 +17,7 @@ public sealed class ConfigurationEditorViewModel(Func<IMonitoringApi> api, bool 
     private PluginCatalog? _catalog;
     private double _streamInterval = 1000;
     private AsusDeviceInfo[] _devices = [];
+    private NvidiaDeviceInfo[] _nvidiaDevices = [];
     private MsiDeviceInfo[] _msiDevices = [];
     private bool _loading;
     private ConfigurationSnapshot? _pendingConfiguration;
@@ -94,6 +96,15 @@ public sealed class ConfigurationEditorViewModel(Func<IMonitoringApi> api, bool 
         foreach (var plugin in Plugins.Where(plugin => plugin.IsAsus))
         {
             plugin.Asus.SetDevices(devices);
+        }
+    }
+
+    public void SetNvidiaDevices(NvidiaDeviceInfo[] devices)
+    {
+        _nvidiaDevices = devices;
+        foreach (var plugin in Plugins.Where(plugin => plugin.IsNvidia))
+        {
+            plugin.Nvidia.SetDevices(devices);
         }
     }
 
@@ -238,6 +249,7 @@ public sealed class ConfigurationEditorViewModel(Func<IMonitoringApi> api, bool 
                 var name = _catalog?.Plugins.FirstOrDefault(plugin => plugin.Id == id)?.Name ?? id;
                 var plugin = new PluginSettingsEditorViewModel(id, name, settings);
                 plugin.Asus.SetDevices(_devices);
+                plugin.Nvidia.SetDevices(_nvidiaDevices);
                 plugin.Msi.SetDevices(_msiDevices);
                 plugin.Edited += MarkDirty;
                 Plugins.Add(plugin);

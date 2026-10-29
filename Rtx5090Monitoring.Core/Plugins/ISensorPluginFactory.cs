@@ -12,6 +12,8 @@ public interface ISensorPluginFactory
     string Id { get; }
     string Name { get; }
     PluginCapability[] Capabilities => [PluginCapability.Telemetry, PluginCapability.Configuration, PluginCapability.Restart];
+    ServiceConfiguration MigrateConfiguration(ServiceConfiguration configuration) => configuration;
+
     ISensorPlugin Create(PluginSettings settings);
     PluginSettings CreateDefaultSettings() => new();
 

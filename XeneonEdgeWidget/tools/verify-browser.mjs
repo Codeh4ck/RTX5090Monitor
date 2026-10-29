@@ -3,10 +3,11 @@ import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { chromium } from 'playwright';
-import { fixture, catalog, configuration } from '../tests/fixtures.mjs';
+import { fixture, catalog, configuration } from '../tests/nvidia-fixtures.mjs';
 import { verifyFlyouts } from './verification/verifyFlyouts.mjs';
 import { verifyUpdates } from './verification/verifyUpdates.mjs';
 import { verifyBars } from './verification/verifyBars.mjs';
+import { verifyGpuStatus } from './verification/verifyGpuStatus.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const latest = JSON.parse(await readFile(resolve(root, '../.dist/latest.json'), 'utf8'));
@@ -51,7 +52,7 @@ async function measure(name) {
         const visible = element => element.getClientRects().length && getComputedStyle(element).visibility !== 'hidden';
         const panels = [...document.querySelectorAll('.panel')].filter(visible);
         const overflow = [];
-        for (const element of document.querySelectorAll('.panel,.metric-value,.row-value,.row-label,.pin-value,.headroom,.psu-comparison,.panel-title,.status-pill,.spread-badge,.chart-axis span,.gpu-usage')) {
+        for (const element of document.querySelectorAll('.panel,.metric-value,.row-value,.row-label,.pin-value,.headroom,.psu-comparison,.panel-title,.status-pill,.spread-badge,.chart-axis span,.gpu-usage,.core-voltage')) {
             if (!visible(element)) continue;
             const bounds = element.getBoundingClientRect();
             if (element.scrollWidth > element.clientWidth + 2 || element.scrollHeight > element.clientHeight + 2
@@ -102,6 +103,7 @@ try {
     await page.waitForFunction(() => document.querySelector('.widget').dataset.connection === 'live');
     const base = { panel1: 'asusPins', panel2: 'asusStatus', panel3: 'msiConnector1', numberLocale: 'en-GB',
         asusCompare: true, wireviewCompare: true, showPeak: true, showAlerts: false };
+    await verifyGpuStatus(page, base, properties, async value => { transform = value; for (const socket of sockets) send(socket); });
     await verifyBars(page, base, properties, value => { transform = value; for (const socket of sockets) send(socket); }, output);
     const largeFonts = Object.fromEntries(['title','label','value','unit','pin','axis','comparison','alert'].map(role=>[role+'Size',140]));
     for (const [name, width, height, count] of [['S-H',840,344,1], ['S-V',696,416,1], ['M-H',840,696,1],
@@ -175,9 +177,10 @@ try {
     assert.ok(summaries.every(tile=>tile.borderWidth==='1px'&&tile.padding>=14));
     assert.equal(summaries[0].border,await page.locator('#panel2 .status-row').first().evaluate(node=>getComputedStyle(node).borderColor));
     const usage=await page.locator('#panel2 .gpu-usage').boundingBox();
-    const connected=await page.locator('#panel2 .status-pill').boundingBox();
-    assert.ok(usage.x+usage.width<=connected.x,'GPU usage sits beside Connected');
-    assert.ok(connected.x-usage.x-usage.width<20);
+    const coreVoltage=await page.locator('#panel2 .core-voltage').boundingBox();
+    assert.ok(usage.x+usage.width<=coreVoltage.x,'Core voltage sits beside GPU usage');
+    assert.equal(await page.locator('.status-pill:visible').count(), 0, 'Healthy sources do not display Connected badges');
+    assert.ok(coreVoltage.x-usage.x-usage.width<20);
     assert.ok(await page.locator('#panel2 .gpu-usage').evaluate(node=>parseFloat(getComputedStyle(node).fontSize))>=24);
     assert.match(await page.locator('#panel1 .spread-extreme').first().innerText(),/^P2\s+High$/);
     assert.match(await page.locator('#panel1 .spread-extreme').last().innerText(),/^P1\s+Low$/);
@@ -324,7 +327,7 @@ try {
     for (const socket of sockets) send(socket);
     await page.waitForFunction(() => document.querySelector('#panel1 .pin-value').textContent.includes('5.8'));
     assert.equal(await page.locator('footer,.chart-footer,#service-dialog').count(),0);
-    assert.equal(await page.locator('#panel1 .status-pill').innerText(),'Connected');
+    assert.equal(await page.locator('#panel1 .status-pill').isVisible(),false);
     const typography = await page.locator('#panel1 .pin-value').first().evaluate(node=>({
         font:getComputedStyle(node).fontFamily,weight:getComputedStyle(node).fontWeight
     }));

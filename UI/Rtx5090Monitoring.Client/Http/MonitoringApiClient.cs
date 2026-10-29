@@ -1,3 +1,4 @@
+using Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.Devices;
 using System.Net.Http.Json;
 using System.Net.WebSockets;
 using System.Runtime.CompilerServices;
@@ -44,6 +45,9 @@ public sealed class MonitoringApiClient(HttpClient http) : IMonitoringApi
         GetAsync("plugins/wireview-pro2/device/config", ClientJsonContext.Default.DeviceConfig, token);
     public Task<AsusDeviceInfo[]> GetAsusDevicesAsync(CancellationToken token) =>
         GetAsync("plugins/asus-astral/devices", ClientJsonContext.Default.AsusDeviceInfoArray, token);
+    public Task<NvidiaDeviceInfo[]> GetNvidiaDevicesAsync(CancellationToken token) =>
+        GetAsync("plugins/generic-nvidia/devices", ClientJsonContext.Default.NvidiaDeviceInfoArray, token);
+
     public Task<MsiDeviceInfo[]> GetMsiDevicesAsync(CancellationToken token) =>
         GetAsync("plugins/msi-psu/devices", ClientJsonContext.Default.MsiDeviceInfoArray, token);
 

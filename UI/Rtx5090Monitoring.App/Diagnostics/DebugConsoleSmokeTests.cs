@@ -44,13 +44,13 @@ internal static class DebugConsoleSmokeTests
 
         await WaitAsync(() => console.ThemeRoot.XamlRoot is not null);
         VisualTreeQuery.Descendants<ToggleSwitch>(console.ThemeRoot).Single(item => item.Name == "SimulationToggle").IsOn = true;
-        await WaitAsync(() => runtime.Debug.Enabled && runtime.Dashboard.ReportingPanels.Count == 3);
+        await WaitAsync(() => runtime.Debug.Enabled && runtime.Dashboard.ReportingPanels.Count == 4);
         if (ReferenceEquals(liveDashboard, runtime.Dashboard))
         {
             throw new InvalidOperationException("Simulation must have separate panel and peak state.");
         }
 
-        console.SelectPlugin("asus-astral");
+        console.SelectPlugin("generic-nvidia");
         await Task.Delay(250);
         var group = VisualTreeQuery.Descendants<Expander>(console.ThemeRoot).Single(item => item.Header as string == "Temperatures");
         group.IsExpanded = true;
@@ -60,7 +60,7 @@ internal static class DebugConsoleSmokeTests
         VisualTreeQuery.Descendants<ComboBox>(editor).Single().SelectedIndex = (int)DebugMetricMode.Fixed;
         VisualTreeQuery.Descendants<NumberBox>(editor).Single().Value = 80;
         window.ShowPanel("asus-astral");
-        await WaitAsync(() => runtime.Dashboard.SelectedPanel!.Metrics.Single(metric => metric.Label == "Core / VRAM temp").Value.StartsWith("80", StringComparison.Ordinal));
+        await WaitAsync(() => runtime.Dashboard.GpuStatus.Metrics.Single(metric => metric.Label.StartsWith("Core / VRAM", StringComparison.Ordinal)).Value.StartsWith("80", StringComparison.Ordinal));
         var temperature = editor.Model;
         temperature.Value = 60;
         runtime.Settings.WarningNotifications = true;

@@ -10,8 +10,8 @@ internal static class WindowSizeLimits
 {
     public const int MinimumWidth = 720;
     public const int MinimumHeight = 550;
-    public const int MaximumWidth = 1150;
-    public const int MaximumHeight = AppPreferences.DefaultWindowHeight;
+    public const int MaximumWidth = 7680;
+    public const int MaximumHeight = 4320;
 
     public static SizeInt32 GetMaximumPixels(nint window)
     {

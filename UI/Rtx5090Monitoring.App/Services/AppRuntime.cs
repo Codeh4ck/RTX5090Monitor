@@ -108,6 +108,8 @@ internal sealed partial class AppRuntime
         StartUpdates();
     }
 
+    internal void ApplyWindowSize() => _window?.ApplyWindowSize();
+
     public void Reconnect() => _session?.Reconnect();
     public void SetPinMetric(PinMetric metric) => Settings.PinMetric = metric;
     internal void SetDemoDeviceAvailable(string pluginId, bool available)
@@ -344,6 +346,7 @@ internal sealed partial class AppRuntime
             Dashboard.RefreshFreshness(DateTimeOffset.UtcNow, Preferences);
         }
 
+        Settings.SetGpuStatusTabRequired(!Dashboard.HasAlternativeGpuStatus);
         _wireViewWindow?.SetPanel(Dashboard.Panels.FirstOrDefault(panel => panel.IsWireView));
         _refresh = false;
     }
@@ -406,6 +409,13 @@ internal sealed partial class AppRuntime
     {
         Configuration.SetDevices(await CurrentApi.GetAsusDevicesAsync(StopToken));
         Configuration.Message = "GPU list refreshed";
+        OperationCompleted?.Invoke(Configuration.Message);
+    });
+
+    public Task RefreshNvidiaDevicesAsync() => PerformAsync(async () =>
+    {
+        Configuration.SetNvidiaDevices(await CurrentApi.GetNvidiaDevicesAsync(StopToken));
+        Configuration.Message = "Desktop GeForce RTX GPU list refreshed";
         OperationCompleted?.Invoke(Configuration.Message);
     });
 

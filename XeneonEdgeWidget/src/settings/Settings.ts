@@ -17,7 +17,8 @@ export class Settings {
                 this.values[definition.id] = value === true || value === 'true' || value === 1;
             } else if (definition.type === 'combobox') {
                 // Keep numeric values saved by older slider controls compatible with dropdowns.
-                const key = typeof value === 'number' ? String(value) : value;
+                const storedKey = typeof value === 'number' ? String(value) : value;
+                const key = /^panel[123]$/.test(definition.id) && storedKey === 'asusStatus' ? 'nvidiaStatus' : storedKey;
                 this.values[definition.id] = definition.options?.some((option) => option.key === key) ? key : definition.defaultValue;
             } else if (definition.type === 'color') {
                 this.values[definition.id] = typeof value === 'string' && /^#[\da-f]{6}$/i.test(value) ? value : definition.defaultValue;

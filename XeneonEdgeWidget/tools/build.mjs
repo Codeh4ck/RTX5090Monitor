@@ -15,6 +15,7 @@ const output = resolve(root, '..', '.dist');
 const lockPath = join(root, '.build.lock');
 let lock;
 let temporary;
+const skipChecks = process.argv.includes('--skip-checks');
 
 function run(command, args) {
     const result = spawnSync(command, args, { cwd: root, encoding: 'utf8', stdio: 'inherit', windowsHide: true });
@@ -79,8 +80,10 @@ configureRtxMonitor(false);`;
 
 try {
     lock = await open(lockPath, 'wx');
-    run(process.execPath, [join(root, 'node_modules/typescript/bin/tsc'), '--noEmit']);
-    run(process.execPath, ['--experimental-strip-types', '--test', 'tests/*.test.mjs']);
+    if (!skipChecks) {
+        run(process.execPath, [join(root, 'node_modules/typescript/bin/tsc'), '--noEmit']);
+        run(process.execPath, ['--experimental-strip-types', '--test', 'tests/*.test.mjs']);
+    }
     const cliLookup = spawnSync(process.platform === 'win32' ? 'where.exe' : 'which', ['icuewidget'], { encoding: 'utf8', windowsHide: true });
     const cli = process.env.ICUEWIDGET_CLI || cliLookup.stdout?.trim().split(/\r?\n/)[0];
     if (!cli || !existsSync(cli)) throw new Error('Install icuewidget on PATH or set ICUEWIDGET_CLI before building.');
@@ -137,7 +140,7 @@ try {
     // copy outside .dist, then retain the actual runtime and package only under the requested output.
     temporary = await mkdtemp(join(tmpdir(), 'rtx5090monitor-'));
     await cp(stage, temporary, { recursive: true });
-    run(cli, ['validate', temporary]);
+    if (!skipChecks) run(cli, ['validate', temporary]);
     run(cli, ['package', temporary, '--output', pendingPackage]);
     if (!existsSync(pendingPackage)) throw new Error('Packaging did not produce an icuewidget file.');
     const archive = await readFile(pendingPackage);

@@ -1,3 +1,17 @@
+1.0.2 - Generic NVIDIA GPU monitoring and desktop improvements
+- Add GenericNvidia for desktop GeForce RTX cards, with a GPU selector and shared hardware polling.
+- Show GPU status alongside ASUS and WireView pin charts, with an optional standalone tab.
+- Add core voltage, optional widget hotspot temperature and reported fan duty.
+- Keep the existing widget fan layout and show widget temperatures with one decimal place.
+- Add GPU Status settings in iCUE and remove Connected badges from widget pages.
+- Preserve existing ASUS temperature thresholds and warning policies during migration.
+- Match desktop GPU status and power cards to the existing icon-based design; use a full-width status panel.
+- Add the GPU usage label and separate temperatures and fans in the standalone desktop tab.
+- Rename Nvidia configuration and save the optional GPU Status tab preference; require the tab when neither WireView nor Astral is reporting.
+- Place the optional GPU Status tab before MSI PSU.
+- Add a saved startup-tab selection, free window resizing and maximization, and remembered window dimensions.
+- Fix the GPU Status tab crash caused by rebuilding rows during loading and accessing an unloaded icon.
+
 1.0.1 - Fresh-install configuration fix
 - Fix fresh installations failing with Invalid service configuration and the 30-second /health timeout.
 - Preserve default warning settings when bootstrap configuration contains empty objects.

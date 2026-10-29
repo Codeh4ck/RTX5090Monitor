@@ -39,6 +39,14 @@ internal static class AsusSnapshotMapper
             readings.Add(CreateReading(data.DeviceId, sensor.Definition.Component, sensor.Definition.Metric, value, now, sensor.Definition.Channel));
         }
 
+        var voltages = data.Sensors.Where(sensor => sensor.Definition.Component == SensorComponent.GpuPin
+            && sensor.Definition.Metric == SensorMetric.Voltage && sensor.Value is > 0).ToArray();
+        if (voltages.Length == 6 && voltages.Select(sensor => sensor.Definition.Channel).Distinct().Count() == 6)
+        {
+            readings.Add(CreateReading(data.DeviceId, SensorComponent.GpuConnector, SensorMetric.Voltage,
+                voltages.Average(sensor => (double)sensor.Value!.Value), now, 1));
+        }
+
         readings.Add(CreateReading(data.DeviceId, SensorComponent.GpuConnector, SensorMetric.ImbalancePercentage, alerts.ImbalancePercentage, now, 1));
         readings.Add(CreateFlagReading(data.DeviceId, SensorComponent.GpuConnector, SensorMetric.ImbalanceDetected, currents.Count >= 2, alerts.CurrentImbalance is not null, now, 1));
 

@@ -77,5 +77,7 @@ public sealed partial class SettingsView : UserControl
         }
     }
 
+    private void ApplyWindowSize_Click(object sender, RoutedEventArgs args) => _runtime.ApplyWindowSize();
+
     private void Reconnect_Click(object sender, RoutedEventArgs args) => _runtime.Reconnect();
 }

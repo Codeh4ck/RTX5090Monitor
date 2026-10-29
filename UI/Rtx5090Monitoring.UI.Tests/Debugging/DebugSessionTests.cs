@@ -53,7 +53,7 @@ internal static class DebugSessionTests
 
         session.Enabled = true;
         var frame = session.Compose(DateTimeOffset.UtcNow);
-        TestAssert.Equal(3, frame.Catalog.Plugins.Length);
+        TestAssert.Equal(4, frame.Catalog.Plugins.Length);
         TestAssert.Equal(12, frame.Snapshot.Sensors.Count(reading => reading.Identity.Component == SensorComponent.PsuPin));
         TestAssert.Equal(frame.Snapshot.Sensors.Length, frame.Snapshot.Sensors.Select(reading => reading.Identity.Key).Distinct().Count());
     }
@@ -114,7 +114,7 @@ internal static class DebugSessionTests
         var plugin = session.Plugins[2];
         plugin.Installed = false;
         var frame = session.Compose(DateTimeOffset.UtcNow);
-        TestAssert.Equal(2, frame.Catalog.Plugins.Length);
+        TestAssert.Equal(3, frame.Catalog.Plugins.Length);
         TestAssert.False(frame.Configuration.Configuration.Plugins.ContainsKey(plugin.Id), "Uninstalled plugins must disappear from configuration.");
         plugin.Installed = true;
         plugin.Enabled = false;
@@ -193,7 +193,7 @@ internal static class DebugSessionTests
         var fault = session.Plugins[0].Metrics.Single(metric => metric.Definition.Metric == SensorMetric.FaultStatus);
         fault.ModeIndex = (int)DebugMetricMode.Fixed;
         fault.Value = 8;
-        var temperature = session.Plugins[1].Metrics.Single(metric => metric.Definition is { Component: SensorComponent.GpuCore, Metric: SensorMetric.Temperature });
+        var temperature = session.Plugins.Single(plugin => plugin.Id == "generic-nvidia").Metrics.Single(metric => metric.Definition is { Component: SensorComponent.GpuCore, Metric: SensorMetric.Temperature });
         temperature.ModeIndex = (int)DebugMetricMode.Fixed;
         temperature.Value = 90;
         var now = DateTimeOffset.UtcNow;

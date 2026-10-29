@@ -36,6 +36,9 @@ public sealed class DebugMonitoringApi(DebugSession session, TimeProvider clock)
     }
 
     public Task<DeviceConfig> GetWireViewConfigurationAsync(CancellationToken token) => Task.FromResult(DebugDeviceDefaults.WireView());
+    public Task<Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.Devices.NvidiaDeviceInfo[]> GetNvidiaDevicesAsync(CancellationToken token) =>
+        Task.FromResult<Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.Devices.NvidiaDeviceInfo[]>([new(session.Plugins.Single(plugin => plugin.Id == "generic-nvidia").DeviceId, "DEBUG GeForce RTX GPU", "debug-nvidia")]);
+
     public Task<AsusDeviceInfo[]> GetAsusDevicesAsync(CancellationToken token) => Task.FromResult<AsusDeviceInfo[]>([new AsusDeviceInfo(session.Plugins[1].DeviceId, "DEBUG ROG Astral")]);
     public Task<MsiDeviceInfo[]> GetMsiDevicesAsync(CancellationToken token) => Task.FromResult<MsiDeviceInfo[]>([new MsiDeviceInfo(session.Plugins[2].DeviceId, "DEBUG MPG TS PSU")]);
 

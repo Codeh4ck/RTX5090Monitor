@@ -1,4 +1,5 @@
 using Rtx5090Monitoring.Plugins.WireView.Analysis.Warnings;
+using Rtx5090Monitoring.Plugins.GenericNvidia.Analysis.Warnings;
 using Rtx5090Monitoring.Plugins.Asus.Analysis.Warnings;
 using Rtx5090Monitoring.Plugins.Asus.Contracts.Warnings;
 using Rtx5090Monitoring.Contracts.Alerts;
@@ -13,12 +14,13 @@ namespace Rtx5090Monitoring.Tests.Fixtures;
 internal static class WarningTestData
 {
     public static Warnings.WarningRegistry Registry() => new([
+        new GenericNvidiaWarningSource(),
         new AsusWarningSource(),
         new WireViewWarningSource()]);
     public static readonly DateTimeOffset Start = new(2026, 10, 24, 12, 0, 0, TimeSpan.Zero);
     public static ServiceConfiguration Configuration(WarningPolicy? policy = null) => new()
     {
-        Plugins = new Dictionary<string, PluginSettings> { ["asus-astral"] = new() { Options = System.Text.Json.JsonSerializer.SerializeToElement(new Rtx5090Monitoring.Plugins.Asus.Contracts.Configuration.AsusOptions { CoreTemperatureWarningC = 80 }) }, ["wireview-pro2"] = new() },
+        Plugins = new Dictionary<string, PluginSettings> { ["generic-nvidia"] = new() { Options = System.Text.Json.JsonSerializer.SerializeToElement(new Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.Configuration.GenericNvidiaOptions { CoreTemperatureWarningC = 80 }) }, ["asus-astral"] = new() { Options = System.Text.Json.JsonSerializer.SerializeToElement(new Rtx5090Monitoring.Plugins.Asus.Contracts.Configuration.AsusOptions { CoreTemperatureWarningC = 80 }) }, ["wireview-pro2"] = new() },
         Warnings = new WarningOptions { Defaults = policy ?? new WarningPolicy() }
     };
     public static SensorSnapshot Frame(int seconds, double temperature = 81, ushort faults = 0, AlertPin[]? pins = null)
@@ -26,7 +28,7 @@ internal static class WarningTestData
         var now = Start.AddSeconds(seconds);
         var sensors = new List<SensorReading>
         {
-            new(new SensorIdentity("asus-astral", "gpu0", SensorComponent.GpuCore, SensorMetric.Temperature), SensorUnit.Celsius, temperature, now),
+            new(new SensorIdentity("generic-nvidia", "gpu0", SensorComponent.GpuCore, SensorMetric.Temperature), SensorUnit.Celsius, temperature, now),
             new(new SensorIdentity("wireview-pro2", "com3", SensorComponent.MonitorBoard, SensorMetric.FaultStatus), SensorUnit.Bitmask, faults, now)
         };
         for (var pin = 1; pin <= 6; pin++)
@@ -35,7 +37,7 @@ internal static class WarningTestData
             sensors.Add(new SensorReading(new SensorIdentity("asus-astral", "gpu0", SensorComponent.GpuPin, SensorMetric.Voltage, pin), SensorUnit.Volts, 12, now));
         }
         return new SensorSnapshot(1, seconds + 1, now, [.. sensors],
-            [new PluginHealth("asus-astral", PluginState.Ready, now, null), new PluginHealth("wireview-pro2", PluginState.Ready, now, null)], [])
+            [new PluginHealth("generic-nvidia", PluginState.Ready, now, null), new PluginHealth("asus-astral", PluginState.Ready, now, null), new PluginHealth("wireview-pro2", PluginState.Ready, now, null)], [])
         {
             Alerts = pins is null ? [] : [new SensorAlert("asus-astral", "gpu0", AsusAlertKinds.WireOvercurrent, now, pins)]
         };

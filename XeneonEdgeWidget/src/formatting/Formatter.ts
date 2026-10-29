@@ -51,13 +51,13 @@ export class Formatter {
         }
 
         return (
-            this.number(value, precision, unit !== 'MHz' && unit !== 'RPM') +
+            this.number(value, precision, unit !== 'MHz' && unit !== 'RPM' && unit !== 'mV') +
             (unit && this.settings.enabled('showUnits') ? `${unit === '%' ? '' : ' '}${unit}` : '')
         );
     }
 
     temperature(value: number | null): string {
-        return this.value(value === null ? null : this.fahrenheit ? (value * 9) / 5 + 32 : value, this.fahrenheit ? '°F' : '°C');
+        return this.value(value === null ? null : this.fahrenheit ? (value * 9) / 5 + 32 : value, this.fahrenheit ? '°F' : '°C', 1);
     }
 
     unit(name: string): string {

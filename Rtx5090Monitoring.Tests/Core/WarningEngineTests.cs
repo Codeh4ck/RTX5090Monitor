@@ -1,5 +1,6 @@
 using Rtx5090Monitoring.Plugins.WireView.Contracts.Warnings;
 using Rtx5090Monitoring.Plugins.Asus.Contracts.Warnings;
+using Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.Warnings;
 using Rtx5090Monitoring.Contracts.Alerts;
 using Rtx5090Monitoring.Contracts.Enums;
 using Rtx5090Monitoring.Contracts.Health;
@@ -120,7 +121,7 @@ internal static class WarningEngineTests
     {
         var engine = new WarningEngine(WarningTestData.Registry());
         var config = WarningTestData.Configuration(new WarningPolicy { RepeatWhileActive = true });
-        config = config with { Warnings = config.Warnings with { Overrides = new Dictionary<string, WarningPolicy> { [AsusWarningIds.CoreTemperature] = new() { RepeatWhileActive = true, RepeatIntervalSeconds = 10 } } } };
+        config = config with { Warnings = config.Warnings with { Overrides = new Dictionary<string, WarningPolicy> { [GenericNvidiaWarningIds.CoreTemperature] = new() { RepeatWhileActive = true, RepeatIntervalSeconds = 10 } } } };
         engine.Evaluate(WarningTestData.Frame(0), config, WarningTestData.Start);
         TestAssert.Equal(1L, engine.Evaluate(WarningTestData.Frame(5), config, WarningTestData.Start.AddSeconds(5)).Sequence);
         TestAssert.Equal(2L, engine.Evaluate(WarningTestData.Frame(10), config, WarningTestData.Start.AddSeconds(10)).Sequence);

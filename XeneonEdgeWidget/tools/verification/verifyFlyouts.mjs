@@ -7,7 +7,7 @@ export async function verifyFlyouts(page, base, properties, setTransform, reques
     await properties(base);
     const widths = [];
     for (const usage of [5, 60, 100]) {
-        setTransform(frame => ({ ...frame, sensors: frame.sensors.map(reading => reading.identity.pluginId === 'asus-astral'
+        setTransform(frame => ({ ...frame, sensors: frame.sensors.map(reading => reading.identity.pluginId === 'generic-nvidia'
             && reading.identity.component === 'GpuCore' && reading.identity.metric === 'Utilization' ? { ...reading, value: usage } : reading) }));
         await page.waitForFunction(value => document.querySelector('#panel2 .gpu-usage-value').textContent.includes(value + '%'), usage);
         widths.push((await page.locator('#panel2 .gpu-usage').boundingBox()).width);
@@ -109,6 +109,6 @@ export async function verifyFlyouts(page, base, properties, setTransform, reques
     await properties({ ...base, warningPreview: 'thermal' });
     await properties(base);
     assert.equal(await page.locator('dialog').count(), 0, 'Off closes the warning preview');
-    assert.match(await page.locator('#panel1 .status-pill').innerText(), /Connected/);
+    assert.equal(await page.locator('#panel1 .status-pill').isVisible(), false);
     assert.equal(await page.locator('#panel1 .pin-value').first().textContent(), '5.8 A', 'Previews never change real telemetry');
 }

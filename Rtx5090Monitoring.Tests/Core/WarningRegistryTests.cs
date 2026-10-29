@@ -1,4 +1,6 @@
 using System.Text.Json;
+using Rtx5090Monitoring.Plugins.GenericNvidia.Analysis.Warnings;
+using Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.Warnings;
 using Microsoft.Extensions.Logging.Abstractions;
 using Rtx5090Monitoring.Contracts.Configuration;
 using Rtx5090Monitoring.Contracts.Warnings;
@@ -51,7 +53,7 @@ internal static class WarningRegistryTests
     {
         var configuration = WarningTestData.Configuration() with
         {
-            Plugins = new Dictionary<string, PluginSettings> { ["asus-astral"] = new() { Options = JsonSerializer.SerializeToElement(new AsusOptions()) } },
+            Plugins = new Dictionary<string, PluginSettings> { ["generic-nvidia"] = new(), ["asus-astral"] = new() { Options = JsonSerializer.SerializeToElement(new AsusOptions()) } },
             Warnings = new WarningOptions
             {
                 Overrides = new Dictionary<string, WarningPolicy> { ["AsusCoreTemperature"] = new() { RepeatWhileActive = true }, ["absent-plugin/future"] = new() { RepeatIntervalSeconds = 17 } },
@@ -60,12 +62,13 @@ internal static class WarningRegistryTests
         };
         var registry = WarningTestData.Registry();
         var upgraded = registry.Migrate(configuration);
-        TestAssert.True(upgraded.Warnings.Overrides[AsusWarningIds.CoreTemperature].RepeatWhileActive, "Legacy overrides must survive.");
+        TestAssert.True(upgraded.Warnings.Overrides[GenericNvidiaWarningIds.CoreTemperature].RepeatWhileActive, "Legacy overrides must survive.");
         TestAssert.False(upgraded.Warnings.Overrides.ContainsKey("AsusCoreTemperature"), "Migration must replace only known legacy aliases.");
         TestAssert.Equal(17, upgraded.Warnings.Overrides["absent-plugin/future"].RepeatIntervalSeconds);
-        var options = upgraded.Plugins["asus-astral"].Options!.Value.Deserialize<AsusOptions>(new JsonSerializerOptions(JsonSerializerDefaults.Web))!;
-        TestAssert.Equal(81d, options.EffectiveCoreTemperatureWarningC);
-        TestAssert.Equal(85d, options.EffectiveMemoryTemperatureWarningC);
+        var nvidia = upgraded.Plugins["generic-nvidia"].Options!.Value.Deserialize<Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.Configuration.GenericNvidiaOptions>(new JsonSerializerOptions(JsonSerializerDefaults.Web))!;
+        TestAssert.Equal<double?>(81, nvidia.CoreTemperatureWarningC);
+        TestAssert.Equal<double?>(85, nvidia.MemoryTemperatureWarningC);
+        var options = new AsusOptions();
         TestAssert.True(upgraded.Warnings.AdditionalSettings is null, "Migrated plugin settings must leave shared policy.");
         TestAssert.Equal(RuntimeJson.Serialize(upgraded), RuntimeJson.Serialize(registry.Migrate(upgraded)));
         TestAssert.True(configuration.Warnings.Overrides.ContainsKey("AsusCoreTemperature"), "Migration must not mutate a loaded baseline.");

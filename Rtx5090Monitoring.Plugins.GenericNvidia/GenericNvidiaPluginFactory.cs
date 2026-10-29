@@ -1,0 +1,34 @@
+using System.Text.Json;
+using Microsoft.Extensions.Configuration;
+using Rtx5090Monitoring.Contracts.Configuration;
+using Rtx5090Monitoring.Contracts.Discovery;
+using Rtx5090Monitoring.Core.Plugins;
+using Rtx5090Monitoring.Hardware.Nvidia;
+using Rtx5090Monitoring.Plugins.GenericNvidia.Analysis.Warnings;
+using Rtx5090Monitoring.Plugins.GenericNvidia.Configuration;
+using Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.Configuration;
+using Rtx5090Monitoring.Plugins.GenericNvidia.Serialization;
+using Rtx5090Monitoring.Warnings;
+
+namespace Rtx5090Monitoring.Plugins.GenericNvidia;
+
+public sealed class GenericNvidiaPluginFactory(NvidiaTelemetryReader reader) : ISensorPluginFactory
+{
+    public string Id => GenericNvidiaPlugin.PluginId;
+    public string Name => "GenericNvidia";
+    public IWarningSource WarningSource { get; } = new GenericNvidiaWarningSource();
+    public PluginCapability[] Capabilities => [PluginCapability.Telemetry, PluginCapability.Configuration,
+        PluginCapability.Restart, PluginCapability.DeviceSelection];
+
+    public PluginSettings CreateDefaultSettings() => GenericNvidiaSettings.WithOptions(new PluginSettings(), new GenericNvidiaOptions());
+
+    public JsonElement ReadBootstrapOptions(IConfigurationSection section) => JsonSerializer.SerializeToElement(
+        section.Get<GenericNvidiaOptions>(binding => binding.ErrorOnUnknownConfiguration = true) ?? new GenericNvidiaOptions(),
+        GenericNvidiaJsonContext.Default.GenericNvidiaOptions);
+
+    public ServiceConfiguration MigrateConfiguration(ServiceConfiguration configuration) => GenericNvidiaConfigurationMigration.Upgrade(configuration);
+
+    public void ValidateSettings(PluginSettings settings) => GenericNvidiaSettings.GetOptions(settings);
+
+    public ISensorPlugin Create(PluginSettings settings) => new GenericNvidiaPlugin(settings, reader);
+}

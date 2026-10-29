@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <ItemGroup>
+        <ProjectReference Include="../Rtx5090Monitoring.Core/Rtx5090Monitoring.Core.csproj" />
+        <ProjectReference Include="../Rtx5090Monitoring.Hardware.Nvidia/Rtx5090Monitoring.Hardware.Nvidia.csproj" />
+        <ProjectReference Include="../Rtx5090Monitoring.Plugins.GenericNvidia.Contracts/Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.csproj" />
+        <ProjectReference Include="../Rtx5090Monitoring.Plugins.GenericNvidia.Analysis/Rtx5090Monitoring.Plugins.GenericNvidia.Analysis.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+        <InternalsVisibleTo Include="Rtx5090Monitoring.Tests" />
+    </ItemGroup>
+</Project>

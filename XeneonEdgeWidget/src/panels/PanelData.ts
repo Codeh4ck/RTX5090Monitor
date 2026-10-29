@@ -7,6 +7,7 @@ export interface PanelData {
     title: string;
     source: string;
     gpuUsage: string;
+    coreVoltage: string;
     state: string;
     tone: 'good' | 'warning' | 'error' | 'neutral';
     summary: MetricData[];

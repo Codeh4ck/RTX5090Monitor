@@ -4,6 +4,7 @@
         <PublishTrimmed>false</PublishTrimmed>
     </PropertyGroup>
     <ItemGroup>
+        <ProjectReference Include="../Rtx5090Monitoring.Plugins.GenericNvidia/Rtx5090Monitoring.Plugins.GenericNvidia.csproj" />
         <ProjectReference Include="../Rtx5090Monitoring.Plugins.Msi/Rtx5090Monitoring.Plugins.Msi.csproj" />
         <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" />
         <ProjectReference Include="../Rtx5090Monitoring.Core/Rtx5090Monitoring.Core.csproj" />

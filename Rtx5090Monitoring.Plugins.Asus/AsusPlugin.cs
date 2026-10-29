@@ -21,6 +21,7 @@ public sealed class AsusPlugin(PluginSettings settings, TimeProvider clock, IAsu
     private readonly AsusAlertMonitor _alerts = new();
     private AsusOptions _options = AsusSettings.GetOptions(settings);
     private string? _deviceId;
+    private int _pollIntervalMs = settings.PollIntervalMs;
 
     public PluginDescriptor Descriptor { get; private set; } = Describe(settings);
     public GpuSensorSnapshot? Latest { get; private set; }
@@ -40,6 +41,7 @@ public sealed class AsusPlugin(PluginSettings settings, TimeProvider clock, IAsu
         }
 
         _options = options;
+        _pollIntervalMs = settings.PollIntervalMs;
         Descriptor = Describe(settings);
     }
 
@@ -47,6 +49,7 @@ public sealed class AsusPlugin(PluginSettings settings, TimeProvider clock, IAsu
     {
         try
         {
+            reader.SetPollInterval(_pollIntervalMs);
             var data = reader.Read(_options.DeviceId, cancellationToken);
             cancellationToken.ThrowIfCancellationRequested();
             if (data is null || data.Sensors.Length == 0)
@@ -65,7 +68,7 @@ public sealed class AsusPlugin(PluginSettings settings, TimeProvider clock, IAsu
             var currents = AsusSnapshotMapper.GetPinCurrents(data);
             _alerts.Evaluate(currents, _options, now);
             Latest = AsusSnapshotMapper.CreateLegacySnapshot(data, _alerts, now);
-            var readings = AsusSnapshotMapper.CreateReadings(data, _alerts, currents, now);
+            var readings = AsusSnapshotMapper.CreateReadings(data, _alerts, currents, data.ObservedAt ?? now);
             stream.Hub.Publish(JsonSerializer.SerializeToUtf8Bytes(Latest, AsusJsonContext.Default.GpuSensorSnapshot));
             return ValueTask.FromResult(new PluginSample(PluginState.Ready, readings, Alerts: AsusAlertMapper.Create(data.DeviceId, _alerts, now)));
         }

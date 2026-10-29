@@ -141,18 +141,21 @@ internal static class HardwarePanelTests
             Reading(SensorComponent.GpuMemory, SensorMetric.MemoryUsed, 8192), Reading(SensorComponent.GpuMemory, SensorMetric.MemoryTotal, 32768),
             Reading(SensorComponent.GpuMemory, SensorMetric.Utilization, 25), Reading(SensorComponent.GpuCore, SensorMetric.Utilization, 80),
             Reading(SensorComponent.GpuBoard, SensorMetric.Power, 450)] };
-        var panel = new HardwarePanelViewModel(UiTestData.Plugin);
-        panel.Apply(frame, new AppPreferences(), frame.Timestamp);
-        TestAssert.Equal(5, panel.Metrics.Count);
-        TestAssert.Equal("VRAM usage", panel.Metrics[2].Label);
-        TestAssert.Equal("Core / VRAM temp", panel.Metrics[3].Label);
-        TestAssert.Equal("1200 RPM / 1400 RPM", panel.Metrics.Single(metric => metric.Label == "Fan 1 / Fan 2").Value);
-        TestAssert.Equal("8 GB / 32 GB (25%)", panel.Metrics.Single(metric => metric.Label == "VRAM usage").Value);
-        TestAssert.True(panel.Metrics.Single(metric => metric.Label == "Core / VRAM temp").IsWarning, "Either temperature must warn in the combined row.");
-        TestAssert.Equal("450 W", panel.BoardPowerText);
-        TestAssert.Equal("80 %", panel.GpuUsageText);
-        panel.MarkDisconnected(new AppPreferences());
-        TestAssert.Equal("—", panel.BoardPowerText);
+        frame = frame with
+        {
+            Sensors = [.. frame.Sensors.Select(reading => reading with { Identity = reading.Identity with { PluginId = "generic-nvidia" } })],
+            Plugins = [new Rtx5090Monitoring.Contracts.Health.PluginHealth("generic-nvidia", PluginState.Ready, frame.Timestamp, "RTX 5090")]
+        };
+        var model = new GpuStatusViewModel();
+        model.Apply(frame, null, new AppPreferences(), frame.Timestamp);
+        TestAssert.Equal(5, model.Metrics.Count);
+        TestAssert.Equal("VRAM usage", model.Metrics[2].Label);
+        TestAssert.Equal("Core / VRAM temp", model.Metrics[3].Label);
+        TestAssert.Equal("1200 RPM / 1400 RPM", model.Metrics.Single(metric => metric.Label == "Fan 1 / 2").Value);
+        TestAssert.Equal("80%", model.GpuUsageText);
+        TestAssert.False(model.Metrics[3].IsWarning, "Warning colors must consume the shared backend state, not infer independent thresholds.");
+        model.Clear();
+        TestAssert.True(model.IsUnavailable, "Disconnected GPU status must be explicit.");
         return;
 
         SensorReading Reading(SensorComponent component, SensorMetric metric, double value, int? channel = null) =>

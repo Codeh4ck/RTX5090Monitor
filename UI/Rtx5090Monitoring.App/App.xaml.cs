@@ -97,6 +97,7 @@ public sealed partial class App : Application
         var width = diagnostic ? WindowSizeLimits.MaximumWidth : Math.Min(_runtime.Preferences.WindowWidth, WindowSizeLimits.MaximumWidth);
         var height = diagnostic ? WindowSizeLimits.MaximumHeight : Math.Min(_runtime.Preferences.WindowHeight, WindowSizeLimits.MaximumHeight);
         _window.AppWindow.Resize(new SizeInt32(Math.Min(area.Width, (int)(width * scale)), Math.Min(area.Height, (int)(height * scale))));
+        _window.EnableWindowSizePersistence();
         await _runtime.StartAsync(_window, _tray);
 #if TELEMETRY_DEBUG
         if (arguments.Contains("--smoke-test") && _runtime.IsDemo)
@@ -158,10 +159,7 @@ public sealed partial class App : Application
         _exiting = true;
         if (_runtime is not null && _window is not null)
         {
-            var size = _window.AppWindow.Size;
-            var scale = Math.Max(96, Platform.Interop.NativeMethods.GetDpiForWindow(WinRT.Interop.WindowNative.GetWindowHandle(_window))) / 96d;
-            _runtime.Settings.SaveWindowSize(Math.Clamp(size.Width / scale, WindowSizeLimits.MinimumWidth, WindowSizeLimits.MaximumWidth),
-                Math.Clamp(size.Height / scale, WindowSizeLimits.MinimumHeight, WindowSizeLimits.MaximumHeight));
+            _window.SaveNormalWindowSize();
             try { await _runtime.StopAsync(); }
             catch (Exception exception) when (exception is IOException or UnauthorizedAccessException) { System.Diagnostics.Debug.WriteLine(exception); }
         }

@@ -68,7 +68,54 @@ public sealed class AppSettingsViewModel(AppPreferences preferences) : Observabl
     } = string.Empty;
     public PinMetric PinMetric { get => _value.PinMetric; set => Update(_value with { PinMetric = value }); }
 
-    public void SaveWindowSize(double width, double height) => Update(_value with { WindowWidth = width, WindowHeight = height });
+    private bool _gpuStatusTabRequired = true;
+
+    public bool CanChooseGpuStatusTab => !_gpuStatusTabRequired;
+
+    public bool ShowSeparateGpuStatusTab
+    {
+        get => _gpuStatusTabRequired || _value.ShowSeparateGpuStatusTab;
+        set
+        {
+            if (!_gpuStatusTabRequired)
+            {
+                Update(_value with { ShowSeparateGpuStatusTab = value });
+            }
+        }
+    }
+
+    public void SetGpuStatusTabRequired(bool required)
+    {
+        if (Set(ref _gpuStatusTabRequired, required))
+        {
+            Raise(nameof(CanChooseGpuStatusTab));
+            Raise(nameof(ShowSeparateGpuStatusTab));
+        }
+    }
+
+    private static readonly string[] StartupTabs = ["", "wireview-pro2", "asus-astral", "generic-nvidia", "msi-psu"];
+
+    public int StartupTabIndex
+    {
+        get => Math.Max(0, Array.IndexOf(StartupTabs, _value.StartupTabId));
+        set
+        {
+            if (value >= 0 && value < StartupTabs.Length)
+            {
+                Update(_value with { StartupTabId = StartupTabs[value] });
+            }
+        }
+    }
+
+    public double WindowWidth { get => _value.WindowWidth; set => Update(_value with { WindowWidth = value }); }
+    public double WindowHeight { get => _value.WindowHeight; set => Update(_value with { WindowHeight = value }); }
+
+    public void SaveWindowSize(double width, double height)
+    {
+        Update(_value with { WindowWidth = width, WindowHeight = height });
+        Raise(nameof(WindowWidth));
+        Raise(nameof(WindowHeight));
+    }
 
     private void Update(AppPreferences candidate, [System.Runtime.CompilerServices.CallerMemberName] string? property = null)
     {

@@ -10,6 +10,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Rtx5090Monitoring.Core.Plugins;
+using Rtx5090Monitoring.Hardware.Nvidia;
+using Rtx5090Monitoring.Plugins.GenericNvidia;
 using Rtx5090Monitoring.Contracts.Configuration;
 using Rtx5090Monitoring.Plugins.WireView;
 using Rtx5090Monitoring.Plugins.WireView.Endpoints;
@@ -67,6 +69,7 @@ internal sealed class MonitoringTestHost : IAsyncDisposable
         {
             ["Plugins:wireview-pro2:Enabled"] = "false",
             ["Plugins:asus-astral:Enabled"] = "false",
+            ["Plugins:generic-nvidia:Enabled"] = "false",
             ["Plugins:msi-psu:Enabled"] = "false"
         });
 
@@ -226,6 +229,12 @@ internal sealed class MonitoringTestHost : IAsyncDisposable
         {
             builder.Services.ConfigureHttpJsonOptions(options => options.SerializerOptions.TypeInfoResolverChain.Insert(0, MsiJsonContext.Default));
             builder.Services.AddSingleton<ISensorPluginFactory>(new TestMsiFactory(msi));
+        }
+
+        if (useInstalledFactories || asus is not null)
+        {
+            builder.Services.AddSingleton<INvidiaHardwareSource, TestNvidiaHardwareSource>();
+            builder.Services.AddGenericNvidiaPlugin();
         }
 
         if (useInstalledFactories)

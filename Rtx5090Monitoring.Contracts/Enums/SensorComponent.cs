@@ -1,4 +1,4 @@
-﻿namespace Rtx5090Monitoring.Contracts.Enums;
+namespace Rtx5090Monitoring.Contracts.Enums;
 
 public enum SensorComponent
 {
@@ -12,5 +12,6 @@ public enum SensorComponent
     ExternalProbe,
     Psu,
     PsuConnector,
-    PsuPin
+    PsuPin,
+    GpuHotspot
 }

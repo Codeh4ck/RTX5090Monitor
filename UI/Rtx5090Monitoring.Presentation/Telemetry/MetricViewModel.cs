@@ -4,7 +4,7 @@ namespace Rtx5090Monitoring.Presentation.Telemetry;
 
 public sealed class MetricViewModel(string label, string value = "Unavailable", string? iconName = null) : ObservableObject
 {
-    public string Label { get; } = label;
+    public string Label { get; set => Set(ref field, value); } = label;
     public string Value
     {
         get;

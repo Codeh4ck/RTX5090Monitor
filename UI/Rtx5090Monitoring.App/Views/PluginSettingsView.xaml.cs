@@ -26,5 +26,7 @@ public sealed partial class PluginSettingsView : UserControl
     }
 
     private async void RefreshDevices_Click(object sender, RoutedEventArgs args) => await _runtime.RefreshDevicesAsync();
+    private async void RefreshNvidiaDevices_Click(object sender, RoutedEventArgs args) => await _runtime.RefreshNvidiaDevicesAsync();
+
     private async void RefreshMsiDevices_Click(object sender, RoutedEventArgs args) => await _runtime.RefreshMsiDevicesAsync();
 }

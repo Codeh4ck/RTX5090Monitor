@@ -45,6 +45,11 @@ internal static class DebugReadingBuilder
 
     private static void Derive(DebugPluginViewModel plugin, List<SensorReading> readings, DateTimeOffset now)
     {
+        if (plugin.Id == "generic-nvidia")
+        {
+            return;
+        }
+
         if (plugin.Id == "msi-psu")
         {
             foreach (var connector in new[] { "1", "2" })

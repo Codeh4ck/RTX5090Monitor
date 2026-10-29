@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.Configuration;
 using Rtx5090Monitoring.Client.Serialization;
 using Rtx5090Monitoring.Plugins.Asus.Contracts.Configuration;
 using Rtx5090Monitoring.Plugins.Msi.Contracts.Configuration;
@@ -17,6 +18,8 @@ public sealed class PluginSettingsEditorViewModel : EditableObject
     public string Id { get; }
     public string Name { get; }
     public bool IsAsus => Id == "asus-astral";
+    public bool IsNvidia => Id == "generic-nvidia";
+    public GenericNvidiaSettingsEditorViewModel Nvidia { get; }
     public bool IsWireView => Id == "wireview-pro2";
     public bool IsMsi => Id == "msi-psu";
     public int MinimumPollMs => IsMsi ? 1000 : 100;
@@ -29,7 +32,7 @@ public sealed class PluginSettingsEditorViewModel : EditableObject
     public PluginSettingsEditorViewModel(string id, string name, PluginSettings settings)
     {
         Id = id;
-        Name = name;
+        Name = id == "generic-nvidia" ? "Nvidia" : name;
         _original = settings;
         _enabled = settings.Enabled;
         _poll = settings.PollIntervalMs;
@@ -37,6 +40,9 @@ public sealed class PluginSettingsEditorViewModel : EditableObject
         var options = IsAsus && settings.Options is { } json ? json.Deserialize(ClientJsonContext.Default.AsusOptions) : null;
         Asus = new AsusSettingsEditorViewModel(options ?? new AsusOptions());
         Asus.Edited += NotifyEdited;
+        var nvidiaOptions = IsNvidia && settings.Options is { } nvidiaJson ? nvidiaJson.Deserialize(ClientJsonContext.Default.GenericNvidiaOptions) : null;
+        Nvidia = new GenericNvidiaSettingsEditorViewModel(nvidiaOptions ?? new GenericNvidiaOptions());
+        Nvidia.Edited += NotifyEdited;
         var msiOptions = IsMsi && settings.Options is { } msiJson ? msiJson.Deserialize(ClientJsonContext.Default.MsiOptions) : null;
         Msi = new MsiSettingsEditorViewModel(msiOptions ?? new MsiOptions());
         Msi.Edited += NotifyEdited;
@@ -60,6 +66,11 @@ public sealed class PluginSettingsEditorViewModel : EditableObject
             result = result with { Options = JsonSerializer.SerializeToElement(Asus.Build(result.PollIntervalMs), ClientJsonContext.Default.AsusOptions) };
         }
 
+        if (IsNvidia)
+        {
+            result = result with { Options = JsonSerializer.SerializeToElement(Nvidia.Build(), ClientJsonContext.Default.GenericNvidiaOptions) };
+        }
+
         if (IsMsi)
         {
             if (result.PollIntervalMs < 1000)
@@ -75,6 +86,11 @@ public sealed class PluginSettingsEditorViewModel : EditableObject
 
     public bool Matches(PluginSettings settings)
     {
+        if (IsNvidia && !Nvidia.Matches(settings.Options?.Deserialize(ClientJsonContext.Default.GenericNvidiaOptions) ?? new GenericNvidiaOptions()))
+        {
+            return false;
+        }
+
         if (IsMsi && !Msi.Matches(settings.Options is { } msiJson ? msiJson.Deserialize(ClientJsonContext.Default.MsiOptions) ?? new MsiOptions() : new MsiOptions()))
         {
             return false;
