@@ -21,6 +21,7 @@ internal static class RuntimeConfigurationTests
         await runner.RunAsync(DisablesAndReenablesPluginsWithoutClosingTheSharedStreamAsync);
         await runner.RunAsync(ReschedulesPublicationWithoutWaitingForTheOldIntervalAsync);
         await runner.RunAsync(AppliesSourceSelectionsToTheNextFrameAsync);
+        await runner.RunAsync(MigratesSelectionsOnceAndPreservesEditedProfilesAcrossRestartsAsync);
         await runner.RunAsync(ReloadsAnExternalAtomicFileReplacementAsync);
         await runner.RunAsync(RetainsValidSettingsWhenTheFileIsInvalidAsync);
         await runner.RunAsync(RejectsInvalidApiSettingsWithoutChangingTheFileAsync);
@@ -106,9 +107,39 @@ internal static class RuntimeConfigurationTests
         using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(5));
         using var client = await host.ConnectSensorClientAsync(timeout.Token);
         var frame = await WebSocketMessageReader.ReadUntilAsync(client,
-            snapshot => snapshot.GetProperty("selections").GetArrayLength() == 1, timeout.Token);
+            snapshot => snapshot.GetProperty("selections").EnumerateArray().Any(item => item.GetProperty("name").GetString() == selection.Name), timeout.Token);
 
-        TestAssert.Equal(identity.Key, frame.GetProperty("selections")[0].GetProperty("sensorKey").GetString());
+        var selected = frame.GetProperty("selections").EnumerateArray().Single(item => item.GetProperty("name").GetString() == selection.Name);
+        TestAssert.Equal(identity.Key, selected.GetProperty("sensorKey").GetString());
+    }
+
+    private static async Task MigratesSelectionsOnceAndPreservesEditedProfilesAcrossRestartsAsync()
+    {
+        var identity = new SensorIdentity(PluginId, "com3", SensorComponent.GpuConnector, SensorMetric.Power, 1);
+        var legacy = new ServiceConfiguration
+        {
+            Plugins = new() { ["asus-astral"] = new(), [PluginId] = new() },
+            Monitoring = new MonitoringOptions { Selections = [new SensorSelection { Name = "old-unused", PreferredSources = [identity] }] }
+        };
+
+        ServiceConfiguration edited;
+        await using (var first = await MonitoringTestHost.StartWithAsusAsync(new AsusTestState(), new WireViewTestState(), legacy))
+        {
+            edited = (await first.GetConfigurationAsync()).Configuration;
+            TestAssert.Equal(0, edited.Monitoring.Selections.Count);
+            TestAssert.Equal(1, edited.Monitoring.ConnectorProfiles.Version);
+            var profile = edited.Monitoring.ConnectorProfiles.Profiles[0];
+            profile.Name = "My connector preferences";
+            profile.Metrics[0].AllowFallback = false;
+            await first.SetConfigurationAsync(edited);
+            var persisted = RuntimeJson.Deserialize(await File.ReadAllTextAsync(first.ConfigurationPath));
+            TestAssert.Equal("My connector preferences", persisted.Monitoring.ConnectorProfiles.Profiles[0].Name);
+        }
+
+        await using var second = await MonitoringTestHost.StartWithAsusAsync(new AsusTestState(), new WireViewTestState(), edited);
+        var restored = (await second.GetConfigurationAsync()).Configuration.Monitoring.ConnectorProfiles.Profiles[0];
+        TestAssert.Equal("My connector preferences", restored.Name);
+        TestAssert.False(restored.Metrics[0].AllowFallback, "Restarting must not overwrite the user's edited priorities.");
     }
 
     private static async Task ReloadsAnExternalAtomicFileReplacementAsync()

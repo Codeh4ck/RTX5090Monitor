@@ -26,18 +26,18 @@ public sealed class RuntimeConfigurationService(PluginRuntimeManager runtime, Ru
 
         ServiceConfiguration configuration;
         var persistDefaults = false;
+
         if (File.Exists(file.Path))
         {
             _observedContents = await ReadContentsAsync(cancellationToken);
+
             var original = RuntimeJson.Deserialize(_observedContents);
             configuration = runtime.MigrateConfiguration(original);
             persistDefaults |= RuntimeJson.Serialize(original) != RuntimeJson.Serialize(configuration);
-            if (configuration.Plugins is not null)
+
+            foreach (var (id, settings) in runtime.CreateDefaults().Plugins)
             {
-                foreach (var (id, settings) in runtime.CreateDefaults().Plugins)
-                {
-                    persistDefaults |= configuration.Plugins.TryAdd(id, settings);
-                }
+                persistDefaults |= configuration.Plugins.TryAdd(id, settings);
             }
         }
         else
@@ -52,8 +52,17 @@ public sealed class RuntimeConfigurationService(PluginRuntimeManager runtime, Ru
         }
 
         var upgraded = runtime.WarningRegistry.Migrate(configuration);
+
         persistDefaults |= RuntimeJson.Serialize(upgraded) != RuntimeJson.Serialize(configuration);
         configuration = upgraded;
+
+        if (configuration.Monitoring.ConnectorProfiles.Version == 0)
+        {
+            configuration.Monitoring.Selections.Clear();
+            configuration.Monitoring.ConnectorProfiles = runtime.ConnectorProfiles.CreateDefaults();
+            persistDefaults = true;
+        }
+
         runtime.Validate(configuration);
         if (persistDefaults)
         {
@@ -68,12 +77,15 @@ public sealed class RuntimeConfigurationService(PluginRuntimeManager runtime, Ru
         {
             NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size | NotifyFilters.FileName
         };
+
         _watcher.Changed += OnFileChanged;
         _watcher.Created += OnFileChanged;
         _watcher.Deleted += OnFileChanged;
         _watcher.Renamed += OnFileChanged;
         _watcher.Error += (_, _) => _reload.Set();
+
         _watcher.EnableRaisingEvents = true;
+
         await base.StartAsync(cancellationToken);
     }
 
@@ -90,6 +102,11 @@ public sealed class RuntimeConfigurationService(PluginRuntimeManager runtime, Ru
             }
 
             var candidate = runtime.WarningRegistry.Migrate(RuntimeJson.Clone(update(RuntimeJson.Clone(previous.Configuration))));
+            if (candidate.Monitoring.ConnectorProfiles.Version == 0)
+            {
+                candidate.Monitoring.ConnectorProfiles = RuntimeJson.Clone(previous.Configuration).Monitoring.ConnectorProfiles;
+            }
+
             runtime.Validate(candidate);
             var contents = RuntimeJson.Serialize(candidate);
             await PersistAsync(contents, cancellationToken);
@@ -146,6 +163,11 @@ public sealed class RuntimeConfigurationService(PluginRuntimeManager runtime, Ru
             }
 
             var candidate = runtime.WarningRegistry.Migrate(runtime.MigrateConfiguration(RuntimeJson.Deserialize(contents)));
+            if (candidate.Monitoring.ConnectorProfiles.Version == 0)
+            {
+                candidate.Monitoring.ConnectorProfiles = RuntimeJson.Clone(Current.Configuration).Monitoring.ConnectorProfiles;
+            }
+
             runtime.Validate(candidate);
             var previous = Current;
 
@@ -184,8 +206,10 @@ public sealed class RuntimeConfigurationService(PluginRuntimeManager runtime, Ru
     {
         var contents = RuntimeJson.Serialize(configuration);
         await PersistAsync(contents, CancellationToken.None);
+
         using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
         await runtime.ApplyAsync(configuration, timeout.Token);
+
         _observedContents = contents;
     }
 
@@ -207,6 +231,7 @@ public sealed class RuntimeConfigurationService(PluginRuntimeManager runtime, Ru
     {
         await using var stream = new FileStream(file.Path, FileMode.Open, FileAccess.Read,
             FileShare.ReadWrite | FileShare.Delete, 4096, FileOptions.Asynchronous);
+
         using var reader = new StreamReader(stream);
         return await reader.ReadToEndAsync(cancellationToken);
     }

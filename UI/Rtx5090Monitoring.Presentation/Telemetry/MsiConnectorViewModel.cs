@@ -33,8 +33,7 @@ public sealed class MsiConnectorViewModel(int connector) : ObservableObject
         }
         var currents = Pins.Select(pin => pin.Current).ToArray();
         var complete = currents.All(value => value.HasValue);
-        var total = readings.FirstOrDefault(reading => reading.Identity.Component == SensorComponent.PsuConnector
-            && reading.Identity.Metric == SensorMetric.Current && reading.Identity.ConnectorId == Id)?.Value;
+        var total = readings.FirstOrDefault(reading => reading.Identity is { Component: SensorComponent.PsuConnector, Metric: SensorMetric.Current } && reading.Identity.ConnectorId == Id)?.Value;
         total ??= complete ? currents.Sum(value => value!.Value) : null;
         Total = total is { } value ? value.ToString("0.##", CultureInfo.CurrentCulture) + " A" : "—";
         Spread = complete ? (currents.Max() - currents.Min())!.Value.ToString("0.##", CultureInfo.CurrentCulture) + " A" : "—";

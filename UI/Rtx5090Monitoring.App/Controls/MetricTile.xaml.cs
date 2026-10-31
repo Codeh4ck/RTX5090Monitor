@@ -44,8 +44,5 @@ public sealed partial class MetricTile : UserControl
         }
     }
 
-    private void UpdateTone()
-    {
-        VisualStateManager.GoToState(this, Model.Tone.ToString(), false);
-    }
+    private void UpdateTone() => VisualStateManager.GoToState(this, Model.Tone.ToString(), false);
 }

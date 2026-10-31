@@ -37,13 +37,14 @@ internal static class SmokeTestRunner
         {
             throw new InvalidOperationException("No demo telemetry received.");
         }
-        await WaitUntilAsync(() => runtime.Dashboard.ReportingPanels.Count == 3 && runtime.Dashboard.SelectedPanel is not null);
         if (Environment.GetCommandLineArgs().Contains("--gpu-status-only"))
         {
+            await WaitUntilAsync(() => !runtime.Dashboard.GpuStatus.IsUnavailable && runtime.Dashboard.SelectedPanel is not null);
             await GenericNvidiaSmokeTests.RunAsync(window, runtime, output);
             return;
         }
 
+        await WaitUntilAsync(() => runtime.Dashboard.ReportingPanels.Count == 3 && runtime.Dashboard.SelectedPanel is not null);
         if (Environment.GetCommandLineArgs().Contains("--warning-policy-only"))
         {
             await WarningPolicySmokeTests.RunAsync(window, runtime, output);
@@ -79,7 +80,7 @@ internal static class SmokeTestRunner
         var initialPrivateBytes = process.PrivateMemorySize64;
         await Task.Delay(200);
         var activeTab = VisualTreeQuery.Descendants<ToggleButton>(window.ThemeRoot).SingleOrDefault(button => button.Tag as string == runtime.Dashboard.SelectedPanel?.Id);
-        if (activeTab?.IsChecked != true || !VisualTreeQuery.Descendants<Border>(activeTab).Any(border => border.Name == "SelectionRail" && border.Visibility == Visibility.Visible))
+        if (activeTab?.IsChecked != true || !VisualTreeQuery.Descendants<Border>(activeTab).Any(border => border is { Name: "SelectionRail", Visibility: Visibility.Visible }))
         {
             throw new InvalidOperationException("The initial hardware tab has no visible selection highlight.");
         }
@@ -118,7 +119,7 @@ internal static class SmokeTestRunner
 
         var hardwareTabs = VisualTreeQuery.Descendants<ToggleButton>(window.ThemeRoot).Where(button => button.Tag is string).ToArray();
         if (hardwareTabs.Count(button => button.IsChecked == true) != 1
-            || hardwareTabs.Sum(button => VisualTreeQuery.Descendants<Border>(button).Count(border => border.Name == "SelectionRail" && border.Visibility == Visibility.Visible)) != 1)
+            || hardwareTabs.Sum(button => VisualTreeQuery.Descendants<Border>(button).Count(border => border is { Name: "SelectionRail", Visibility: Visibility.Visible })) != 1)
         {
             throw new InvalidOperationException("Switching hardware tabs must leave exactly one visible selection highlight.");
         }
@@ -190,7 +191,7 @@ internal static class SmokeTestRunner
         await WaitUntilAsync(() => runtime.Dashboard.ReportingPanels.Count == 1 && !runtime.Dashboard.HasPluginWarning);
         window.ShowPanel("asus-astral");
         await CaptureAsync(window, Path.Combine(output, "astral-only-dark.png"));
-        if (!VisualTreeQuery.Descendants<Border>(window.ThemeRoot).Any(border => border.Name == "NavigationStrip" && border.Visibility == Visibility.Visible && border.Background is not null))
+        if (!VisualTreeQuery.Descendants<Border>(window.ThemeRoot).Any(border => border is { Name: "NavigationStrip", Visibility: Visibility.Visible, Background: not null }))
         {
             throw new InvalidOperationException("The navigation strip must remain visible with a single plugin tab.");
         }

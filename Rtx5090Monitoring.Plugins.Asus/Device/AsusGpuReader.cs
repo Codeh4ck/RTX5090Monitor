@@ -16,8 +16,12 @@ public sealed class AsusGpuReader(NvidiaTelemetryReader reader) : IAsusGpuReader
     public AsusGpuData? Read(string? deviceId, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
+
         var devices = reader.GetDevices().Where(device => Matches(HardwareType.GpuNvidia, device.Name)).ToArray();
-        Devices = [.. devices.Select(device => new AsusDeviceInfo(device.LegacyId, device.Name))];
+        devices = [.. devices.Where(device => IsAstral(reader.Read(device.Id, _pollIntervalMs, cancellationToken)))];
+
+        Devices = [.. devices.Select(device => new AsusDeviceInfo(device.Id, device.Name))];
+
         var selected = deviceId is null ? devices.FirstOrDefault()
             : devices.FirstOrDefault(device => device.Id == deviceId || device.LegacyId == deviceId);
 
@@ -35,16 +39,14 @@ public sealed class AsusGpuReader(NvidiaTelemetryReader reader) : IAsusGpuReader
             }
         }
 
-        return new AsusGpuData(selected.LegacyId, selected.Name, [.. readings], sample.ObservedAt);
+        return new AsusGpuData(selected.Id, selected.Name, [.. readings], sample.ObservedAt);
     }
+
+    public static bool IsAstral(NvidiaSample? sample) => sample?.Sensors.Any(sensor => sensor is { Name: "12VHPWR Pin 1", Type: SensorType.Current }) == true;
 
     internal static bool Matches(HardwareType type, string name) => type == HardwareType.GpuNvidia
         && name.Contains("RTX", StringComparison.OrdinalIgnoreCase)
         && (name.Contains("5090", StringComparison.Ordinal) || name.Contains("5080", StringComparison.Ordinal));
 
-    public void Dispose()
-    {
-        Devices = [];
-        // The service owns the hardware reader shared with GenericNvidia.
-    }
+    public void Dispose() => Devices = [];
 }

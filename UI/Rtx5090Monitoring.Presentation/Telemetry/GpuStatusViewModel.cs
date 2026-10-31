@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Text.Json;
 using Rtx5090Monitoring.Client.Serialization;
 using Rtx5090Monitoring.Contracts.Configuration;
+using Rtx5090Monitoring.Contracts.Monitoring;
 using Rtx5090Monitoring.Contracts.Enums;
 using Rtx5090Monitoring.Contracts.Sensors;
 using Rtx5090Monitoring.Presentation.Infrastructure;
@@ -84,7 +85,7 @@ public sealed class GpuStatusViewModel : ObservableObject
         var electrical = options.ElectricalSource switch
         {
             "None" => [],
-            "WireView" when snapshot.Plugins.Any(plugin => plugin.PluginId == "wireview-pro2" && plugin.State == PluginState.Ready) =>
+            "WireView" when snapshot.Plugins.Any(plugin => plugin is { PluginId: "wireview-pro2", State: PluginState.Ready }) =>
                 snapshot.Sensors.Where(reading => reading.Identity.PluginId == "wireview-pro2").ToArray(),
             "WireView" => [],
             _ => readings
@@ -94,6 +95,16 @@ public sealed class GpuStatusViewModel : ObservableObject
 
         double? Input(SensorMetric metric)
         {
+            var selection = snapshot.Selections.FirstOrDefault(item => item.Name == ConnectorProfiles.SelectionName(metric));
+            if (configuration?.Configuration.Monitoring.ConnectorProfiles.Version == 1 || selection is not null)
+            {
+                var selected = snapshot.Sensors.FirstOrDefault(reading => reading.Identity.Key == selection?.SensorKey);
+                var age = configuration?.Configuration.Plugins.GetValueOrDefault(selected?.Identity.PluginId ?? "")?.StaleAfterMs ?? 5000;
+                return selected is { Quality: ReadingQuality.Valid, Value: { } number } && double.IsFinite(number)
+                    && snapshot.Plugins.Any(plugin => plugin.PluginId == selected.Identity.PluginId && plugin.State == PluginState.Ready)
+                    && now - selected.ObservedAt <= TimeSpan.FromMilliseconds(age) ? number : null;
+            }
+
             if (electrical.Select(reading => reading.Identity.DeviceId).Distinct().Take(2).Count() != 1)
             {
                 return null;
@@ -133,7 +144,7 @@ public sealed class GpuStatusViewModel : ObservableObject
 
         Metrics[3].Value = string.Join(" / ", temperatures);
         Metrics[3].IsWarning = snapshot.Warnings?.States.Any(warning => warning.PluginId == PluginId
-            && warning.DeviceId == devices[0] && warning.Phase == Contracts.Warnings.WarningPhase.Active && warning.Icon == "temperature") == true;
+                                                                        && warning.DeviceId == devices[0] && warning is { Phase: Contracts.Warnings.WarningPhase.Active, Icon: "temperature" }) == true;
 
         var fans = readings.Where(reading => reading.Identity is { Component: SensorComponent.GpuFan, Metric: SensorMetric.FanSpeed, Channel: > 0 })
             .OrderBy(reading => reading.Identity.Channel).Take(2).ToArray();
@@ -149,11 +160,9 @@ public sealed class GpuStatusViewModel : ObservableObject
         _memoryTemperature.Value = Temperature(Value(SensorComponent.GpuMemory, SensorMetric.Temperature));
         _hotspotTemperature.Value = Temperature(hotspot);
         _coreTemperature.IsWarning = snapshot.Warnings?.States.Any(warning => warning.PluginId == PluginId
-            && warning.DeviceId == devices[0] && warning.Phase == Contracts.Warnings.WarningPhase.Active
-            && warning.TypeId == "generic-nvidia/core-temperature") == true;
+                                                                              && warning.DeviceId == devices[0] && warning is { Phase: Contracts.Warnings.WarningPhase.Active, TypeId: "generic-nvidia/core-temperature" }) == true;
         _memoryTemperature.IsWarning = snapshot.Warnings?.States.Any(warning => warning.PluginId == PluginId
-            && warning.DeviceId == devices[0] && warning.Phase == Contracts.Warnings.WarningPhase.Active
-            && warning.TypeId == "generic-nvidia/memory-temperature") == true;
+                                                                                && warning.DeviceId == devices[0] && warning is { Phase: Contracts.Warnings.WarningPhase.Active, TypeId: "generic-nvidia/memory-temperature" }) == true;
         _fan1.Label = fans.Length == 0 ? "Fans" : "Fan 1";
         _fan1.Value = Fan(fans.ElementAtOrDefault(0));
         _fan2.Value = Fan(fans.ElementAtOrDefault(1));

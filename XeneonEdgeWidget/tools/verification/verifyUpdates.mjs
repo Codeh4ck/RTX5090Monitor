@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { join } from 'node:path';
 
-export async function verifyUpdates(page, base, properties, setManifest, fail, requests, output) {
+export async function verifyUpdates(page, base, properties, setManifest, fail, requests, output, installedVersion) {
     await page.setViewportSize({ width: 1688, height: 696 });
     await properties({ ...base, checkUpdates: false, showAlerts: false });
     await page.evaluate(() => {
@@ -17,7 +17,9 @@ export async function verifyUpdates(page, base, properties, setManifest, fail, r
     await page.locator('.check-updates').click();
     await page.getByRole('button', { name: 'View release', exact: true }).waitFor();
     assert.equal(await page.locator('.widget-flyout').getAttribute('data-mode'), 'updates');
-    assert.match(await page.locator('.flyout-body').innerText(), /1.0.0[\s\S]*1.1.0/);
+    const updateText = await page.locator('.flyout-body').innerText();
+    assert.ok(updateText.includes(installedVersion), `Expected installed widget version ${installedVersion}`);
+    assert.match(updateText, /1.1.0/);
     await page.getByRole('button', { name: 'View release', exact: true }).click();
     assert.deepEqual(await page.evaluate(() => window.openedUpdateLinks),
         ['https://github.com/Codeh4ck/RTX5090Monitor/releases/tag/v1.1.0']);

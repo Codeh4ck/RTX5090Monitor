@@ -127,15 +127,7 @@ public sealed partial class ConfigurationView : UserControl
         }
     }
 
-    private void RebuildSelections(object? sender, NotifyCollectionChangedEventArgs? args)
-    {
-        SelectionHost.Children.Clear();
-        foreach (var selection in Model.Selections)
-        {
-            SelectionHost.Children.Add(new SelectionEditorView(selection, Model.RemoveSelection));
-        }
-        EmptySelections.Visibility = Model.Selections.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
-    }
+    private void RebuildSelections(object? sender, NotifyCollectionChangedEventArgs? args) => ProfilesHost.Content = new ConnectorProfilesView(Model.ConnectorProfiles);
 
     internal void SelectSection(string id) => ConfigurationTabs.SelectedItem = ConfigurationTabs.TabItems.OfType<TabViewItem>().Single(tab => tab.Tag as string == id);
 
@@ -147,8 +139,14 @@ public sealed partial class ConfigurationView : UserControl
         }
     }
 
-    private void OnModelChanged(object? sender, PropertyChangedEventArgs args) =>
+    private void OnModelChanged(object? sender, PropertyChangedEventArgs args)
+    {
         ConflictText.Visibility = Model.HasExternalChanges ? Visibility.Visible : Visibility.Collapsed;
+        if (args.PropertyName == nameof(Model.RevisionText))
+        {
+            RebuildSelections(null, null);
+        }
+    }
 
     private void OnUnloaded(object sender, RoutedEventArgs args)
     {

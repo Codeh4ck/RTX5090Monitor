@@ -28,6 +28,7 @@ public static class MonitoringServices
         services.AddSingleton<IRuntimeConfiguration>(provider => provider.GetRequiredService<RuntimeConfigurationService>());
         services.AddHostedService(provider => provider.GetRequiredService<RuntimeConfigurationService>());
         services.AddHostedService<SnapshotBroadcastService>();
+        services.AddHostedService<HardwareDiscoveryService>();
         services.AddSingleton<IServiceRestart, ServiceRestart>();
 
         return services;

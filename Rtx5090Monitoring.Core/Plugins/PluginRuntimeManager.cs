@@ -14,13 +14,18 @@ public sealed class PluginRuntimeManager : IHostedService, IAsyncDisposable
 
     private readonly Lock _shutdownLock = new();
     private Task? _shutdown;
+    public IReadOnlyList<ISensorPluginFactory> Factories => _factories;
+    public ConnectorProfileResolver ConnectorProfiles { get; }
     public WarningRegistry WarningRegistry { get; }
     public PluginDefinition[] Definitions => [.. field];
 
     public PluginRuntimeManager(IEnumerable<ISensorPluginFactory> factories, SensorStateStore store, TimeProvider clock, ILogger<PluginRuntimeManager> logger)
     {
         var installed = factories.ToArray();
+
         _factories = installed;
+        ConnectorProfiles = new ConnectorProfileResolver(installed.OfType<IConnectorSourceProvider>());
+
         if (installed.Any(factory => factory.WarningSource is { } source && source.PluginId != factory.Id))
         {
             throw new ArgumentException("A warning source must belong to its plugin factory.");
@@ -33,6 +38,8 @@ public sealed class PluginRuntimeManager : IHostedService, IAsyncDisposable
         [
             .. installed.Select(factory => new PluginDefinition(factory.Id, factory.Name, factory.Capabilities)
             {
+                ConnectorMetrics = factory is IConnectorSourceProvider provider
+                    ? [.. Enum.GetValues<Contracts.Enums.SensorMetric>().Where(metric => provider.Priority(metric) is not null)] : [],
                 Warnings = [.. WarningRegistry.Definitions.Where(definition => definition.PluginId == factory.Id)]
             })
         ];
@@ -51,15 +58,8 @@ public sealed class PluginRuntimeManager : IHostedService, IAsyncDisposable
         };
     }
 
-    public ServiceConfiguration MigrateConfiguration(ServiceConfiguration configuration)
-    {
-        foreach (var factory in _factories)
-        {
-            configuration = factory.MigrateConfiguration(configuration);
-        }
-
-        return configuration;
-    }
+    public ServiceConfiguration MigrateConfiguration(ServiceConfiguration configuration) =>
+        _factories.Aggregate(configuration, (current, factory) => factory.MigrateConfiguration(current));
 
     public void Validate(ServiceConfiguration configuration)
     {

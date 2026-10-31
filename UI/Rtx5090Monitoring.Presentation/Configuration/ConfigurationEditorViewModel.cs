@@ -22,6 +22,7 @@ public sealed class ConfigurationEditorViewModel(Func<IMonitoringApi> api, bool 
     private bool _loading;
     private ConfigurationSnapshot? _pendingConfiguration;
 
+    public ConnectorProfilesEditorViewModel ConnectorProfiles { get; } = new();
     public WarningOptionsEditorViewModel Warnings { get; } = new();
     public ObservableCollection<PluginSettingsEditorViewModel> Plugins { get; } = [];
     public ObservableCollection<SelectionEditorViewModel> Selections { get; } = [];
@@ -129,6 +130,8 @@ public sealed class ConfigurationEditorViewModel(Func<IMonitoringApi> api, bool 
             }
         }
 
+        ConnectorProfiles.Apply(snapshot);
+
         foreach (var selection in Selections)
         {
             var resolved = snapshot.Selections.FirstOrDefault(item => item.Name == selection.Name);
@@ -188,6 +191,7 @@ public sealed class ConfigurationEditorViewModel(Func<IMonitoringApi> api, bool 
         {
             var monitoring = new MonitoringOptions
             {
+                ConnectorProfiles = ConnectorProfiles.Build(),
                 StreamIntervalMs = NumericInput.Integer(StreamIntervalMs, "Stream interval"),
                 Selections = [.. Selections.Select(selection => selection.Build())]
             };
@@ -240,6 +244,9 @@ public sealed class ConfigurationEditorViewModel(Func<IMonitoringApi> api, bool 
             Plugins.Clear();
             Selections.Clear();
             _baseline = snapshot;
+            ConnectorProfiles.Edited -= MarkDirty;
+            ConnectorProfiles.Load(snapshot.Configuration.Monitoring.ConnectorProfiles, _catalog);
+            ConnectorProfiles.Edited += MarkDirty;
             Warnings.Edited -= MarkDirty;
             Warnings.Load(snapshot.Configuration.Warnings);
             Warnings.Edited += MarkDirty;
@@ -285,7 +292,7 @@ public sealed class ConfigurationEditorViewModel(Func<IMonitoringApi> api, bool 
         }
 
         var original = _baseline.Configuration;
-        IsDirty = !Warnings.Matches(original.Warnings) || !double.IsFinite(StreamIntervalMs) || Math.Abs(StreamIntervalMs - original.Monitoring.StreamIntervalMs) > 0.001
+        IsDirty = !ConnectorProfiles.Matches(original.Monitoring.ConnectorProfiles) || !Warnings.Matches(original.Warnings) || !double.IsFinite(StreamIntervalMs) || Math.Abs(StreamIntervalMs - original.Monitoring.StreamIntervalMs) > 0.001
             || Plugins.Count != original.Plugins.Count
             || Plugins.Any(plugin => !original.Plugins.TryGetValue(plugin.Id, out var settings) || !plugin.Matches(settings))
             || Selections.Count != original.Monitoring.Selections.Count

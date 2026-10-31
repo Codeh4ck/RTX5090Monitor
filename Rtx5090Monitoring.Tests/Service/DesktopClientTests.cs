@@ -30,7 +30,7 @@ internal static class DesktopClientTests
         var catalog = await client.GetPluginsAsync(default);
         TestAssert.Equal(1, catalog.SchemaVersion);
         TestAssert.Equal(4, catalog.Plugins.Length);
-        TestAssert.True(catalog.Plugins.All(plugin => !plugin.Enabled && plugin.State == PluginState.Disabled), "Installed disabled plugins must remain discoverable.");
+        TestAssert.True(catalog.Plugins.All(plugin => plugin is { Enabled: false, State: PluginState.Disabled }), "Installed disabled plugins must remain discoverable.");
         TestAssert.True(catalog.Plugins.Single(plugin => plugin.Id == "wireview-pro2").Capabilities.Contains(PluginCapability.FaultClear), "WireView must advertise fault-clear support.");
         TestAssert.True(catalog.Plugins.Single(plugin => plugin.Id == "asus-astral").Capabilities.Contains(PluginCapability.DeviceSelection), "ASUS must advertise device selection.");
         TestAssert.True(catalog.Plugins.Single(plugin => plugin.Id == "msi-psu").Capabilities.Contains(PluginCapability.DeviceSelection), "MSI must advertise device selection.");

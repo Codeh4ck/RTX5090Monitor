@@ -21,10 +21,8 @@ public sealed partial class WarningOptionsView : UserControl
         DefaultsHost.Content = new WarningPolicyView(Model.Defaults);
         WarningPicker.SelectedIndex = 0;
     }
-    private void Warning_Changed(object sender, SelectionChangedEventArgs args)
-    {
-        OverrideHost.Content = WarningPicker.SelectedItem is WarningOverrideEditorViewModel model ? new WarningOverrideView(model) : null;
-    }
+    private void Warning_Changed(object sender, SelectionChangedEventArgs args) => OverrideHost.Content = WarningPicker.SelectedItem is WarningOverrideEditorViewModel model ? new WarningOverrideView(model) : null;
+
     private async void Info_Click(object sender, RoutedEventArgs args)
     {
         if (_helpOpen)

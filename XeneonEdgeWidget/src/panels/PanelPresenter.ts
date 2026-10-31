@@ -138,8 +138,18 @@ export class PanelPresenter {
                     : 'Automatic';
                 const electricalPlugin = selectedSource === 'WireView' ? 'wireview-pro2' : pluginId;
                 const electricalDevice = electricalPlugin === pluginId ? deviceId : this.store.device(electricalPlugin, '', now);
-                const electrical = (metric: string) => selectedSource === 'None' ? null
-                    : this.store.value(electricalPlugin, electricalDevice, 'GpuConnector', metric, now, 1);
+                const electrical = (metric: string) => {
+                    const selection = isNvidia
+                        ? this.store.snapshot?.selections.find(selection => selection.name === `gpu-status/${metric.toLowerCase()}`)
+                        : undefined;
+                    const profiles = this.store.configuration?.configuration.monitoring?.connectorProfiles as { version?: number } | undefined;
+                    if (isNvidia && (profiles?.version === 1 || selection)) {
+                        return selection?.sensorKey ? this.store.byKey(selection.sensorKey, now)?.value ?? null : null;
+                    }
+
+                    return selectedSource === 'None' ? null
+                        : this.store.value(electricalPlugin, electricalDevice, 'GpuConnector', metric, now, 1);
+                };
                 const power = electrical('Power');
                 const current = electrical('Current');
                 const voltage = electrical('Voltage');

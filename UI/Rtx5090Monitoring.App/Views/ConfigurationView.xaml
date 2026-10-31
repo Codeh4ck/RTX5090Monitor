@@ -56,10 +56,7 @@
                         <StackPanel Spacing="14">
                             <ContentControl IsEnabled="{x:Bind Model.CanEdit, Mode=OneWay}" HorizontalContentAlignment="Stretch">
                                 <StackPanel Spacing="14">
-                                    <TextBlock Text="Choose the preferred sensor sources for each value. Sources are checked in the order you specify." Style="{StaticResource MonitorCaption}" />
-                                    <TextBlock x:Name="EmptySelections" Text="No source selections configured." Style="{StaticResource MonitorCaption}" />
-                                    <StackPanel x:Name="SelectionHost" Spacing="14" />
-                                    <Button Content="Add source selection" Click="AddSelection_Click" />
+                                    <ContentControl x:Name="ProfilesHost" HorizontalContentAlignment="Stretch" />
                                 </StackPanel>
                             </ContentControl>
                         </StackPanel>

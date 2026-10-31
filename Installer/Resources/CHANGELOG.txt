@@ -1,3 +1,16 @@
+1.0.3 - Shared connector source profiles
+- Add Automatic and WireView profiles shared by GPU status in the desktop app and widget.
+- Configure Power, Total current and Voltage priorities and fallback independently.
+- Use connector measurements only; GPU board power is never substituted.
+- Add Nvidia connector voltage fallback using connector power and current from the same GPU sample.
+- Publish WireView's native average connector voltage and firmware-reported power/current totals.
+- Automatically select the active MSI PSU connector, retain known associations at idle and allow manual selection when both connectors are active.
+- Automatically disable absent Astral, WireView and MSI hardware and rediscover automatically disabled devices; respect manual disabling.
+- Identify Astral hardware by per-pin sensor capability and retain stable GPU identities.
+- Replace unused legacy source selections once, then preserve edited profiles across restarts.
+- Update profile configuration help and desktop debug simulation.
+- Update the service, desktop app and widget together; import the new widget manually in iCUE.
+
 1.0.2 - Generic NVIDIA GPU monitoring and desktop improvements
 - Add GenericNvidia for desktop GeForce RTX cards, with a GPU selector and shared hardware polling.
 - Show GPU status alongside ASUS and WireView pin charts, with an optional standalone tab.

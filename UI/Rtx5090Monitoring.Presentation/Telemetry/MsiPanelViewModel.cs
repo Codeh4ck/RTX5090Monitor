@@ -21,7 +21,7 @@ public sealed class MsiPanelViewModel : ObservableObject
 
     public void Update(SensorReading[] readings, AppPreferences preferences, DateTimeOffset now, int staleAfterMs)
     {
-        var valid = readings.Where(reading => reading.Quality == ReadingQuality.Valid && reading.Value is { } value && double.IsFinite(value)
+        var valid = readings.Where(reading => reading is { Quality: ReadingQuality.Valid, Value: { } value } && double.IsFinite(value)
             && now - reading.ObservedAt <= TimeSpan.FromMilliseconds(staleAfterMs)).ToArray();
         if (valid.Select(reading => reading.Identity.DeviceId).Distinct().Skip(1).Any())
         {

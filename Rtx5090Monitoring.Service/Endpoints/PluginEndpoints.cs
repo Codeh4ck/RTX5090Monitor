@@ -17,7 +17,7 @@ internal static class PluginEndpoints
             {
                 var state = health[definition.Id];
                 return new PluginInfo(definition.Id, definition.Name, settings[definition.Id].Enabled,
-                    state.State, state.LastSuccessAt, state.Message, definition.Capabilities) { Warnings = definition.Warnings };
+                    state.State, state.LastSuccessAt, state.Message, definition.Capabilities) { Warnings = definition.Warnings, ConnectorMetrics = definition.ConnectorMetrics };
             }).ToArray();
 
             return Results.Json(new PluginCatalog(1, plugins), AppJsonContext.Default.PluginCatalog);

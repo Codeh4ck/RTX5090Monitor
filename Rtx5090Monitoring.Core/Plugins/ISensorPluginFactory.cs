@@ -1,6 +1,6 @@
-using Rtx5090Monitoring.Warnings;
 using System.Text.Json;
 using Microsoft.Extensions.Configuration;
+using Rtx5090Monitoring.Warnings;
 using Rtx5090Monitoring.Contracts.Configuration;
 using Rtx5090Monitoring.Contracts.Discovery;
 
@@ -13,6 +13,9 @@ public interface ISensorPluginFactory
     string Name { get; }
     PluginCapability[] Capabilities => [PluginCapability.Telemetry, PluginCapability.Configuration, PluginCapability.Restart];
     ServiceConfiguration MigrateConfiguration(ServiceConfiguration configuration) => configuration;
+
+    // null means detection is unsupported or inconclusive, never absence
+    bool? HardwarePresent(PluginSettings settings) => null;
 
     ISensorPlugin Create(PluginSettings settings);
     PluginSettings CreateDefaultSettings() => new();

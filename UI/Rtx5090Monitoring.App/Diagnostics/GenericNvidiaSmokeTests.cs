@@ -42,6 +42,26 @@ internal static class GenericNvidiaSmokeTests
         }
 
         await SmokeTestRunner.CaptureElementAsync(window.ThemeRoot, Path.Combine(output, "generic-nvidia-settings.png"));
+        configuration.SelectSection("sources");
+        await Task.Delay(200);
+        var profileSelector = VisualTreeQuery.Descendants<ComboBox>(configuration)
+            .Single(box => box.Header as string == "Active GPU status profile");
+        if (profileSelector.Items.Count != 2 || VisualTreeQuery.Descendants<ConnectorMetricEditorView>(configuration).Count() != 3)
+        {
+            throw new InvalidOperationException("Source profiles must show two choices and three independent metric editors.");
+        }
+
+        profileSelector.SelectedIndex = 1;
+        await Task.Delay(150);
+        if (runtime.Configuration.ConnectorProfiles.SelectedProfile?.Name != "WireView"
+            || VisualTreeQuery.Descendants<ConnectorMetricEditorView>(configuration).Any(view => view.Model.AllowFallback))
+        {
+            throw new InvalidOperationException("Selecting WireView must render its own fallback-disabled metric editors.");
+        }
+
+        await runtime.Configuration.ApplyAsync(CancellationToken.None);
+        await Task.Delay(200);
+        await SmokeTestRunner.CaptureElementAsync(window.ThemeRoot, Path.Combine(output, "connector-profiles.png"));
         runtime.OpenDebugConsole();
         foreach (var plugin in runtime.Debug.Plugins)
         {

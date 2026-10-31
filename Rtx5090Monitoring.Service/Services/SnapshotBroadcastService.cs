@@ -27,6 +27,7 @@ internal sealed class SnapshotBroadcastService(IRuntimeConfiguration configurati
                 var settings = current.Configuration.Monitoring;
                 var now = clock.GetUtcNow();
                 var snapshot = store.Snapshot(now, settings.Selections) with { ConfigurationRevision = current.Revision };
+                snapshot = runtime.ConnectorProfiles.Resolve(snapshot, current.Configuration);
                 snapshot = snapshot with { Warnings = _warnings.Evaluate(snapshot, current.Configuration, now) };
                 if (lastPublication is null || now - lastPublication >= TimeSpan.FromMilliseconds(settings.StreamIntervalMs)
                     || publishedWarnings != _warnings.Revision || publishedConfiguration != current.Revision)

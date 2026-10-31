@@ -28,7 +28,7 @@ internal static class PreferenceTests
             TestAssert.True(store.LastError is null, store.LastError ?? "Legacy preferences must load successfully.");
             TestAssert.Equal((double)AppPreferences.DefaultWindowHeight, migrated.WindowHeight);
             TestAssert.Equal(1120d, migrated.WindowWidth);
-            TestAssert.True(migrated.Theme == AppTheme.Dark && migrated.StartMinimized, "Migrating window height must preserve other preferences.");
+            TestAssert.True(migrated is { Theme: AppTheme.Dark, StartMinimized: true }, "Migrating window height must preserve other preferences.");
             await store.SaveAsync(migrated with { WindowHeight = 900 });
             TestAssert.Equal(900d, store.Load().WindowHeight);
             legacy["windowHeight"] = 1200;

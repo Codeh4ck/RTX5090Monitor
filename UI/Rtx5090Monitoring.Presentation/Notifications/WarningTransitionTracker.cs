@@ -35,8 +35,8 @@ public sealed class WarningTransitionTracker
             _seen.Remove(old);
         }
         var due = new List<WarningState>();
-        foreach (var state in feed.States.Where(state => state.Phase == WarningPhase.Active && state.NotificationSequence > 0
-            && (state.Policy.NotifyOnStart || state.Policy.RepeatWhileActive)))
+        foreach (var state in feed.States.Where(state => state is { Phase: WarningPhase.Active, NotificationSequence: > 0 }
+                                                         && (state.Policy.NotifyOnStart || state.Policy.RepeatWhileActive)))
         {
             var key = state.Id + "/" + state.EpisodeId;
             if (state.NotificationSequence > _seen.GetValueOrDefault(key))

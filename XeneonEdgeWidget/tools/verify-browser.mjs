@@ -364,7 +364,7 @@ try {
     assert.equal(lexicalProperty.namedElement,true,'test exercises the DOM named-property collision');
     assert.equal(lexicalProperty.value,'msiConnector2','iCUE sandbox-local settings win over DOM named properties');
 
-    await verifyUpdates(page, base, properties, value => { updateManifest = value; }, value => { updateFailure = value; }, requests, output);
+    await verifyUpdates(page, base, properties, value => { updateManifest = value; }, value => { updateFailure = value; }, requests, output, latest.version);
 
     assert.equal(messages.length, 0, 'No commands sent through the telemetry socket');
     assert.ok(requests.every(request => request.method === 'GET' && (

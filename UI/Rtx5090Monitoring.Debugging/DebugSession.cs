@@ -18,6 +18,8 @@ namespace Rtx5090Monitoring.Debugging;
 
 public sealed class DebugSession : ObservableObject
 {
+    private readonly Core.ConnectorProfileResolver _connectorProfiles = Processing.SimulationConnectorProfiles.CreateResolver();
+
     private long _revision = 1;
     private long _sequence;
     private PluginCatalog _liveCatalog = new(1, []);
@@ -170,6 +172,7 @@ public sealed class DebugSession : ObservableObject
             _warningOverride = configuration.Warnings;
             _monitoringOverride = new MonitoringOptions
             {
+                ConnectorProfiles = configuration.Monitoring.ConnectorProfiles,
                 StreamIntervalMs = configuration.Monitoring.StreamIntervalMs, Selections = [.. configuration.Monitoring.Selections]
             };
         }
@@ -318,6 +321,7 @@ public sealed class DebugSession : ObservableObject
 
         var monitoring = new MonitoringOptions
         {
+            ConnectorProfiles = sourceMonitoring.ConnectorProfiles,
             StreamIntervalMs = sourceMonitoring.StreamIntervalMs, Selections = [.. sourceMonitoring.Selections]
         };
 
@@ -333,6 +337,7 @@ public sealed class DebugSession : ObservableObject
         var selections = monitoring.Selections.Select(selection => Core.SourceResolver.Resolve(selection, usable)).ToArray();
         var snapshot = new SensorSnapshot(1, ++_sequence, now, [.. readings], [.. health], selections, _revision) { Alerts = [.. alerts] };
 
+        snapshot = _connectorProfiles.Resolve(snapshot, configuration.Configuration);
         snapshot = snapshot with { Warnings = _warningEngine.Evaluate(snapshot, configuration.Configuration, now) };
 
         foreach (var plugin in Plugins)

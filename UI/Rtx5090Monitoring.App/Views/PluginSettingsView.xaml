@@ -52,12 +52,7 @@
                                 IsEnabled="{x:Bind Model.Nvidia.MemoryWarningEnabled, Mode=OneWay}" Minimum="30" Maximum="120" SmallChange="1" />
                         </StackPanel>
                     </Grid>
-                    <ComboBox Header="GPU status electrical source" SelectedIndex="{x:Bind Model.Nvidia.ElectricalSourceIndex, Mode=TwoWay}" HorizontalAlignment="Stretch">
-                        <ComboBoxItem Content="Automatic - measured GPU connector readings" />
-                        <ComboBoxItem Content="WireView - explicitly associate it with the selected GPU" />
-                        <ComboBoxItem Content="None" />
-                    </ComboBox>
-                    <TextBlock Text="Select WireView only when it monitors this GPU. Unsupported readings remain unavailable; current is never estimated from GPU board power. Fans and core voltage are read only."
+                    <TextBlock Text="Connector Power, Total current and Voltage use the shared profile in Source selections. Fans and core voltage are read only."
                         Style="{StaticResource MonitorCaption}" />
                 </StackPanel>
                 <TextBlock Text="Firmware thresholds and fan configuration can be inspected in the WireView device settings window. Device writes are not supported."

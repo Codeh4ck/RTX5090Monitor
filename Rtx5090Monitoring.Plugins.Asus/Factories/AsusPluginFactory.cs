@@ -1,3 +1,5 @@
+using Rtx5090Monitoring.Contracts.Enums;
+using Rtx5090Monitoring.Contracts.Sensors;
 using Rtx5090Monitoring.Plugins.Asus.Analysis.Warnings;
 using Rtx5090Monitoring.Warnings;
 using Rtx5090Monitoring.Hardware.Nvidia;
@@ -14,7 +16,7 @@ using Rtx5090Monitoring.Contracts.Discovery;
 
 namespace Rtx5090Monitoring.Plugins.Asus.Factories;
 
-public sealed class AsusPluginFactory(TimeProvider clock, AsusStream stream, NvidiaTelemetryReader reader) : ISensorPluginFactory
+public sealed class AsusPluginFactory(TimeProvider clock, AsusStream stream, NvidiaTelemetryReader reader) : ISensorPluginFactory, IConnectorSourceProvider
 {
     public IWarningSource WarningSource { get; } = new AsusWarningSource();
     public string Id => AsusPlugin.PluginId;
@@ -29,4 +31,39 @@ public sealed class AsusPluginFactory(TimeProvider clock, AsusStream stream, Nvi
 
     public void ValidateSettings(PluginSettings settings) => AsusSettings.GetOptions(settings);
     public ISensorPlugin Create(PluginSettings settings) => new AsusPlugin(settings, clock, new AsusGpuReader(reader), stream);
+
+    public int? Priority(SensorMetric metric) => metric switch
+    {
+        SensorMetric.Power or SensorMetric.Current => 10,
+        SensorMetric.Voltage => 0,
+        _ => null
+    };
+
+    public bool? HardwarePresent(PluginSettings settings)
+    {
+        var selected = AsusSettings.GetOptions(settings).DeviceId;
+        return reader.GetDevices().Where(device => selected is null || device.Id == selected || device.LegacyId == selected)
+            .Any(device => AsusGpuReader.IsAstral(reader.Read(device.Id, settings.PollIntervalMs, CancellationToken.None)));
+    }
+
+    public SensorIdentity[] ConnectorSources(SensorSnapshot snapshot, PluginSettings settings, string? connectorId)
+    {
+        var gpus = snapshot.Sensors
+            .Where(reading => reading.Identity.PluginId == "generic-nvidia")
+            .Select(reading => reading.Identity.DeviceId)
+            .ToHashSet();
+
+        if (gpus.Count != 1)
+        {
+            return [];
+        }
+
+        return
+        [
+            .. snapshot.Sensors
+                .Where(reading => reading.Identity.PluginId == Id && reading.Identity.DeviceId == gpus.First() &&
+                                  reading.Identity is { Component: SensorComponent.GpuConnector, Channel: 1 }).Select(reading => reading.Identity)
+        ];
+    }
+
 }

@@ -9,8 +9,7 @@ namespace Rtx5090Monitoring.Plugins.Asus.Mapping;
 internal static class AsusSnapshotMapper
 {
     public static Dictionary<string, float> GetPinCurrents(AsusGpuData data) => data.Sensors
-        .Where(sensor => sensor.Definition.Component == SensorComponent.GpuPin && sensor.Definition.Metric == SensorMetric.Current
-            && sensor.Value is { } value && float.IsFinite(value))
+        .Where(sensor => sensor is { Definition: { Component: SensorComponent.GpuPin, Metric: SensorMetric.Current }, Value: { } value } && float.IsFinite(value))
         .ToDictionary(sensor => sensor.Definition.FriendlyName, sensor => sensor.Value!.Value);
 
     public static GpuSensorSnapshot CreateLegacySnapshot(AsusGpuData data, AsusAlertMonitor alerts, DateTimeOffset now) => new()
@@ -39,8 +38,7 @@ internal static class AsusSnapshotMapper
             readings.Add(CreateReading(data.DeviceId, sensor.Definition.Component, sensor.Definition.Metric, value, now, sensor.Definition.Channel));
         }
 
-        var voltages = data.Sensors.Where(sensor => sensor.Definition.Component == SensorComponent.GpuPin
-            && sensor.Definition.Metric == SensorMetric.Voltage && sensor.Value is > 0).ToArray();
+        var voltages = data.Sensors.Where(sensor => sensor is { Definition: { Component: SensorComponent.GpuPin, Metric: SensorMetric.Voltage }, Value: > 0 }).ToArray();
         if (voltages.Length == 6 && voltages.Select(sensor => sensor.Definition.Channel).Distinct().Count() == 6)
         {
             readings.Add(CreateReading(data.DeviceId, SensorComponent.GpuConnector, SensorMetric.Voltage,

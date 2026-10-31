@@ -48,14 +48,39 @@ public static class GenericNvidiaSnapshotMapper
             }
         }
 
-        if (!readings.Any(reading => reading.Identity is { Component: SensorComponent.GpuConnector, Metric: SensorMetric.Voltage }))
+        if (!readings.Any(reading => reading is { Identity: { Component: SensorComponent.GpuConnector, Metric: SensorMetric.Voltage }, Value: > 0 }))
         {
-            var pins = Enumerable.Range(1, 6).Select(channel => sample.Sensors.FirstOrDefault(sensor =>
-                sensor.Name == $"12VHPWR Pin {channel}" && sensor.Type == SensorType.Voltage)?.Value).ToArray();
+            var pins = Enumerable.Range(1, 6)
+                .Select(channel => sample.Sensors.FirstOrDefault(sensor => sensor.Name == $"12VHPWR Pin {channel}" && sensor.Type == SensorType.Voltage)?.Value)
+                .ToArray();
 
             if (pins.All(value => value is { } number && float.IsFinite(number) && number > 0))
             {
+                readings.RemoveAll(reading => reading.Identity is { Component: SensorComponent.GpuConnector, Metric: SensorMetric.Voltage });
                 Add(SensorComponent.GpuConnector, SensorMetric.Voltage, pins.Average(value => value!.Value), 1);
+            }
+        }
+
+        var connectorVoltage = readings.FirstOrDefault(reading => reading.Identity is { Component: SensorComponent.GpuConnector, Metric: SensorMetric.Voltage });
+
+        if (connectorVoltage?.Value is not > 0)
+        {
+            var power = readings
+                .FirstOrDefault(reading => reading.Identity is { Component: SensorComponent.GpuConnector, Metric: SensorMetric.Power })?.Value;
+
+            var current = readings
+                .FirstOrDefault(reading => reading.Identity is { Component: SensorComponent.GpuConnector, Metric: SensorMetric.Current })?.Value;
+
+            if (power is > 0 && current is > 0 && double.IsFinite(power.Value / current.Value))
+            {
+                if (connectorVoltage is not null)
+                {
+                    readings.Remove(connectorVoltage);
+                }
+
+                readings.Add(new SensorReading(
+                    new SensorIdentity(GenericNvidiaPlugin.PluginId, sample.Device.Id, SensorComponent.GpuConnector, SensorMetric.Voltage, 1),
+                    SensorUnit.Volts, power.Value / current.Value, sample.ObservedAt) { Derived = true });
             }
         }
 
@@ -86,6 +111,11 @@ public static class GenericNvidiaSnapshotMapper
         void Add(SensorComponent component, SensorMetric metric, float? value, int? channel = null)
         {
             double? number = value is { } finite && float.IsFinite(finite) ? finite : null;
+            if (component == SensorComponent.GpuConnector && metric == SensorMetric.Voltage && number is not > 0)
+            {
+                number = null;
+            }
+
             readings.Add(new SensorReading(new SensorIdentity(GenericNvidiaPlugin.PluginId, sample.Device.Id, component, metric, channel),
                 SensorUnits.For(metric), number, sample.ObservedAt, number is null ? ReadingQuality.Unavailable : ReadingQuality.Valid));
         }

@@ -73,9 +73,9 @@ Use Windows Settings > Apps > RTX Monitor to modify, repair or uninstall, or rer
 
 Use the desktop app's **Configuration** page for plugin settings, Sensor stream, source selections, warnings and backend maintenance.
 
-- **GenericNvidia** provides GPU status for a selected desktop GeForce RTX GPU, shared by its own tab and the ASUS and WireView views. It reports driver-exposed clocks, VRAM, temperatures, fans and core voltage. Fresh installations warn at 81 °C core / 85 °C VRAM; upgrades retain existing thresholds and notification overrides. Electrical readings are measured; associate WireView explicitly when it monitors the selected GPU.
+- **GenericNvidia** provides GPU status for a selected desktop GeForce RTX GPU, shared by its own tab and the ASUS and WireView views. It reports driver-exposed clocks, VRAM, temperatures, fans and core voltage. Fresh installations warn at 81 °C core / 85 °C VRAM; upgrades retain existing thresholds and notification overrides. GPU status uses shared connector-source profiles. Automatic prefers Nvidia connector power/current, then Astral and WireView; MSI provides a final current fallback. Voltage prefers Astral, WireView and then Nvidia connector voltage (using connector power/current when necessary). GPU board power is never used.
 - **Sensor stream** controls how often the backend publishes aggregate snapshots. Hardware polling is configured independently for each plugin.
-- **Source selections** define preferred sensor sources and fallback behavior for consumers that request named selections.
+- **Source selections** configure the shared Automatic and WireView GPU status profiles, including independent metric priorities, fallback policies and MSI connector association. Both desktop and widget consume the backend selections. Absent Astral, WireView and MSI hardware is automatically disabled and rediscovered; manual disabling is respected.
 - **Warnings** control initial Windows notifications, optional reminders and clear confirmation, with per-warning overrides. The default reminder interval is five seconds; repeating reminders are off by default.
 - **MSI PSU settings** include fan-control options and desktop PSU pin-comparison preferences. Fan control defaults to leaving the existing device mode untouched.
 

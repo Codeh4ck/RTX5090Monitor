@@ -20,6 +20,7 @@ PsuComparisonTests.Run(runner);
 DirtyTrackingTests.Run(runner);
 DeviceRefreshTests.Run(runner);
 GenericNvidiaEditorTests.Run(runner);
+ConnectorProfilesTests.Run(runner);
 await EditorTests.RunAsync(runner);
 await LegacyConfigurationTests.RunAsync(runner);
 await PreferenceTests.RunAsync(runner);

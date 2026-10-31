@@ -52,7 +52,7 @@ internal static class MsiHardwareVerification
         await host.SetPluginSettingsAsync("msi-psu", manual with { Enabled = false });
         using var reader = new MsiPsuReader(NullLogger<MsiPsuReader>.Instance);
         var restored = reader.Read(new MsiOptions(), DateTimeOffset.UtcNow, CancellationToken.None)!;
-        TestAssert.True(restored.AutomaticFan && restored.FanDutyPercent == 0, "Disabling the real plugin must restore automatic control.");
+        TestAssert.True(restored is { AutomaticFan: true, FanDutyPercent: 0 }, "Disabling the real plugin must restore automatic control.");
         Console.WriteLine("PASS: Live configuration changed actual fan mode/duty; disabling the plugin restored automatic mode and zero requested duty.");
     }
 }

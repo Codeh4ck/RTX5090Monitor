@@ -179,9 +179,8 @@ public sealed class DashboardViewModel : ObservableObject
         var source = Panels.FirstOrDefault(panel => panel.IsMsi);
         var staleAfterMs = _configuration?.Configuration.Plugins.GetValueOrDefault("msi-psu")?.StaleAfterMs ?? 5000;
         var readings = source is { Enabled: true, IsReporting: true, State: "Ready" } && _lastSnapshot is { } snapshot
-            ? snapshot.Sensors.Where(reading => reading.Identity is { PluginId: "msi-psu", Component: SensorComponent.PsuPin, Metric: SensorMetric.Current }
-                && reading.Unit == SensorUnit.Amperes && reading.Quality == ReadingQuality.Valid && reading.Value is { } value && value >= 0
-                && double.IsFinite(value) && now - reading.ObservedAt <= TimeSpan.FromMilliseconds(staleAfterMs)).ToArray()
+            ? snapshot.Sensors.Where(reading => reading is { Identity: { PluginId: "msi-psu", Component: SensorComponent.PsuPin, Metric: SensorMetric.Current }, Unit: SensorUnit.Amperes, Quality: ReadingQuality.Valid, Value: { } value and >= 0 }
+                                                && double.IsFinite(value) && now - reading.ObservedAt <= TimeSpan.FromMilliseconds(staleAfterMs)).ToArray()
             : [];
         if (readings.Select(reading => reading.Identity.DeviceId).Distinct().Skip(1).Any())
         {
@@ -196,7 +195,7 @@ public sealed class DashboardViewModel : ObservableObject
 
     private void RefreshReportingPanels()
     {
-        var available = Panels.Where(panel => panel.Enabled && panel.IsReporting).ToArray();
+        var available = Panels.Where(panel => panel is { Enabled: true, IsReporting: true }).ToArray();
         HasAlternativeGpuStatus = available.Any(panel => panel.IsWireView || panel.IsAsus);
         var reporting = available.Where(panel => !panel.IsNvidia || _preferences.ShowSeparateGpuStatusTab || !HasAlternativeGpuStatus)
             .OrderBy(panel => panel.IsMsi ? 3 : panel.IsNvidia ? 2 : panel.IsAsus ? 1 : 0)

@@ -26,6 +26,7 @@ internal sealed class DemoMonitoringApi : IMonitoringApi
     private readonly DateTimeOffset _started = DateTimeOffset.UtcNow;
     private ConfigurationSnapshot _configuration = new(1, new ServiceConfiguration
     {
+        Monitoring = new() { ConnectorProfiles = Rtx5090Monitoring.Debugging.Processing.SimulationConnectorProfiles.CreateResolver().CreateDefaults() },
         Plugins = new Dictionary<string, PluginSettings>
         {
             ["wireview-pro2"] = new(),
@@ -34,6 +35,7 @@ internal sealed class DemoMonitoringApi : IMonitoringApi
             ["generic-nvidia"] = new() { Options = JsonSerializer.SerializeToElement(new Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.Configuration.GenericNvidiaOptions(), ClientJsonContext.Default.GenericNvidiaOptions) }
         }
     }, Version: "demo:1");
+    private readonly Rtx5090Monitoring.Core.ConnectorProfileResolver _profiles = Rtx5090Monitoring.Debugging.Processing.SimulationConnectorProfiles.CreateResolver();
     private long _sequence;
     private readonly Warnings.WarningEngine _warnings = new(Rtx5090Monitoring.Debugging.Catalog.DebugWarningCatalog.Registry);
     private readonly HashSet<string> _unavailable = [];
@@ -222,6 +224,7 @@ internal sealed class DemoMonitoringApi : IMonitoringApi
             }
 
             var snapshot = new SensorSnapshot(1, ++_sequence, now, [.. readings], [.. health], [], configuration.Revision);
+            snapshot = _profiles.Resolve(snapshot, configuration.Configuration);
             yield return snapshot with { Warnings = _warnings.Evaluate(snapshot, configuration.Configuration, now) };
             await Task.Delay(configuration.Configuration.Monitoring.StreamIntervalMs, token);
         }

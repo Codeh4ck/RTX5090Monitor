@@ -5,6 +5,9 @@
         <ProjectReference Include="../../Rtx5090Monitoring.Warnings/Rtx5090Monitoring.Warnings.csproj" />
         <ProjectReference Include="../Rtx5090Monitoring.Presentation/Rtx5090Monitoring.Presentation.csproj" />
         <ProjectReference Include="../../Rtx5090Monitoring.Plugins.Asus.Analysis/Rtx5090Monitoring.Plugins.Asus.Analysis.csproj" />
+        <Compile Include="../../Rtx5090Monitoring.Core/ConnectorProfileResolver.cs" Link="Processing/ConnectorProfileResolver.cs" />
+        <Compile Include="../../Rtx5090Monitoring.Core/Plugins/IConnectorSourceProvider.cs" Link="Processing/IConnectorSourceProvider.cs" />
+        <Compile Include="../../Rtx5090Monitoring.Plugins.Msi/Mapping/MsiConnectorSelection.cs" Link="Processing/MsiConnectorSelection.cs" />
         <Compile Include="../../Rtx5090Monitoring.Core/SourceResolver.cs" Link="Processing/SourceResolver.cs" />
     </ItemGroup>
     <ItemGroup Condition="'$(EnableTelemetryDebug)' != 'true'">

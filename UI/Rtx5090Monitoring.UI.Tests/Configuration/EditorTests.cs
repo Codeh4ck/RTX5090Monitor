@@ -38,7 +38,7 @@ internal static class EditorTests
         editor.Receive(api.Configuration);
         TestAssert.True(editor.HasExternalChanges, "An external update must be reported.");
         await editor.ApplyAsync(default);
-        TestAssert.True(editor.IsDirty && editor.HasExternalChanges, "A conflict must preserve the draft.");
+        TestAssert.True(editor is { IsDirty: true, HasExternalChanges: true }, "A conflict must preserve the draft.");
         TestAssert.Equal(250d, editor.StreamIntervalMs);
         await editor.ReloadAsync(default);
         TestAssert.False(editor.IsDirty || editor.HasExternalChanges, "Reload must replace the draft.");

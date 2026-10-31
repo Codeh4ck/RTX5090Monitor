@@ -4,6 +4,7 @@ using System.Text;
 
 namespace Rtx5090Monitoring.Plugins.WireView.Device;
 
+// ReSharper disable once ContextualLoggerProblem
 public sealed class WireViewProReader(ILogger<WireViewPlugin> logger) : IWireViewDeviceReader
 {
     private const int Baud = 115200;

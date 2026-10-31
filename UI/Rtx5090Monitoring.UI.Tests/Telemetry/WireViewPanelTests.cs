@@ -42,7 +42,7 @@ internal static class WireViewPanelTests
         TestAssert.Equal("Active", panel.Faults.Single(metric => metric.Label == "Overtemperature").Value);
         TestAssert.Equal("Active / Logged", panel.Faults.Single(metric => metric.Label == "Overcurrent").Value);
         TestAssert.Equal("Logged", panel.Faults.Single(metric => metric.Label == "Unrecognized device fault").Value);
-        TestAssert.True(panel.Faults.All(metric => metric.Tone == StatusTone.Negative && metric.IconName == "overcurrent"), "Every fault must use the negative tone and fault icon.");
+        TestAssert.True(panel.Faults.All(metric => metric is { Tone: StatusTone.Negative, IconName: "overcurrent" }), "Every fault must use the negative tone and fault icon.");
         TestAssert.True(panel.Metrics.Concat(panel.Faults).All(metric => !metric.Value.Contains("0x", StringComparison.Ordinal)), "No raw fault masks should be displayed.");
         TestAssert.Equal(StatusTone.Negative, Metric(panel, "Fault Status").Tone);
         TestAssert.Equal(StatusTone.Negative, Metric(panel, "Fault Log Status").Tone);

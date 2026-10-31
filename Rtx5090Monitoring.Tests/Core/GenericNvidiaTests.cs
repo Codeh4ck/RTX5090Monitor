@@ -18,7 +18,8 @@ internal static class GenericNvidiaTests
         runner.Run(PreservesSelectedIdentityWhenEnumerationChanges);
         runner.Run(MapsSingleAndMultipleFansByCoolerIdWithoutInventingDuty);
         runner.Run(MapsCoreVoltageAndHotspotWithoutPublishingBoardPower);
-        runner.Run(InputVoltageUsesMeasuredPinsAndNeverPowerDividedByCurrent);
+        runner.Run(InputVoltagePrefersMeasurementsAndUsesConnectorRatioOnlyAsFallback);
+        runner.Run(RecognizesAstralCapabilitiesAndKeepsStableGpuIdentity);
         runner.Run(MigrationPreservesExistingThresholdsAndDefaults);
         runner.Run(LegacyThresholdPrecedenceSurvivesThePluginMove);
     }
@@ -81,12 +82,35 @@ internal static class GenericNvidiaTests
         TestAssert.Equal<double?>(75, readings.Single(reading => reading.Identity.Component == SensorComponent.GpuHotspot).Value);
     }
 
-    private static void InputVoltageUsesMeasuredPinsAndNeverPowerDividedByCurrent()
+    private static void InputVoltagePrefersMeasurementsAndUsesConnectorRatioOnlyAsFallback()
     {
         var sensors = new[] { new NvidiaSensor("12VHPWR Connector", SensorType.Power, 0, 400), new NvidiaSensor("12VHPWR Connector", SensorType.Current, 0, 20) };
-        TestAssert.False(GenericNvidiaSnapshotMapper.Create(Sample(sensors)).Any(reading => reading.Identity.Metric == SensorMetric.Voltage), "Missing measured input voltage must remain unavailable.");
+        TestAssert.Equal<double?>(20, GenericNvidiaSnapshotMapper.Create(Sample(sensors)).Single(reading => reading.Identity.Metric == SensorMetric.Voltage).Value);
+        TestAssert.True(GenericNvidiaSnapshotMapper.Create(Sample(sensors)).Single(reading => reading.Identity.Metric == SensorMetric.Voltage).Derived,
+            "The ratio sensor must preserve internal provenance without changing the displayed voltage label.");
+        var stopped = new[] { sensors[0], sensors[1] with { Value = 0 } };
+        TestAssert.False(GenericNvidiaSnapshotMapper.Create(Sample(stopped)).Any(reading => reading.Identity.Metric == SensorMetric.Voltage),
+            "Zero connector current must not produce voltage from a division by zero.");
+        var board = new[] { new NvidiaSensor("GPU Package", SensorType.Power, 0, 400), sensors[1] };
+        TestAssert.False(GenericNvidiaSnapshotMapper.Create(Sample(board)).Any(reading => reading.Identity.Metric == SensorMetric.Voltage),
+            "Board power must never be used to derive connector voltage.");
         sensors = [.. sensors, .. Enumerable.Range(1, 6).Select(pin => new NvidiaSensor($"12VHPWR Pin {pin}", SensorType.Voltage, pin, 12))];
         TestAssert.Equal<double?>(12, GenericNvidiaSnapshotMapper.Create(Sample(sensors)).Single(reading => reading.Identity.Metric == SensorMetric.Voltage).Value);
+    }
+
+    private static void RecognizesAstralCapabilitiesAndKeepsStableGpuIdentity()
+    {
+        var source = Source();
+        using var reader = new NvidiaTelemetryReader(source, new TestTimeProvider());
+        using var asus = new Rtx5090Monitoring.Plugins.Asus.Device.AsusGpuReader(reader);
+        var factory = new Rtx5090Monitoring.Plugins.Asus.Factories.AsusPluginFactory(new TestTimeProvider(),
+            new Rtx5090Monitoring.Plugins.Asus.Streaming.AsusStream(), reader);
+        TestAssert.True(asus.Read(null, CancellationToken.None) is null, "An RTX 5090 name alone must not qualify as Astral.");
+        TestAssert.Equal<bool?>(false, factory.HardwarePresent(factory.CreateDefaultSettings()));
+        source.Sensors = [.. source.Sensors, new("12VHPWR Pin 1", SensorType.Current, 1, 0)];
+        reader.GetDevices(refresh: true);
+        TestAssert.Equal<bool?>(true, factory.HardwarePresent(factory.CreateDefaultSettings()));
+        TestAssert.Equal("pci-first", asus.Read("/gpu-nvidia/0", CancellationToken.None)!.DeviceId);
     }
 
     private static void MigrationPreservesExistingThresholdsAndDefaults()

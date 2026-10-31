@@ -53,6 +53,7 @@ public sealed class PluginSettingsEditorViewModel : EditableObject
         var result = _original with
         {
             Enabled = Enabled,
+            AutomaticallyDisabled = Enabled == _original.Enabled && _original.AutomaticallyDisabled,
             PollIntervalMs = NumericInput.Integer(PollIntervalMs, Name + " polling interval"),
             StaleAfterMs = NumericInput.Integer(StaleAfterMs, Name + " freshness timeout")
         };

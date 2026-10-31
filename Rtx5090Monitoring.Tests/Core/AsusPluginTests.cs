@@ -65,7 +65,7 @@ internal static class AsusPluginTests
         TestAssert.Equal(41, sample.Sensors.Select(sensor => sensor.Identity.Key).Distinct().Count());
         TestAssert.True(sample.Sensors.All(sensor => sensor.Identity.DeviceId == AsusTestData.FirstDeviceId), "Only one GPU may contribute readings.");
         var boardPower = sample.Sensors.Single(sensor => sensor.Identity.Component == SensorComponent.GpuBoard);
-        var connectorPower = sample.Sensors.Single(sensor => sensor.Identity.Component == SensorComponent.GpuConnector && sensor.Identity.Metric == SensorMetric.Power);
+        var connectorPower = sample.Sensors.Single(sensor => sensor.Identity is { Component: SensorComponent.GpuConnector, Metric: SensorMetric.Power });
         TestAssert.Equal<double?>(470, boardPower.Value);
         TestAssert.Equal<double?>(450, connectorPower.Value);
 
@@ -94,8 +94,7 @@ internal static class AsusPluginTests
     private static async Task PublishesCorrectedAlertsInBothFormatsAsync()
     {
         var data = AsusTestData.Create();
-        var sensors = data.Sensors.Select(sensor => sensor.Definition.Component == SensorComponent.GpuPin
-            && sensor.Definition.Metric == SensorMetric.Current ? sensor with { Value = sensor.Definition.Channel == 1 ? 10 : 4 } : sensor).ToArray();
+        var sensors = data.Sensors.Select(sensor => sensor.Definition is { Component: SensorComponent.GpuPin, Metric: SensorMetric.Current } ? sensor with { Value = sensor.Definition.Channel == 1 ? 10 : 4 } : sensor).ToArray();
         var state = new AsusTestState { Data = [data with { Sensors = sensors }] };
         var clock = new TestTimeProvider();
         using var stream = new AsusStream();
@@ -107,7 +106,7 @@ internal static class AsusPluginTests
 
         TestAssert.True(plugin.Latest!.CurrentImbalance is not null, "Legacy imbalance details must be retained.");
         TestAssert.Equal("Pin 1", plugin.Latest.WireOvercurrent!.PinValues.Keys.Single());
-        var overcurrent = sample.Sensors.Single(sensor => sensor.Identity.Metric == SensorMetric.OvercurrentDetected && sensor.Identity.Channel == 1);
+        var overcurrent = sample.Sensors.Single(sensor => sensor.Identity is { Metric: SensorMetric.OvercurrentDetected, Channel: 1 });
         TestAssert.Equal<double?>(1, overcurrent.Value);
         TestAssert.Equal(SensorUnit.Boolean, overcurrent.Unit);
         var detail = sample.Alerts!.Single(alert => alert.Kind == AsusAlertKinds.WireOvercurrent);
@@ -145,8 +144,7 @@ internal static class AsusPluginTests
     private static async Task AppliesThresholdsToTheNextSampleAsync()
     {
         var data = AsusTestData.Create();
-        var sensors = data.Sensors.Select(sensor => sensor.Definition.Component == SensorComponent.GpuPin
-            && sensor.Definition.Metric == SensorMetric.Current ? sensor with { Value = 10 } : sensor).ToArray();
+        var sensors = data.Sensors.Select(sensor => sensor.Definition is { Component: SensorComponent.GpuPin, Metric: SensorMetric.Current } ? sensor with { Value = 10 } : sensor).ToArray();
         var state = new AsusTestState { Data = [data with { Sensors = sensors }] };
         var clock = new TestTimeProvider();
         using var stream = new AsusStream();

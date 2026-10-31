@@ -1,3 +1,5 @@
+using Rtx5090Monitoring.Contracts.Enums;
+using Rtx5090Monitoring.Contracts.Sensors;
 using System.Text.Json;
 using Microsoft.Extensions.Configuration;
 using Rtx5090Monitoring.Contracts.Configuration;
@@ -12,13 +14,12 @@ using Rtx5090Monitoring.Warnings;
 
 namespace Rtx5090Monitoring.Plugins.GenericNvidia;
 
-public sealed class GenericNvidiaPluginFactory(NvidiaTelemetryReader reader) : ISensorPluginFactory
+public sealed class GenericNvidiaPluginFactory(NvidiaTelemetryReader reader) : ISensorPluginFactory, IConnectorSourceProvider
 {
     public string Id => GenericNvidiaPlugin.PluginId;
     public string Name => "GenericNvidia";
     public IWarningSource WarningSource { get; } = new GenericNvidiaWarningSource();
-    public PluginCapability[] Capabilities => [PluginCapability.Telemetry, PluginCapability.Configuration,
-        PluginCapability.Restart, PluginCapability.DeviceSelection];
+    public PluginCapability[] Capabilities => [PluginCapability.Telemetry, PluginCapability.Configuration, PluginCapability.Restart, PluginCapability.DeviceSelection];
 
     public PluginSettings CreateDefaultSettings() => GenericNvidiaSettings.WithOptions(new PluginSettings(), new GenericNvidiaOptions());
 
@@ -26,9 +27,39 @@ public sealed class GenericNvidiaPluginFactory(NvidiaTelemetryReader reader) : I
         section.Get<GenericNvidiaOptions>(binding => binding.ErrorOnUnknownConfiguration = true) ?? new GenericNvidiaOptions(),
         GenericNvidiaJsonContext.Default.GenericNvidiaOptions);
 
-    public ServiceConfiguration MigrateConfiguration(ServiceConfiguration configuration) => GenericNvidiaConfigurationMigration.Upgrade(configuration);
+    public ServiceConfiguration MigrateConfiguration(ServiceConfiguration configuration)
+    {
+        configuration = GenericNvidiaConfigurationMigration.Upgrade(configuration);
+        if (configuration.Monitoring.ConnectorProfiles.Version == 0 && configuration.Plugins.TryGetValue(Id, out var settings))
+        {
+            configuration = configuration with
+            {
+                Plugins = new Dictionary<string, PluginSettings>(configuration.Plugins, StringComparer.Ordinal)
+                {
+                    [Id] = GenericNvidiaSettings.WithOptions(settings, GenericNvidiaSettings.GetOptions(settings) with { ElectricalSource = "Automatic" })
+                }
+            };
+        }
+
+        return configuration;
+    }
 
     public void ValidateSettings(PluginSettings settings) => GenericNvidiaSettings.GetOptions(settings);
 
     public ISensorPlugin Create(PluginSettings settings) => new GenericNvidiaPlugin(settings, reader);
+
+    public int? Priority(SensorMetric metric) => metric switch
+    {
+        SensorMetric.Power or SensorMetric.Current => 0,
+        SensorMetric.Voltage => 100,
+        _ => null
+    };
+
+    public SensorIdentity[] ConnectorSources(SensorSnapshot snapshot, PluginSettings settings, string? connectorId) =>
+    [
+        .. snapshot.Sensors
+            .Where(reading => reading.Identity.PluginId == Id && reading.Identity is { Component: SensorComponent.GpuConnector, Channel: 1 })
+            .Select(reading => reading.Identity)
+    ];
+
 }
