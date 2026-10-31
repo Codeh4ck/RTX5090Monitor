@@ -15,6 +15,9 @@ internal static class WireViewEndpointTests
     public static async Task RunAsync(TestRunner runner)
     {
         await runner.RunAsync(PreservesTheOriginalHttpSnapshotAsync);
+        await runner.RunAsync(BroadcastsNativeConnectorVoltageAsync);
+        await runner.RunAsync(KeepsNativeConnectorVoltageAtZeroCurrentAsync);
+        await runner.RunAsync(MarksInvalidNativeConnectorVoltageUnavailableAsync);
         await runner.RunAsync(StreamsTheOriginalWireViewPayloadAsync);
         await runner.RunAsync(ReturnsDeviceConfigurationAndRawBytesAsync);
         await runner.RunAsync(ComplementsIndependentFaultMasksAsync);
@@ -44,6 +47,59 @@ internal static class WireViewEndpointTests
         TestAssert.Equal(0x08, snapshot.GetProperty("faultStatus").GetInt32());
         TestAssert.False(snapshot.TryGetProperty("schemaVersion", out _), "Legacy snapshots must retain their original shape.");
     }
+
+    private static async Task BroadcastsNativeConnectorVoltageAsync()
+    {
+        var device = new WireViewTestState();
+        device.Sample = device.Sample with { ReportedAverageVoltageV = 12.073, ReportedTotalPowerW = 62.345, ReportedTotalCurrentA = 5 };
+        await using var host = await MonitoringTestHost.StartWithWireViewAsync(device);
+
+        var snapshot = await host.GetSensorSnapshotAsync();
+        var voltage = FindConnectorVoltage(snapshot);
+
+        TestAssert.Equal("Volts", voltage.GetProperty("unit").GetString());
+        TestAssert.Equal("Valid", voltage.GetProperty("quality").GetString());
+        TestAssert.Equal(12.073, voltage.GetProperty("value").GetDouble());
+        TestAssert.Equal(12d, device.Sample.PinVoltage.Average());
+
+        using var legacy = await host.Client.GetFromJsonAsync<JsonDocument>(Prefix + "/sensors");
+        TestAssert.Equal(62.345, legacy!.RootElement.GetProperty("totalPowerW").GetDouble());
+        TestAssert.Equal(5d, legacy.RootElement.GetProperty("totalCurrentA").GetDouble());
+    }
+
+    private static async Task KeepsNativeConnectorVoltageAtZeroCurrentAsync()
+    {
+        var device = new WireViewTestState();
+        device.Sample = device.Sample with { ReportedAverageVoltageV = 12.08, ReportedTotalPowerW = 0, ReportedTotalCurrentA = 0 };
+        await using var host = await MonitoringTestHost.StartWithWireViewAsync(device);
+
+        var voltage = FindConnectorVoltage(await host.GetSensorSnapshotAsync());
+
+        TestAssert.Equal(12.08, voltage.GetProperty("value").GetDouble());
+        TestAssert.Equal("Valid", voltage.GetProperty("quality").GetString());
+    }
+
+    private static async Task MarksInvalidNativeConnectorVoltageUnavailableAsync()
+    {
+        foreach (var nativeVoltage in new double?[] { null, 0, -0.001, double.NaN, double.PositiveInfinity })
+        {
+            var device = new WireViewTestState();
+            device.Sample = device.Sample with { ReportedAverageVoltageV = nativeVoltage };
+            await using var host = await MonitoringTestHost.StartWithWireViewAsync(device);
+
+            var snapshot = await host.GetSensorSnapshotAsync();
+            var voltage = FindConnectorVoltage(snapshot);
+
+            TestAssert.Equal(JsonValueKind.Null, voltage.GetProperty("value").ValueKind);
+            TestAssert.Equal("Unavailable", voltage.GetProperty("quality").GetString());
+        }
+    }
+
+    private static JsonElement FindConnectorVoltage(JsonElement snapshot) => snapshot.GetProperty("sensors").EnumerateArray().Single(reading =>
+        reading.GetProperty("identity").GetProperty("pluginId").GetString() == "wireview-pro2"
+        && reading.GetProperty("identity").GetProperty("component").GetString() == "GpuConnector"
+        && reading.GetProperty("identity").GetProperty("metric").GetString() == "Voltage"
+        && reading.GetProperty("identity").GetProperty("channel").GetInt32() == 1);
 
     private static async Task StreamsTheOriginalWireViewPayloadAsync()
     {

@@ -9,9 +9,31 @@ internal static class WireViewConfigParserTests
 {
     public static void Run(TestRunner runner)
     {
+        runner.Run(ParsesReportedTotalsAndVoltageFromTheSensorPacket);
         runner.Run(ParsesVersionZeroWithoutAveraging);
         runner.Run(ParsesVersionOneAveraging);
         runner.Run(ParsesVersionTwoAndPreservesThresholdsAndMasks);
+    }
+
+    private static void ParsesReportedTotalsAndVoltageFromTheSensorPacket()
+    {
+        var bytes = new byte[100];
+        for (var pin = 0; pin < 6; pin++)
+        {
+            BinaryPrimitives.WriteInt16LittleEndian(bytes.AsSpan(12 + pin * 12), 12000);
+            BinaryPrimitives.WriteUInt32LittleEndian(bytes.AsSpan(16 + pin * 12), 1000);
+        }
+
+        BinaryPrimitives.WriteUInt32LittleEndian(bytes.AsSpan(84), 62345);
+        BinaryPrimitives.WriteUInt32LittleEndian(bytes.AsSpan(88), 5000);
+        BinaryPrimitives.WriteUInt16LittleEndian(bytes.AsSpan(92), 12073);
+        var data = WireViewProReader.Parse(bytes);
+
+        TestAssert.Equal<double?>(12.073, data.ReportedAverageVoltageV);
+        TestAssert.Equal(62.345, data.TotalPowerW);
+        TestAssert.Equal(5d, data.TotalCurrentA);
+        TestAssert.Equal(72d, data.PinPower.Sum());
+        TestAssert.Equal(6d, data.PinCurrent.Sum());
     }
 
     private static void ParsesVersionZeroWithoutAveraging()

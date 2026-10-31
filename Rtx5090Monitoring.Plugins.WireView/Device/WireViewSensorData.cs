@@ -12,6 +12,10 @@ public sealed record WireViewSensorData(
     ushort FaultStatus,
     ushort FaultLog)
 {
-    public double TotalCurrentA => PinCurrent.Sum();
-    public double TotalPowerW => PinPower.Sum();
+    public double? ReportedAverageVoltageV { get; init; }
+    public double? ReportedTotalCurrentA { get; init; }
+    public double? ReportedTotalPowerW { get; init; }
+
+    public double TotalCurrentA => ReportedTotalCurrentA ?? PinCurrent.Sum();
+    public double TotalPowerW => ReportedTotalPowerW ?? PinPower.Sum();
 }

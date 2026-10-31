@@ -15,6 +15,9 @@ public sealed class WireViewProReader(ILogger<WireViewPlugin> logger) : IWireVie
 
     private const int OffTs = 0;
     private const int OffReadings = 12;
+    private const int OffTotalPower = 84;
+    private const int OffTotalCurrent = 88;
+    private const int OffAverageVoltage = 92;
     private const int OffHpwrCap = 94;
     private const int OffFaultStatus = 96;
     private const int OffFaultLog = 98;
@@ -462,7 +465,7 @@ public sealed class WireViewProReader(ILogger<WireViewPlugin> logger) : IWireVie
         return offset == size ? buffer : null;
     }
 
-    private static WireViewSensorData Parse(byte[] b)
+    internal static WireViewSensorData Parse(byte[] b)
     {
         var tempIn = ReadI16(b, OffTs + 0) / 10.0;
         var tempOut = ReadI16(b, OffTs + 2) / 10.0;
@@ -488,7 +491,12 @@ public sealed class WireViewProReader(ILogger<WireViewPlugin> logger) : IWireVie
             tempIn, tempOut, extTemp1, extTemp2,
             psuCapW,
             ReadU16(b, OffFaultStatus),
-            ReadU16(b, OffFaultLog));
+            ReadU16(b, OffFaultLog))
+        {
+            ReportedAverageVoltageV = ReadU16(b, OffAverageVoltage) / 1000.0,
+            ReportedTotalPowerW = ReadU32(b, OffTotalPower) / 1000.0,
+            ReportedTotalCurrentA = ReadU32(b, OffTotalCurrent) / 1000.0
+        };
     }
 
     internal static DeviceConfig ParseConfig(byte[] b, int version)

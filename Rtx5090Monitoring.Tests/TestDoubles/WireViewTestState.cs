@@ -16,7 +16,7 @@ internal sealed class WireViewTestState
     public ushort LastStatusMask { get; set; }
     public ushort LastLogMask { get; set; }
 
-    public WireViewSensorData Sample { get; } = new(
+    public WireViewSensorData Sample { get; set; } = new(
         [12, 12, 12, 12, 12, 12],
         [1, 2, 3, 4, 5, 6],
         [12, 24, 36, 48, 60, 72],

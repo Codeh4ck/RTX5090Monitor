@@ -67,7 +67,7 @@ public sealed class WireViewPlugin : ISensorPlugin
         _stream.Hub.Publish(JsonSerializer.SerializeToUtf8Bytes(Latest, WireViewJsonContext.Default.SensorResponse));
 
         var deviceId = Reader.PortName.ToLowerInvariant();
-        var sensors = new List<SensorReading>(27);
+        var sensors = new List<SensorReading>(28);
 
         for (var i = 0; i < 6; i++)
         {
@@ -76,6 +76,11 @@ public sealed class WireViewPlugin : ISensorPlugin
             Add(SensorComponent.GpuPin, SensorMetric.Power, data.PinPower[i], i + 1);
         }
 
+        // Use the firmware's native AvgVoltage reading, including when connector current is zero.
+        double? connectorVoltage = data.ReportedAverageVoltageV is { } voltage && double.IsFinite(voltage) && voltage > 0
+            ? voltage : null;
+
+        Add(SensorComponent.GpuConnector, SensorMetric.Voltage, connectorVoltage, 1);
         Add(SensorComponent.GpuConnector, SensorMetric.Power, data.TotalPowerW, 1);
         Add(SensorComponent.GpuConnector, SensorMetric.Current, data.TotalCurrentA, 1);
         Add(SensorComponent.GpuConnector, SensorMetric.PowerCapability, data.PsuCapabilityW, 1);
