@@ -16,7 +16,7 @@ public sealed partial class HardwareView : UserControl
     public HardwarePanelViewModel Model { get; }
     internal bool IsResetPeakVisible => ResetPeakButton.Visibility == Visibility.Visible;
     public string DetailsHeading => Model.IsWireView ? "Temperatures and faults" : "GPU status";
-    public string DeviceIconName => Model.IsAsus ? "asus" : "pin";
+    public string DeviceIconName => Model.IsAsus ? "asus" : Model.IsWireView ? "tg" : "pin";
     public string DetailsIconName => Model.IsWireView ? "vtemp" : "vcore";
 
     internal HardwareView(HardwarePanelViewModel model, AppRuntime runtime)
