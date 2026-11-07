@@ -14,6 +14,7 @@ public sealed partial class App : Application
     private AppRuntime? _runtime;
     private TrayService? _tray;
     private bool _exiting;
+    private bool _exitRequestPending;
     private bool _hidden;
 
     public App()
@@ -54,6 +55,11 @@ public sealed partial class App : Application
             }
 
             closing.Cancel = true;
+            if (_exitRequestPending)
+            {
+                return;
+            }
+
             if (_runtime.Preferences.CloseToTray && _tray?.IsAvailable == true)
             {
                 Hide();
@@ -111,7 +117,7 @@ public sealed partial class App : Application
                 await File.WriteAllTextAsync(Path.Combine(output, "smoke-error.txt"), exception.ToString());
                 Environment.ExitCode = 1;
             }
-            ExitApplication();
+            await ExitCoreAsync();
             return;
         }
 #endif
@@ -150,6 +156,33 @@ public sealed partial class App : Application
     }
 
     private async void ExitApplication()
+    {
+        if (_exiting || _exitRequestPending || _runtime is null || _window is null)
+        {
+            return;
+        }
+
+        _exitRequestPending = true;
+        try
+        {
+            if (_runtime.Settings.ConfirmBeforeExit)
+            {
+                Show();
+                if (!await ExitConfirmation.ConfirmAsync(_window.ThemeRoot, _runtime.Settings))
+                {
+                    return;
+                }
+            }
+
+            await ExitCoreAsync();
+        }
+        finally
+        {
+            _exitRequestPending = false;
+        }
+    }
+
+    private async Task ExitCoreAsync()
     {
         if (_exiting)
         {

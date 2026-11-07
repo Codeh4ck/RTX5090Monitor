@@ -20,6 +20,8 @@ public sealed partial class PluginSettingsView : UserControl
         InitializeComponent();
     }
 
+    private async void FanCurve_Click(object sender, RoutedEventArgs args) => await _runtime.OpenMsiFanCurveAsync();
+
     private async void RefreshDevices_Click(object sender, RoutedEventArgs args) => await _runtime.RefreshDevicesAsync();
     private async void RefreshNvidiaDevices_Click(object sender, RoutedEventArgs args) => await _runtime.RefreshNvidiaDevicesAsync();
 

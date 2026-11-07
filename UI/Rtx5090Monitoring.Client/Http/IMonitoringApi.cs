@@ -35,6 +35,9 @@ public interface IMonitoringApi
     Task<AsusDeviceInfo[]> GetAsusDevicesAsync(CancellationToken token);
     Task<NvidiaDeviceInfo[]> GetNvidiaDevicesAsync(CancellationToken token) => Task.FromResult(Array.Empty<NvidiaDeviceInfo>());
     Task<MsiDeviceInfo[]> GetMsiDevicesAsync(CancellationToken token);
+    Task<Rtx5090Monitoring.Plugins.Msi.Contracts.Telemetry.MsiSnapshot> GetMsiSnapshotAsync(CancellationToken token) =>
+        Task.FromException<Rtx5090Monitoring.Plugins.Msi.Contracts.Telemetry.MsiSnapshot>(
+            new NotSupportedException("MSI fan telemetry is unavailable from this connection."));
     Task ClearWireViewFaultsAsync(ClearFaultsRequest request, CancellationToken token);
     Task RestartPluginAsync(string pluginId, CancellationToken token);
     Task RestartServiceAsync(CancellationToken token);

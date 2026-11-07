@@ -37,6 +37,18 @@ internal static class SmokeTestRunner
         {
             throw new InvalidOperationException("No demo telemetry received.");
         }
+        if (Environment.GetCommandLineArgs().Contains("--exit-confirmation-only"))
+        {
+            await ExitConfirmationSmokeTests.RunAsync(window, runtime, output);
+            return;
+        }
+
+        if (Environment.GetCommandLineArgs().Contains("--msi-fan-curve-only"))
+        {
+            await MsiFanCurveSmokeTests.RunAsync(runtime, output);
+            return;
+        }
+
         if (Environment.GetCommandLineArgs().Contains("--performance-chart-only"))
         {
             await PerformanceChartSmokeTests.RunAsync(window, runtime, output);

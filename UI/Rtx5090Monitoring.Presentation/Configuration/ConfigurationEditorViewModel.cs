@@ -4,6 +4,7 @@ using Rtx5090Monitoring.Client.Http;
 using Rtx5090Monitoring.Plugins.Asus.Contracts.Common;
 using Rtx5090Monitoring.Plugins.Msi.Contracts.Devices;
 using Rtx5090Monitoring.Contracts.Configuration;
+using Rtx5090Monitoring.Plugins.Msi.Contracts.Configuration;
 using Rtx5090Monitoring.Contracts.Discovery;
 using Rtx5090Monitoring.Contracts.Monitoring;
 using Rtx5090Monitoring.Contracts.Sensors;
@@ -226,6 +227,34 @@ public sealed class ConfigurationEditorViewModel(Func<IMonitoringApi> api, bool 
         {
             IsBusy = false;
         }
+    }
+
+    public void ReceiveMsiCurveUpdate(ConfigurationSnapshot snapshot, MsiFanCurve curve, string previousVersion)
+    {
+        if (_baseline?.Version != previousVersion)
+        {
+            Receive(snapshot);
+            return;
+        }
+
+        _loading = true;
+
+        try
+        {
+            _baseline = snapshot;
+            _pendingConfiguration = null;
+            HasExternalChanges = false;
+            var msi = Plugins.Single(plugin => plugin.IsMsi).Msi;
+            msi.SetCurve(curve);
+            msi.FanModeIndex = (int)MsiFanControl.Curve;
+            Raise(nameof(RevisionText));
+        }
+        finally
+        {
+            _loading = false;
+        }
+
+        MarkDirty();
     }
 
     private void Load(ConfigurationSnapshot snapshot)

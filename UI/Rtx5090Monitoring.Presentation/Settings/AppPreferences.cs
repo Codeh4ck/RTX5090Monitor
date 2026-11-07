@@ -18,6 +18,7 @@ public sealed record AppPreferences
     public bool ReducedEffects { get; init; } = true;
     public bool MinimizeToTray { get; init; } = true;
     public bool CloseToTray { get; init; }
+    public bool SuppressExitConfirmation { get; init; }
     public bool StartWithWindows { get; init; }
     public bool StartMinimized { get; init; }
     public bool AutomaticallyCheckForUpdates { get; init; } = true;

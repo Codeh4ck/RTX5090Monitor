@@ -171,6 +171,7 @@ internal sealed partial class AppRuntime
             _ = Updates.CheckAsync(false, StopToken);
             _window?.ApplyAppearance(preferences);
             WireViewSettingsWindow?.ApplyAppearance(preferences);
+            FanCurveWindow?.ApplyAppearance(preferences);
 #if TELEMETRY_DEBUG
             DebugConsole?.ApplyAppearance(preferences);
 #endif
@@ -525,6 +526,7 @@ internal sealed partial class AppRuntime
         Updates.Cancel();
         _updateHttp.Dispose();
         WireViewSettingsWindow?.Close();
+        FanCurveWindow?.Close();
 #if TELEMETRY_DEBUG
         StopDebugging();
 #endif

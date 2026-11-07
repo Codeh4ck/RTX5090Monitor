@@ -21,7 +21,8 @@ public sealed class MsiPlugin(PluginSettings settings, TimeProvider clock, IMsiP
     public void ApplySettings(PluginSettings settings)
     {
         var options = MsiSettings.GetOptions(settings);
-        if (_options.DevicePath != options.DevicePath || _options.FanControl != options.FanControl)
+        if (_options.DevicePath != options.DevicePath || _options.FanControl != options.FanControl
+            || _options.FanDutyPercent != options.FanDutyPercent || !_options.FanCurve.Matches(options.FanCurve))
         {
             reader.ReleaseFanControl();
         }
@@ -45,7 +46,8 @@ public sealed class MsiPlugin(PluginSettings settings, TimeProvider clock, IMsiP
         var readings = MsiSnapshotMapper.Create(sample);
         Latest = sample;
 
-        return ValueTask.FromResult(new PluginSample(PluginState.Ready, readings, sample.Model + " · revision " + sample.Revision));
+        return ValueTask.FromResult(new PluginSample(PluginState.Ready, readings, sample.FanControllerMessage is { } message
+            ? "Automatic fan fallback - " + message : sample.Model + " · revision " + sample.Revision));
     }
 
     public void Dispose()

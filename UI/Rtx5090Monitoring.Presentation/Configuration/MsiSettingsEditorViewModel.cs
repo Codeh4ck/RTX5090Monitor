@@ -12,6 +12,12 @@ public sealed class MsiSettingsEditorViewModel : EditableObject
     private bool _refreshingDevices;
     private int _fanMode;
     private double _fanDuty;
+    private double _responseDelay;
+
+    public ObservableCollection<MsiFanCurvePointViewModel> CurvePoints { get; } = [];
+    public double ResponseDelaySeconds { get => _responseDelay; set => Edit(ref _responseDelay, value); }
+    public bool CanAddCurvePoint => CurvePoints.Count < 6;
+    public bool IsCurve => FanModeIndex == (int)MsiFanControl.Curve;
 
     public ObservableCollection<PsuChoice> Devices { get; } = [];
 
@@ -46,6 +52,7 @@ public sealed class MsiSettingsEditorViewModel : EditableObject
 
             Edit(ref _fanMode, value);
             Raise(nameof(IsManual));
+            Raise(nameof(IsCurve));
         }
     }
 
@@ -56,6 +63,20 @@ public sealed class MsiSettingsEditorViewModel : EditableObject
     {
         _fanMode = (int)options.FanControl;
         _fanDuty = options.FanDutyPercent;
+        _responseDelay = options.FanCurve.ResponseDelaySeconds;
+
+        foreach (var point in options.FanCurve.Points)
+        {
+            var editor = new MsiFanCurvePointViewModel(point.TemperatureC, point.DutyPercent);
+            editor.Edited += NotifyEdited;
+            CurvePoints.Add(editor);
+        }
+        CurvePoints.CollectionChanged += (_, _) =>
+        {
+            Raise(nameof(CanAddCurvePoint));
+            NotifyEdited();
+        };
+
         _selectedDevice = new PsuChoice(options.DevicePath, options.DevicePath ?? "Automatic · single connected MPG TS PSU");
         SetDevices([]);
     }
@@ -93,13 +114,97 @@ public sealed class MsiSettingsEditorViewModel : EditableObject
         {
             DevicePath = SelectedDevice.Id,
             FanControl = (MsiFanControl)FanModeIndex,
-            FanDutyPercent = NumericInput.Integer(FanDutyPercent, "MSI fan duty")
+            FanDutyPercent = NumericInput.Integer(FanDutyPercent, "MSI fan duty"),
+            FanCurve = new MsiFanCurve
+            {
+                Points = [.. CurvePoints.Select(point => point.Build())],
+                ResponseDelaySeconds = NumericInput.Integer(ResponseDelaySeconds, "Fan curve response delay")
+            }
         };
 
         options.Validate();
         return options;
     }
 
+    public void AddCurvePoint(double? temperature = null, double? duty = null)
+    {
+        if (!CanAddCurvePoint)
+        {
+            return;
+        }
+
+        try
+        {
+            Build();
+        }
+        catch (ArgumentException)
+        {
+            return;
+        }
+
+        var temperatures = new[] { 0d }.Concat(CurvePoints.Select(point => point.TemperatureC)).Append(100d).ToArray();
+        var gap = Enumerable.Range(1, temperatures.Length - 1).MaxBy(index => temperatures[index] - temperatures[index - 1]);
+        var temp = Math.Round(temperature ?? (temperatures[gap - 1] + temperatures[gap]) / 2, MidpointRounding.AwayFromZero);
+
+        if (!double.IsFinite(temp) || temp is < 0 or > 100 || CurvePoints.Any(point => point.TemperatureC == temp))
+        {
+            return;
+        }
+
+        var index = CurvePoints.TakeWhile(point => point.TemperatureC < temp).Count();
+        var left = CurvePoints[Math.Max(0, index - 1)];
+        var right = CurvePoints[Math.Min(CurvePoints.Count - 1, index)];
+        var interpolated = left.TemperatureC == right.TemperatureC ? left.DutyPercent
+            : left.DutyPercent + (temp - left.TemperatureC) / (right.TemperatureC - left.TemperatureC) * (right.DutyPercent - left.DutyPercent);
+        var value = Math.Clamp(Math.Round(duty ?? interpolated, MidpointRounding.AwayFromZero), 0, 100);
+
+        if (!double.IsFinite(value))
+        {
+            return;
+        }
+
+        var added = new MsiFanCurvePointViewModel(temp, value);
+        added.Edited += NotifyEdited;
+        CurvePoints.Insert(index, added);
+    }
+
+    public void SetCurve(MsiFanCurve curve)
+    {
+        curve.Validate();
+
+        foreach (var point in CurvePoints)
+        {
+            point.Edited -= NotifyEdited;
+        }
+
+        CurvePoints.Clear();
+
+        foreach (var point in curve.Points)
+        {
+            var editor = new MsiFanCurvePointViewModel(point.TemperatureC, point.DutyPercent);
+            editor.Edited += NotifyEdited;
+            CurvePoints.Add(editor);
+        }
+
+        ResponseDelaySeconds = curve.ResponseDelaySeconds;
+    }
+
+    public void RemoveCurvePoint(MsiFanCurvePointViewModel point)
+    {
+        if (CurvePoints.Count <= 2)
+        {
+            return;
+        }
+
+        point.Edited -= NotifyEdited;
+        CurvePoints.Remove(point);
+        NotifyEdited();
+    }
+
     public bool Matches(MsiOptions options) => SelectedDevice.Id == options.DevicePath
-                                               && FanModeIndex == (int)options.FanControl && Math.Abs(FanDutyPercent - options.FanDutyPercent) < 0.0001;
+                                               && FanModeIndex == (int)options.FanControl && Math.Abs(FanDutyPercent - options.FanDutyPercent) < 0.0001
+                                               && double.IsFinite(ResponseDelaySeconds) && ResponseDelaySeconds == options.FanCurve.ResponseDelaySeconds
+                                               && CurvePoints.Count == options.FanCurve.Points.Length
+                                               && CurvePoints.Select((point, index) => point.TemperatureC == options.FanCurve.Points[index].TemperatureC
+                                                   && point.DutyPercent == options.FanCurve.Points[index].DutyPercent).All(equal => equal);
 }

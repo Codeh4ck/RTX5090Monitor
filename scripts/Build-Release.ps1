@@ -120,7 +120,7 @@ try
         }
     }
 
-    $buildProperties = @('-c', 'Release', "-p:InstallerVersion=$Version", "-p:PayloadDirectory=$payload")
+    $buildProperties = @('-t:Rebuild', '-c', 'Release', "-p:InstallerVersion=$Version", "-p:PayloadDirectory=$payload")
 
     Invoke-ReleaseCommand dotnet (@('build', 'Installer/Rtx5090Monitoring.Installer/Rtx5090Monitoring.Installer.wixproj') + $buildProperties)
 

@@ -9,6 +9,7 @@ internal static class PreferenceTests
     public static async Task RunAsync(TestRunner runner)
     {
         runner.Run(RejectsInvalidPreferences);
+        await runner.RunAsync(PersistsExitConfirmationChoiceAsync);
         await runner.RunAsync(PersistsAndRecoversFromCorruptPreferencesAsync);
         await runner.RunAsync(MigratesWindowHeightOnceWithoutLosingPreferencesAsync);
     }
@@ -34,6 +35,35 @@ internal static class PreferenceTests
             legacy["windowHeight"] = 1200;
             await File.WriteAllTextAsync(path, legacy.ToJsonString());
             TestAssert.Equal(1200d, store.Load().WindowHeight);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    private static async Task PersistsExitConfirmationChoiceAsync()
+    {
+        var path = Path.Combine(Path.GetTempPath(), "rtx-exit-test-" + Guid.NewGuid().ToString("N") + ".json");
+        try
+        {
+            var store = new PreferencesStore(path);
+            var settings = new AppSettingsViewModel(store.Load());
+            TestAssert.True(settings.ConfirmBeforeExit, "New installations must confirm exits.");
+
+            settings.ConfirmBeforeExit = false;
+            await store.SaveAsync(settings.Value);
+            TestAssert.True(store.Load().SuppressExitConfirmation, "Opting out must survive restarting the app.");
+
+            var reloaded = new AppSettingsViewModel(store.Load());
+            reloaded.ConfirmBeforeExit = true;
+            await store.SaveAsync(reloaded.Value);
+            TestAssert.True(!store.Load().SuppressExitConfirmation, "Settings must allow confirmation to be restored.");
+
+            var legacy = JsonNode.Parse(await File.ReadAllTextAsync(path))!.AsObject();
+            legacy.Remove("suppressExitConfirmation");
+            await File.WriteAllTextAsync(path, legacy.ToJsonString());
+            TestAssert.True(new AppSettingsViewModel(store.Load()).ConfirmBeforeExit, "Existing installations must confirm exits after upgrading.");
         }
         finally
         {
