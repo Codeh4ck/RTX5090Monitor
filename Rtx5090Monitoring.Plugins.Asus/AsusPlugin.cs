@@ -3,6 +3,7 @@ using System.Text.Json;
 using Rtx5090Monitoring.Contracts.Enums;
 using Rtx5090Monitoring.Contracts.Configuration;
 using Rtx5090Monitoring.Core.Plugins;
+using Rtx5090Monitoring.Core.Configuration;
 using Rtx5090Monitoring.Plugins.Asus.Configuration;
 using Rtx5090Monitoring.Plugins.Asus.Contracts.Common;
 using Rtx5090Monitoring.Plugins.Asus.Device;
@@ -14,13 +15,14 @@ using Rtx5090Monitoring.Plugins.Asus.Streaming;
 
 namespace Rtx5090Monitoring.Plugins.Asus;
 
-public sealed class AsusPlugin(PluginSettings settings, TimeProvider clock, IAsusGpuReader reader, AsusStream stream) : ISensorPlugin
+public sealed class AsusPlugin(PluginSettings settings, TimeProvider clock, IAsusGpuReader reader, AsusStream stream, ActiveSettingsProfileState? profiles = null) : ISensorPlugin
 {
     public const string PluginId = "asus-astral";
 
     private readonly AsusAlertMonitor _alerts = new();
     private AsusOptions _options = AsusSettings.GetOptions(settings);
     private string? _deviceId;
+    private AsusOptions? _effectiveOptions;
     private int _pollIntervalMs = settings.PollIntervalMs;
 
     public PluginDescriptor Descriptor { get; private set; } = Describe(settings);
@@ -66,10 +68,22 @@ public sealed class AsusPlugin(PluginSettings settings, TimeProvider clock, IAsu
 
             var now = clock.GetUtcNow();
             var currents = AsusSnapshotMapper.GetPinCurrents(data);
-            _alerts.Evaluate(currents, _options, now);
+            var active = profiles?.Current;
+            var effective = active?.AppliesToConnector(PluginId, data.DeviceId) == true ? AsusProfileOptions.Apply(active.Profile, _options) : _options;
+
+            if (_effectiveOptions != effective)
+            {
+                _alerts.Reset();
+                _effectiveOptions = effective;
+            }
+
+            _alerts.Evaluate(currents, effective, now);
+
             Latest = AsusSnapshotMapper.CreateLegacySnapshot(data, _alerts, now);
+
             var readings = AsusSnapshotMapper.CreateReadings(data, _alerts, currents, data.ObservedAt ?? now);
             stream.Hub.Publish(JsonSerializer.SerializeToUtf8Bytes(Latest, AsusJsonContext.Default.GpuSensorSnapshot));
+
             return ValueTask.FromResult(new PluginSample(PluginState.Ready, readings, Alerts: AsusAlertMapper.Create(data.DeviceId, _alerts, now)));
         }
         catch

@@ -18,6 +18,9 @@
                 <Rectangle Width="48" Height="2" Fill="{ThemeResource MonitorPeak}" Canvas.Top="{x:Bind Model.PeakTop, Mode=OneWay}"
                     Visibility="{x:Bind PeakVisibility, Mode=OneWay}" />
             </Canvas>
+            <TextBlock Text="!" Foreground="{ThemeResource MonitorWarning}" FontSize="18" FontWeight="Bold"
+                HorizontalAlignment="Center" VerticalAlignment="Top" AutomationProperties.Name="Outside display range"
+                Visibility="{x:Bind Model.IsOverflow, Mode=OneWay, Converter={StaticResource BoolVisibility}}" />
             <Border BorderBrush="{ThemeResource MonitorWarning}" BorderThickness="2" CornerRadius="4"
                 Visibility="{x:Bind Model.IsWarning, Mode=OneWay, Converter={StaticResource BoolVisibility}}" />
         </Grid>

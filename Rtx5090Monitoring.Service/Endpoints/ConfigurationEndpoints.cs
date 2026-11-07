@@ -1,6 +1,7 @@
 using Rtx5090Monitoring.Core.Configuration;
 using Rtx5090Monitoring.Contracts.Configuration;
 using Rtx5090Monitoring.Core.Http;
+using Rtx5090Monitoring.Service.Configuration;
 
 namespace Rtx5090Monitoring.Service.Endpoints;
 
@@ -8,6 +9,15 @@ internal static class ConfigurationEndpoints
 {
     public static void MapConfigurationEndpoints(this IEndpointRouteBuilder endpoints)
     {
+        endpoints.MapGet("/settings-profiles", (SettingsProfileResolver profiles) =>
+            Results.Json(profiles.Catalog(), AppJsonContext.Default.SettingsProfileCatalog));
+
+        endpoints.MapPut("/settings-profiles", (SettingsProfileRequest request, SettingsProfileStore store, SettingsProfileResolver profiles) =>
+        {
+            store.Apply(request);
+            return Results.Json(profiles.Catalog(), AppJsonContext.Default.SettingsProfileCatalog);
+        }).AddEndpointFilter<ApiExceptionFilter>();
+
         endpoints.MapGet("/configuration", (HttpContext context, IRuntimeConfiguration configuration) => ConfigurationPrecondition.Respond(context, configuration.Current));
 
         endpoints.MapPut("/configuration",

@@ -42,10 +42,13 @@ public sealed partial class ConnectorProfilesView : UserControl
         if (profile.HasMsi)
         {
             var connector = new ComboBox { Header = "MSI connector feeding this GPU", HorizontalAlignment = HorizontalAlignment.Stretch, DataContext = profile };
+
             connector.Items.Add("Automatic - nonzero pins (one active connector)");
             connector.Items.Add("Connector 1");
             connector.Items.Add("Connector 2");
+
             connector.SetBinding(Selector.SelectedIndexProperty, new Binding { Path = new PropertyPath(nameof(profile.MsiConnectorIndex)), Mode = BindingMode.TwoWay });
+
             ProfileHost.Children.Add(connector);
             ProfileHost.Children.Add(new TextBlock
             {

@@ -131,11 +131,29 @@ public sealed partial class ConfigurationView : UserControl
 
     internal void SelectSection(string id) => ConfigurationTabs.SelectedItem = ConfigurationTabs.TabItems.OfType<TabViewItem>().Single(tab => tab.Tag as string == id);
 
+    internal void TrySelectSection(string id)
+    {
+        var tab = ConfigurationTabs.TabItems.OfType<TabViewItem>().FirstOrDefault(item => item.Tag as string == id);
+        if (tab is not null)
+        {
+            ConfigurationTabs.SelectedItem = tab;
+        }
+    }
+
     private void OnSectionChanged(object sender, SelectionChangedEventArgs args)
     {
         if (!_rebuilding)
         {
             _selectedSection = SelectedSection;
+            if (_selectedSection == "warnings" && DeviceWarningProfilesHost.Content is null)
+            {
+                DeviceWarningProfilesHost.Content = new DeviceWarningProfilesView(_runtime);
+            }
+
+            if (_selectedSection == "gpu-profiles" && SettingsProfilesHost.Content is null)
+            {
+                SettingsProfilesHost.Content = new SettingsProfilesView(_runtime);
+            }
         }
     }
 

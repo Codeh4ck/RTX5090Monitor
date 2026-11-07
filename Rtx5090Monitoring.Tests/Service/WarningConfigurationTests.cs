@@ -5,6 +5,7 @@ using Rtx5090Monitoring.Plugins.Asus.Contracts.Warnings;
 using System.Text.Json;
 using System.Net;
 using System.Text;
+using Rtx5090Monitoring.Contracts.Configuration;
 using Rtx5090Monitoring.Contracts.Monitoring;
 using Rtx5090Monitoring.Contracts.Warnings;
 using Rtx5090Monitoring.Service.Configuration;
@@ -108,7 +109,11 @@ internal static class WarningConfigurationTests
         TestAssert.True(plugins.All(plugin => !plugin.GetProperty("enabled").GetBoolean()), "Catalogue discovery must work without enabling hardware.");
         TestAssert.Equal(2, plugins.Single(plugin => plugin.GetProperty("id").GetString() == "generic-nvidia").GetProperty("warnings").GetArrayLength());
         TestAssert.Equal(4, plugins.Single(plugin => plugin.GetProperty("id").GetString() == "asus-astral").GetProperty("warnings").GetArrayLength());
-        TestAssert.Equal(6, plugins.Single(plugin => plugin.GetProperty("id").GetString() == "wireview-pro2").GetProperty("warnings").GetArrayLength());
+        var wireViewWarnings = plugins.Single(plugin => plugin.GetProperty("id").GetString() == "wireview-pro2").GetProperty("warnings");
+        TestAssert.Equal(7, wireViewWarnings.GetArrayLength());
+        TestAssert.True(wireViewWarnings.EnumerateArray().Any(warning =>
+            warning.GetProperty("id").GetString() == ActiveSettingsProfile.WireViewProfileOvercurrent),
+            "The software pin warning must be available in the notification catalog.");
         TestAssert.Equal(0, plugins.Single(plugin => plugin.GetProperty("id").GetString() == "msi-psu").GetProperty("warnings").GetArrayLength());
     }
     private static async Task MigratesPersistedLegacyWarningSettingsOnStartupAsync()

@@ -5,7 +5,7 @@ using Rtx5090Monitoring.App.Platform.Windowing;
 
 namespace Rtx5090Monitoring.App.Platform.Tray;
 
-internal sealed class TrayService : IDisposable
+internal sealed partial class TrayService : IDisposable
 {
     private const uint CallbackMessage = 0x800B;
     private readonly nint _window;
@@ -32,7 +32,9 @@ internal sealed class TrayService : IDisposable
         _minimizeChanged = minimizeChanged;
         _taskbarCreated = NativeMethods.RegisterWindowMessageW("TaskbarCreated");
         _showMessage = NativeMethods.RegisterWindowMessageW("Rtx5090Monitoring.App.Show");
+
         WindowProcedure procedure = ProcessMessage;
+
         // Windows retains a function pointer; root the delegate until the window subclass is removed.
         _procedureHandle = GCHandle.Alloc(procedure);
         try
@@ -78,7 +80,9 @@ internal sealed class TrayService : IDisposable
         _data.Info = message[..Math.Min(message.Length, 255)];
         _data.InfoFlags = NativeConstants.BalloonWarning | NativeConstants.RespectQuietTime;
         _data.Flags |= NativeConstants.NotifyInfoFlag;
+
         NativeMethods.Shell_NotifyIconW(NativeConstants.NotifyModify, ref _data);
+
         _data.Flags &= ~NativeConstants.NotifyInfoFlag;
         _data.Info = string.Empty;
         _data.InfoTitle = string.Empty;
@@ -88,6 +92,7 @@ internal sealed class TrayService : IDisposable
     {
         IsAvailable = NativeMethods.Shell_NotifyIconW(NativeConstants.NotifyAdd, ref _data);
         _data.Version = 4;
+
         NativeMethods.Shell_NotifyIconW(NativeConstants.NotifySetVersion, ref _data);
     }
 
@@ -99,14 +104,18 @@ internal sealed class TrayService : IDisposable
             var limits = Marshal.PtrToStructure<MinMaxInfo>(lParam);
             var scale = Math.Max(96, NativeMethods.GetDpiForWindow(window)) / 96d;
             var maximum = WindowSizeLimits.GetMaximumPixels(window);
+
             limits.MinTrackSize = new NativePoint
             {
                 X = Math.Min(maximum.Width, (int)(WindowSizeLimits.MinimumWidth * scale)),
                 Y = Math.Min(maximum.Height, (int)(WindowSizeLimits.MinimumHeight * scale))
             };
+
             limits.MaxTrackSize = new NativePoint { X = maximum.Width, Y = maximum.Height };
             limits.MaxSize = limits.MaxTrackSize;
+
             Marshal.StructureToPtr(limits, lParam, false);
+
             return result;
         }
 
@@ -128,14 +137,14 @@ internal sealed class TrayService : IDisposable
             case CallbackMessage:
                 {
                     var action = (uint)(lParam.ToInt64() & 0xFFFF);
-                    if (action is NativeConstants.LeftDoubleClick or NativeConstants.TraySelect or NativeConstants.TrayKeyboardSelect or NativeConstants.BalloonClick)
+                    switch (action)
                     {
-                        _dispatcher.TryEnqueue(() => _show());
-                    }
-
-                    if (action is NativeConstants.ContextMenu or NativeConstants.RightButtonUp)
-                    {
-                        ShowMenu();
+                        case NativeConstants.LeftDoubleClick or NativeConstants.TraySelect or NativeConstants.TrayKeyboardSelect or NativeConstants.BalloonClick:
+                            _dispatcher.TryEnqueue(() => _show());
+                            break;
+                        case NativeConstants.ContextMenu or NativeConstants.RightButtonUp:
+                            ShowMenu();
+                            break;
                     }
 
                     break;
@@ -156,6 +165,7 @@ internal sealed class TrayService : IDisposable
             NativeMethods.AppendMenuW(menu, 0, NativeConstants.CommandExit, "Exit");
             NativeMethods.GetCursorPos(out var point);
             NativeMethods.SetForegroundWindow(_window);
+
             var command = NativeMethods.TrackPopupMenu(menu, NativeConstants.MenuReturnCommand | NativeConstants.MenuRightButton, point.X, point.Y, 0, _window, 0);
 
             switch (command)
@@ -187,9 +197,12 @@ internal sealed class TrayService : IDisposable
         }
 
         _disposed = true;
+
         NativeMethods.Shell_NotifyIconW(NativeConstants.NotifyDelete, ref _data);
         NativeMethods.SetWindowLongPtr(_window, NativeConstants.WindowProcedureIndex, _previous);
+
         _procedureHandle.Free();
+
         if (_data.Icon != 0)
         {
             NativeMethods.DestroyIcon(_data.Icon);

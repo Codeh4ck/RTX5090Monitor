@@ -1,11 +1,11 @@
 <UserControl x:Class="Rtx5090Monitoring.App.Controls.MsiConnectorCard"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <Border Style="{StaticResource MonitorCard}" BorderBrush="{ThemeResource MonitorAccent}">
+    <Border Style="{StaticResource MonitorAccentCard}">
         <StackPanel Spacing="14">
             <TextBlock Text="{x:Bind Model.Name}" Style="{StaticResource MonitorSectionHeading}" />
             <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
-                <Border Background="{ThemeResource MonitorInset}" CornerRadius="6" Padding="10">
+                <Border Background="{ThemeResource MonitorInset}" BorderBrush="{ThemeResource MonitorAccent}" BorderThickness="1" CornerRadius="6" Padding="10">
                     <StackPanel Spacing="5">
                         <TextBlock Text="SUM OF PIN CURRENTS" Style="{StaticResource MonitorCaption}" FontSize="10" />
                         <TextBlock Text="{x:Bind Model.Total, Mode=OneWay}" FontSize="22" FontWeight="SemiBold" />

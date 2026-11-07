@@ -10,15 +10,22 @@
         <Project Path="Installer/Rtx5090Monitoring.Installer.Actions/Rtx5090Monitoring.Installer.Actions.csproj" />
         <Project Path="Installer/Rtx5090Monitoring.Installer.Tests/Rtx5090Monitoring.Installer.Tests.csproj" />
     </Folder>
-    <Folder Name="/Plugins/">
+    <Folder Name="/Plugins/" />
+    <Folder Name="/Plugins/Asus/">
         <Project Path="Rtx5090Monitoring.Plugins.Asus.Analysis/Rtx5090Monitoring.Plugins.Asus.Analysis.csproj" />
         <Project Path="Rtx5090Monitoring.Plugins.Asus.Contracts/Rtx5090Monitoring.Plugins.Asus.Contracts.csproj" />
         <Project Path="Rtx5090Monitoring.Plugins.Asus/Rtx5090Monitoring.Plugins.Asus.csproj" />
+    </Folder>
+    <Folder Name="/Plugins/MSI/">
+        <Project Path="Rtx5090Monitoring.Plugins.Msi.Contracts/Rtx5090Monitoring.Plugins.Msi.Contracts.csproj" />
+        <Project Path="Rtx5090Monitoring.Plugins.Msi/Rtx5090Monitoring.Plugins.Msi.csproj" />
+    </Folder>
+    <Folder Name="/Plugins/Nvidia/">
         <Project Path="Rtx5090Monitoring.Plugins.GenericNvidia.Analysis/Rtx5090Monitoring.Plugins.GenericNvidia.Analysis.csproj" />
         <Project Path="Rtx5090Monitoring.Plugins.GenericNvidia.Contracts/Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.csproj" />
         <Project Path="Rtx5090Monitoring.Plugins.GenericNvidia/Rtx5090Monitoring.Plugins.GenericNvidia.csproj" />
-        <Project Path="Rtx5090Monitoring.Plugins.Msi.Contracts/Rtx5090Monitoring.Plugins.Msi.Contracts.csproj" />
-        <Project Path="Rtx5090Monitoring.Plugins.Msi/Rtx5090Monitoring.Plugins.Msi.csproj" />
+    </Folder>
+    <Folder Name="/Plugins/WireView/">
         <Project Path="Rtx5090Monitoring.Plugins.WireView.Analysis/Rtx5090Monitoring.Plugins.WireView.Analysis.csproj" />
         <Project Path="Rtx5090Monitoring.Plugins.WireView.Contracts/Rtx5090Monitoring.Plugins.WireView.Contracts.csproj" />
         <Project Path="Rtx5090Monitoring.Plugins.WireView/Rtx5090Monitoring.Plugins.WireView.csproj" />

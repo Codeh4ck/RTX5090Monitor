@@ -11,7 +11,7 @@ internal static class DirtyTrackingTests
     public static void Run(TestRunner runner)
     {
         runner.Run(RevertingSharedAndPluginSettingsClearsChanges);
-        runner.Run(RevertingAsusThresholdsClearsChanges);
+        runner.Run(ChangingAsusGpuPreservesLegacyThresholds);
         runner.Run(RemovingANewSelectionRestoresTheOriginalConfiguration);
         runner.Run(RestoringSourceOrderClearsChanges);
         runner.Run(AbandoningADraftAcceptsThePendingExternalConfiguration);
@@ -35,14 +35,20 @@ internal static class DirtyTrackingTests
         TestAssert.False(editor.IsDirty, "Correcting invalid input back to its original value must clear the change.");
     }
 
-    private static void RevertingAsusThresholdsClearsChanges()
+    private static void ChangingAsusGpuPreservesLegacyThresholds()
     {
-        var editor = new ConfigurationEditorViewModel(() => new FakeMonitoringApi());
-        editor.Receive(UiTestData.Configuration);
-        editor.Plugins[0].Asus.OvercurrentA = 9.5;
-        TestAssert.True(editor.IsDirty, "A changed threshold must count as an edit.");
-        editor.Plugins[0].Asus.OvercurrentA = 9.2;
-        TestAssert.False(editor.IsDirty, "The original single-precision threshold must compare by its transmitted value.");
+        var original = new Rtx5090Monitoring.Plugins.Asus.Contracts.Configuration.AsusOptions
+        {
+            WireOvercurrentAmperageThreshold = 9.5f,
+            ImbalancePercentageThreshold = 25
+        };
+        var asus = new AsusSettingsEditorViewModel(original);
+        asus.SetDevices([new("gpu0", "RTX 5090")]);
+        asus.SelectedDevice = asus.Devices.Single(device => device.Id == "gpu0");
+
+        TestAssert.Equal(original with { DeviceId = "gpu0" }, asus.Build());
+        asus.SelectedDevice = asus.Devices.Single(device => device.Id is null);
+        TestAssert.True(asus.Matches(original), "Returning to the original GPU must restore the original plugin options.");
     }
 
     private static void RemovingANewSelectionRestoresTheOriginalConfiguration()

@@ -64,7 +64,7 @@ public sealed class PluginSettingsEditorViewModel : EditableObject
 
         if (IsAsus)
         {
-            result = result with { Options = JsonSerializer.SerializeToElement(Asus.Build(result.PollIntervalMs), ClientJsonContext.Default.AsusOptions) };
+            result = result with { Options = JsonSerializer.SerializeToElement(Asus.Build(), ClientJsonContext.Default.AsusOptions) };
         }
 
         if (IsNvidia)

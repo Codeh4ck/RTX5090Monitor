@@ -34,4 +34,9 @@ namespace Rtx5090Monitoring.Client.Serialization;
 [JsonSerializable(typeof(DeviceConfig))]
 [JsonSerializable(typeof(ClearFaultsRequest))]
 [JsonSerializable(typeof(ErrorResponse))]
+[JsonSerializable(typeof(SettingsProfileCatalog))]
+[JsonSerializable(typeof(SettingsProfileRequest))]
+[JsonSerializable(typeof(DeviceWarningProfile))]
+[JsonSerializable(typeof(DeviceWarningProfileCatalog))]
+[JsonSerializable(typeof(WarningShutdownReason))]
 public partial class ClientJsonContext : JsonSerializerContext;

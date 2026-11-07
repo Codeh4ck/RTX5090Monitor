@@ -3,7 +3,7 @@ using Microsoft.UI.Xaml.Data;
 
 namespace Rtx5090Monitoring.App.Converters;
 
-public sealed class BooleanVisibilityConverter : IValueConverter
+public sealed partial class BooleanVisibilityConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language) => value is true ? Visibility.Visible : Visibility.Collapsed;
     public object ConvertBack(object value, Type targetType, object parameter, string language) => value is Visibility.Visible;

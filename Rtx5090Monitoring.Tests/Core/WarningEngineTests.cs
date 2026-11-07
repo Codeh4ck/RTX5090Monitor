@@ -2,6 +2,7 @@ using Rtx5090Monitoring.Plugins.WireView.Contracts.Warnings;
 using Rtx5090Monitoring.Plugins.Asus.Contracts.Warnings;
 using Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.Warnings;
 using Rtx5090Monitoring.Contracts.Alerts;
+using Rtx5090Monitoring.Contracts.Configuration;
 using Rtx5090Monitoring.Contracts.Enums;
 using Rtx5090Monitoring.Contracts.Health;
 using Rtx5090Monitoring.Contracts.Warnings;
@@ -25,6 +26,7 @@ internal static class WarningEngineTests
         runner.Run(WireViewBitsHaveIndependentStableIdentities);
         runner.Run(GlobalMuteAndEnableApplyImmediately);
         runner.Run(OverridesAndIntervalChangesApplyLive);
+        runner.Run(ChartProfilesDoNotOverrideNvidiaWarnings);
         runner.Run(RejectsInvalidPolicyAndLeavesMsiWithoutInventedWarnings);
     }
     private static void DefaultsUseFiveSecondsWithoutRepetition()
@@ -128,6 +130,26 @@ internal static class WarningEngineTests
         config = config with { Warnings = config.Warnings with { Overrides = [] } };
         TestAssert.Equal(3L, engine.Evaluate(WarningTestData.Frame(15), config, WarningTestData.Start.AddSeconds(15)).Sequence);
     }
+
+    private static void ChartProfilesDoNotOverrideNvidiaWarnings()
+    {
+        var chartProfile = SettingsProfile.Rtx5090 with
+        {
+            CoreTemperature = 100,
+            Notifications = new WarningOptions { NotificationsEnabled = false }
+        };
+        var frame = WarningTestData.Frame(0, temperature: 85) with
+        {
+            SettingsProfile = new ActiveSettingsProfile(chartProfile, "gpu0", null)
+        };
+        var engine = new WarningEngine(WarningTestData.Registry());
+
+        var warnings = engine.Evaluate(frame, WarningTestData.Configuration(), frame.Timestamp);
+
+        TestAssert.Equal(GenericNvidiaWarningIds.CoreTemperature, warnings.States.Single().TypeId);
+        TestAssert.Equal(1L, warnings.Sequence);
+    }
+
     private static void RejectsInvalidPolicyAndLeavesMsiWithoutInventedWarnings()
     {
         TestAssert.False(new WarningPolicy { RepeatIntervalSeconds = 4 }.IsValid(), "The minimum interval must be five seconds.");

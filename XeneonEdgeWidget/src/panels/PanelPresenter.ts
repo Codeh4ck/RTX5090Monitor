@@ -287,16 +287,27 @@ export class PanelPresenter {
         const prefix = isWire ? 'wireview' : 'asus';
         const unit = isPsu ? 'A' : this.settings.text(`${prefix}Metric`);
         const metric = unit === 'W' ? 'Power' : unit === 'V' ? 'Voltage' : 'Current';
-        const limit = isPsu ? null : this.store.limit(binding.pluginId, binding.deviceId);
+        const active = this.store.snapshot?.settingsProfile;
+        const associatedDevice = isWire ? active?.wireViewDeviceId : active?.gpuDeviceId;
+        const profile = !isPsu && binding.deviceId && binding.deviceId === associatedDevice ? active?.profile : undefined;
+        const publishedLimits = this.store.snapshot?.pinWarningLimits;
+        const profileLimit = publishedLimits
+            ? publishedLimits.find(item => item.pluginId === binding.pluginId && item.deviceId === binding.deviceId)?.overcurrentAmperes
+            : !isWire || profile?.useWireViewOvercurrentFallback ? profile?.overcurrentAmperes : undefined;
+        const deviceLimit = isWire || !publishedLimits ? this.store.limit(binding.pluginId, binding.deviceId) : null;
+        const limit = isPsu ? null
+            : profileLimit === undefined ? deviceLimit
+            : deviceLimit === null ? profileLimit : Math.min(profileLimit, deviceLimit);
         const cable = this.store.value(binding.pluginId, binding.deviceId, 'GpuConnector', 'PowerCapability', now, 1);
-        const max =
-            unit === 'V'
-                ? 12.6
-                : unit === 'W'
-                  ? (cable !== null && cable > 0 ? cable : this.settings.number('powerCableFallback')) / 6
-                  : this.settings.number('currentMax');
+        const powerCeiling = profile?.powerCeilingPerPin
+            ?? (cable !== null && cable > 0 ? cable / 6 : profile?.powerFallbackPerPin ?? this.settings.number('powerCableFallback') / 6);
+        const max = unit === 'V' ? profile?.voltageMaximum ?? 12.6
+            : unit === 'W' ? powerCeiling : profile?.currentCeiling ?? this.settings.number('currentMax');
+        const min = unit === 'V' ? profile?.voltageMinimum ?? 11.4 : 0;
 
-        const min = unit === 'V' ? 11.4 : 0;
+        if (profile) {
+            data.source += ' · ' + profile.name;
+        }
         const fill = (value: number) => Math.max(0, Math.min(100, ((value - min) / (max - min)) * 100));
         const component = isPsu ? 'PsuPin' : 'GpuPin';
         const psuDevice = this.store.device('msi-psu', '', now);
@@ -306,7 +317,8 @@ export class PanelPresenter {
         data.voltage = unit === 'V';
 
         if (this.settings.enabled('showAxis')) {
-            data.axis = (unit === 'V' ? [12.6, 12.3, 12, 11.7, 11.4] : [max, max * 0.75, max * 0.5, max * 0.25, 0]).map((tick) =>
+            const ticks = [1, 0.75, 0.5, 0.25, 0].map(fraction => min + (max - min) * fraction);
+            data.axis = ticks.map((tick) =>
                 this.format.value(tick, unit, unit === 'V' ? 1 : 2)
             );
         }
@@ -315,14 +327,16 @@ export class PanelPresenter {
             ? 'PSU-side current'
             : limit === null
               ? 'Protection limit unavailable'
-              : `Headroom to ${this.format.value(limit, 'A')} ${isWire ? 'device' : 'service'} limit`;
+              : `Headroom to ${this.format.value(limit, 'A')} ${limit === profileLimit ? 'profile' : isWire ? 'device' : 'service'} limit`;
         data.comparisonLabel = comparison
             ? `PSU C${connector} · current beneath P1-P6` +
               (!isWire ? ' · reversed P6-P1' : '') +
               (!this.store.reporting('msi-psu', now) || !psuDevice ? ' · unavailable' : '')
             : '';
 
-        if (unit === 'W' && !(cable !== null && cable > 0)) {
+        if (profile) {
+            data.detail = profile.name + ' settings profile';
+        } else if (unit === 'W' && !(cable !== null && cable > 0)) {
             data.detail = `Display range uses ${this.format.value(this.settings.number('powerCableFallback'), 'W', 0)} cable equivalent; capability unknown`;
         }
 
@@ -342,7 +356,10 @@ export class PanelPresenter {
                     now,
                     channel,
                     binding.connectorId
-                ) === 1;
+                ) === 1 || (isWire && this.store.snapshot?.alerts.some(alert =>
+                    alert.pluginId === binding.pluginId && alert.deviceId === binding.deviceId
+                    && alert.kind === 'wireview-pro2/profile-pin-overcurrent'
+                    && alert.pins.some(pin => pin.channel === channel)) === true);
 
             return {
                 value: this.format.value(value, unit),

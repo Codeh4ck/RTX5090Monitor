@@ -11,8 +11,8 @@ public sealed class SensorSelection
 
     public bool IsValid() =>
         !string.IsNullOrWhiteSpace(Name)
-        && PreferredSources is { Count: > 0 } && PreferredSources[0] is not null
-        && PreferredSources.All(x => x is not null && SensorValidation.IsValidIdentity(x) && x.Metric == PreferredSources[0].Metric
+        && PreferredSources is { Count: > 0 }
+        && PreferredSources.All(x => SensorValidation.IsValidIdentity(x) && x.Metric == PreferredSources[0].Metric
                                                                          && (AllowDifferentScope || (x.Component == PreferredSources[0].Component &&
                                                                              x.Channel == PreferredSources[0].Channel &&
                                                                              x.ConnectorId == PreferredSources[0].ConnectorId)))

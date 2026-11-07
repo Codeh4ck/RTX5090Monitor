@@ -41,3 +41,44 @@ test('GPU status uses backend profile sources and does not fall back locally whe
     assert.equal(presenter.present(binding, Date.parse(frame.timestamp)).summary[0].text, '-');
     assert.equal(presenter.present(binding, Date.parse(frame.timestamp) + 5001).summary[1].text, '-');
 });
+
+test('5080 profile scales an associated WireView chart and marks readings above 6 A', () => {
+    const frame = fixture();
+    const now = Date.parse(frame.timestamp);
+    const wireView = frame.sensors.find(reading => reading.identity.pluginId === 'wireview-pro2'
+        && reading.identity.component === 'GpuPin' && reading.identity.metric === 'Current');
+    wireView.value = 6.25;
+    const deviceId = wireView.identity.deviceId;
+    frame.settingsProfile = {
+        gpuDeviceId: 'gpu-5080', wireViewDeviceId: deviceId,
+        profile: { name: 'RTX 5080', gpuModel: '5080', currentCeiling: 6, powerCeilingPerPin: 75,
+            powerFallbackPerPin: 100, voltageMinimum: 11.4, voltageMaximum: 12.6, useWireViewOvercurrentFallback: true, overcurrentAmperes: 6 }
+    };
+    const store = new TelemetryStore();
+    store.configuration = configuration();
+    store.catalog = catalog().plugins;
+    store.connection = 'live';
+    store.update(parseSnapshot(frame));
+    const settings = new Settings();
+    const overrides = { numberLocale: 'en-GB', currentMax: 10, wireviewMetric: 'A' };
+    settings.update(name => overrides[name]);
+    const presenter = new PanelPresenter(store, settings, new Formatter(settings), new PeakStore());
+    const binding = { pluginId: 'wireview-pro2', deviceId, kind: 'pins' };
+    const shown = presenter.present(binding, now);
+    const pin = shown.pins[wireView.identity.channel - 1];
+
+    assert.match(shown.axis[0], /^6(?:[.,]0+)?\s*A$/);
+    assert.equal(pin.number, 6.25);
+    assert.equal(pin.fill, 100);
+    assert.equal(pin.overflow, true);
+
+    overrides.wireviewMetric = 'W';
+    settings.update(name => overrides[name]);
+    assert.match(presenter.present(binding, now).axis[0], /^75(?:[.,]0+)?\s*W$/);
+
+    frame.settingsProfile.wireViewDeviceId = null;
+    store.update(parseSnapshot(frame));
+    overrides.wireviewMetric = 'A';
+    settings.update(name => overrides[name]);
+    assert.match(presenter.present(binding, now).axis[0], /^10(?:[.,]0+)?\s*A$/);
+});

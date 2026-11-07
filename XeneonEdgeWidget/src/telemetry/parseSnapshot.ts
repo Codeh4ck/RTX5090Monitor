@@ -116,6 +116,38 @@ export function parseSnapshot(value: unknown): SensorSnapshot {
         throw new Error('Invalid service health, selection or alert.');
     }
 
+    if (value.settingsProfile != null) {
+        const active = value.settingsProfile;
+        const profile = isRecord(active) ? active.profile : null;
+        const inRange = (number: unknown, min: number, max: number) =>
+            typeof number === 'number' && Number.isFinite(number) && number >= min && number <= max;
+
+        if (!isRecord(active) || typeof active.gpuDeviceId !== 'string'
+            || !(active.wireViewDeviceId == null || typeof active.wireViewDeviceId === 'string')
+            || !isRecord(profile) || typeof profile.name !== 'string' || !['5080', '5090'].includes(String(profile.gpuModel))
+            || !inRange(profile.currentCeiling, 1, 30)
+            || !(profile.powerCeilingPerPin == null || inRange(profile.powerCeilingPerPin, 1, 250))
+            || !inRange(profile.powerFallbackPerPin, 1, 250)
+            || !inRange(profile.voltageMinimum, 5, 12) || profile.voltageMinimum === 12
+            || !inRange(profile.voltageMaximum, 12, 20) || profile.voltageMaximum === 12
+            || typeof profile.useWireViewOvercurrentFallback !== 'boolean'
+            || !inRange(profile.overcurrentAmperes, 6, 10.5)) {
+            throw new Error('Invalid GPU settings profile.');
+        }
+    }
+
+    if (value.pinWarningLimits != null && (
+        !Array.isArray(value.pinWarningLimits)
+        || value.pinWarningLimits.some(limit => !isRecord(limit)
+            || typeof limit.pluginId !== 'string'
+            || typeof limit.deviceId !== 'string'
+            || typeof limit.overcurrentAmperes !== 'number'
+            || !Number.isFinite(limit.overcurrentAmperes)
+            || limit.overcurrentAmperes <= 0)
+    )) {
+        throw new Error('Invalid pin warning limits.');
+    }
+
     if (value.warnings != null) {
         const feed = value.warnings;
 

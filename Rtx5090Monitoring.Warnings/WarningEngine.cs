@@ -23,7 +23,8 @@ public sealed class WarningEngine
 
     public long Revision { get; private set; }
 
-    public WarningSnapshot Evaluate(SensorSnapshot snapshot, ServiceConfiguration configuration, DateTimeOffset now)
+    public WarningSnapshot Evaluate(SensorSnapshot snapshot, ServiceConfiguration configuration, DateTimeOffset now,
+        IReadOnlyList<ConfiguredWarning>? configuredWarnings = null, Func<WarningObservation, bool>? includePluginWarning = null)
     {
         var options = configuration.Warnings;
         if (!options.IsValid())
@@ -41,6 +42,11 @@ public sealed class WarningEngine
 
             foreach (var observation in source.Observe(snapshot, settings))
             {
+                if (includePluginWarning?.Invoke(observation) == false)
+                {
+                    continue;
+                }
+
                 if (observation.PluginId != source.PluginId || !_definitions.TryGetValue(observation.TypeId, out var definition)
                     || definition.PluginId != source.PluginId || string.IsNullOrWhiteSpace(observation.DeviceId)
                     || !observations.TryAdd(observation.Id, observation))
@@ -50,18 +56,30 @@ public sealed class WarningEngine
             }
         }
 
+        var configured = configuredWarnings?.ToDictionary(warning => warning.Observation.Id, StringComparer.Ordinal)
+            ?? new Dictionary<string, ConfiguredWarning>(StringComparer.Ordinal);
+
+        foreach (var (id, warning) in configured)
+        {
+            observations.Add(id, warning.Observation);
+        }
+
         var due = new List<WarningEntry>();
         foreach (var observation in observations.Values.Where(observation => observation is { Available: true, Active: true }))
         {
             if (!_entries.ContainsKey(observation.Id))
             {
-                _entries.Add(observation.Id, new WarningEntry(observation, _definitions[observation.TypeId], options.PolicyFor(observation.TypeId), now));
+                var definition = configured.GetValueOrDefault(observation.Id)?.Definition ?? _definitions[observation.TypeId];
+                var policy = configured.GetValueOrDefault(observation.Id)?.Policy ?? options.PolicyFor(observation.TypeId);
+                _entries.Add(observation.Id, new WarningEntry(observation, definition, policy, now));
             }
         }
 
         foreach (var (id, entry) in _entries.ToArray())
         {
-            if (!configuration.Plugins.TryGetValue(entry.Observation.PluginId, out var plugin) || !plugin.Enabled
+
+            if ((entry.Observation.ProfileId is not null && !configured.ContainsKey(id))
+                || !configuration.Plugins.TryGetValue(entry.Observation.PluginId, out var plugin) || !plugin.Enabled
                 || (!observations.Values.Any(observation => observation.PluginId == entry.Observation.PluginId && observation.DeviceId == entry.Observation.DeviceId)
                     && observations.Values.Any(observation => observation.PluginId == entry.Observation.PluginId)))
             {
@@ -69,10 +87,12 @@ public sealed class WarningEngine
                 continue;
             }
 
-            var policy = options.PolicyFor(entry.Observation.TypeId);
-            var notifyEnabled = (!_enabled && options.NotificationsEnabled) || (!entry.Policy.NotifyOnStart && policy.NotifyOnStart);
+            var policy = configured.GetValueOrDefault(id)?.Policy ?? options.PolicyFor(entry.Observation.TypeId);
+            var notificationsEnabled = options.NotificationsEnabled;
+            var notifyEnabled = (!entry.NotificationsEnabled && notificationsEnabled) || (!entry.Policy.NotifyOnStart && policy.NotifyOnStart);
 
             entry.Policy = policy;
+            entry.NotificationsEnabled = notificationsEnabled;
 
             if (!observations.TryGetValue(id, out var current) || !current.Available)
             {
@@ -98,7 +118,7 @@ public sealed class WarningEngine
             entry.Phase = WarningPhase.Active;
             entry.ClearSince = null;
 
-            if (options.NotificationsEnabled && (((entry.NotificationSequence == 0 || notifyEnabled) && policy.NotifyOnStart)
+            if (notificationsEnabled && (((entry.NotificationSequence == 0 || notifyEnabled) && policy.NotifyOnStart)
                 || (policy.RepeatWhileActive && now - (entry.LastNotificationAt ?? entry.StartedAt) >= TimeSpan.FromSeconds(policy.RepeatIntervalSeconds))))
             {
                 due.Add(entry);

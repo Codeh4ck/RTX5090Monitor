@@ -127,7 +127,7 @@ public sealed partial class HardwareView : UserControl
         MetricsHost.Children.Clear();
         foreach (var metric in Model.Metrics)
         {
-            MetricsHost.Children.Add(new MetricTile(metric));
+            MetricsHost.Children.Add(new MetricTile(metric, usePanelBorder: true));
         }
     }
 

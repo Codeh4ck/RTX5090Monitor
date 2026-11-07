@@ -20,16 +20,6 @@
                     <ComboBox Header="Selected GPU" ItemsSource="{x:Bind Model.Asus.Devices}" DisplayMemberPath="Name"
                         SelectedItem="{x:Bind Model.Asus.SelectedDevice, Mode=TwoWay}" HorizontalAlignment="Stretch" />
                     <Button Content="Refresh GPU list" Click="RefreshDevices_Click" />
-                    <Grid ColumnDefinitions="*,*" ColumnSpacing="14">
-                        <NumberBox Header="Imbalance activation (A)" Value="{x:Bind Model.Asus.ImbalanceActivationA, Mode=TwoWay}" Minimum="1" Maximum="10" SmallChange="1" />
-                        <NumberBox Grid.Column="1" Header="Imbalance threshold (%)" Value="{x:Bind Model.Asus.ImbalancePercentage, Mode=TwoWay}" Minimum="10" Maximum="50" SmallChange="1" />
-                    </Grid>
-                    <NumberBox Header="Imbalance duration (ms)" Value="{x:Bind Model.Asus.ImbalanceDurationMs, Mode=TwoWay}" Minimum="100" Maximum="30000" SmallChange="100" />
-                    <Grid ColumnDefinitions="*,*" ColumnSpacing="14">
-                        <NumberBox x:Name="OvercurrentInput" Header="Per-pin overcurrent (A)" Value="{x:Bind Model.Asus.OvercurrentA, Mode=TwoWay}" Minimum="6" Maximum="10.5" SmallChange="0.1" />
-                        <NumberBox Grid.Column="1" Header="Overcurrent duration (ms)" Value="{x:Bind Model.Asus.OvercurrentDurationMs, Mode=TwoWay}" Minimum="100" Maximum="30000" SmallChange="100" />
-                    </Grid>
-                    <TextBlock Text="Durations must be at least the polling interval and at most max(polling interval, 10000 ms)." Style="{StaticResource MonitorCaption}" />
                 </StackPanel>
                 <StackPanel x:Name="NvidiaSettings" Spacing="12" x:Load="{x:Bind Model.IsNvidia}">
                     <CheckBox Content="Show GPU status as a separate tab"
@@ -40,18 +30,6 @@
                     <ComboBox Header="Selected GPU" ItemsSource="{x:Bind Model.Nvidia.Devices}" DisplayMemberPath="Name"
                         SelectedItem="{x:Bind Model.Nvidia.SelectedDevice, Mode=TwoWay}" HorizontalAlignment="Stretch" />
                     <Button Content="Refresh GPU list" Click="RefreshNvidiaDevices_Click" />
-                    <Grid ColumnDefinitions="*,*" ColumnSpacing="14">
-                        <StackPanel Spacing="8">
-                            <CheckBox Content="Core temperature warning" IsChecked="{x:Bind Model.Nvidia.CoreWarningEnabled, Mode=TwoWay}" />
-                            <NumberBox Header="Core warning threshold (°C)" Value="{x:Bind Model.Nvidia.CoreTemperatureWarningC, Mode=TwoWay}"
-                                IsEnabled="{x:Bind Model.Nvidia.CoreWarningEnabled, Mode=OneWay}" Minimum="30" Maximum="120" SmallChange="1" />
-                        </StackPanel>
-                        <StackPanel Grid.Column="1" Spacing="8">
-                            <CheckBox Content="VRAM temperature warning" IsChecked="{x:Bind Model.Nvidia.MemoryWarningEnabled, Mode=TwoWay}" />
-                            <NumberBox Header="VRAM warning threshold (°C)" Value="{x:Bind Model.Nvidia.MemoryTemperatureWarningC, Mode=TwoWay}"
-                                IsEnabled="{x:Bind Model.Nvidia.MemoryWarningEnabled, Mode=OneWay}" Minimum="30" Maximum="120" SmallChange="1" />
-                        </StackPanel>
-                    </Grid>
                     <TextBlock Text="Connector Power, Total current and Voltage use the shared profile in Source selections. Fans and core voltage are read only."
                         Style="{StaticResource MonitorCaption}" />
                 </StackPanel>

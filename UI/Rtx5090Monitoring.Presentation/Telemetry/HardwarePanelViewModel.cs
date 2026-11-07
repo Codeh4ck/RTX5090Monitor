@@ -27,6 +27,7 @@ public sealed class HardwarePanelViewModel : ObservableObject
     public bool HasGpuStatus => IsAsus || IsWireView || IsNvidia;
     public bool IsMsi => Id == "msi-psu";
     public MsiPanelViewModel Msi { get; } = new();
+
     public bool Enabled
     {
         get;
@@ -38,19 +39,23 @@ public sealed class HardwarePanelViewModel : ObservableObject
             }
         }
     }
+
     public bool IsReporting
     {
         get;
         private set => Set(ref field, value);
     }
+
     public bool CanReadDevice => _capabilities.Contains(PluginCapability.DeviceConfigurationRead);
     public bool CanClearFaults => _capabilities.Contains(PluginCapability.FaultClear);
     public bool CanRestart => _capabilities.Contains(PluginCapability.Restart);
+
     public bool HasPins
     {
         get;
         private set => Set(ref field, value);
     }
+
     public string State
     {
         get;
@@ -61,7 +66,8 @@ public sealed class HardwarePanelViewModel : ObservableObject
                 Raise(nameof(Tone));
             }
         }
-    } = "Starting";
+    }
+
     public StatusTone Tone => State switch
     {
         "Ready" => StatusTone.Positive,
@@ -69,62 +75,75 @@ public sealed class HardwarePanelViewModel : ObservableObject
         "Error" or "Disconnected" or "Unavailable" => StatusTone.Negative,
         _ => StatusTone.Neutral
     };
+
     public bool IsSelected
     {
         get;
         set => Set(ref field, value);
     }
+
     public bool ShowPeakHold
     {
         get;
         private set => Set(ref field, value);
     }
+
     public bool ShowHeadroom
     {
         get;
         private set => Set(ref field, value);
     }
+
     public bool ShowPsuComparison
     {
         get;
         private set => Set(ref field, value);
     }
+
     public string PsuComparisonLabel => $"MSI PSU · CONNECTOR {_psuConnector} · A";
+
     public string Message
     {
         get;
         private set => Set(ref field, value);
-    } = "Waiting for telemetry";
+    }
+
     public string PowerText
     {
         get;
         private set => Set(ref field, value);
     } = "—";
+
     public string CurrentText
     {
         get;
         private set => Set(ref field, value);
     } = "—";
+
     public string VoltageText
     {
         get;
         private set => Set(ref field, value);
     } = "—";
+
     public string BoardPowerText
     {
         get;
         private set => Set(ref field, value);
     } = "—";
+
     public string GpuUsageText
     {
         get;
         private set => Set(ref field, value);
     } = "—";
+
     public string CurrentSpreadText
     {
         get;
         private set => Set(ref field, value);
     } = "—";
+
     public string HighestCurrentText
     {
         get;
@@ -260,23 +279,40 @@ public sealed class HardwarePanelViewModel : ObservableObject
 
         var power = Value(SensorComponent.GpuConnector, SensorMetric.Power, 1);
         var current = Value(SensorComponent.GpuConnector, SensorMetric.Current, 1);
+
         PowerText = Format(power, "W", 1);
         CurrentText = Format(current, "A", 2);
         VoltageText = Format(Value(SensorComponent.GpuConnector, SensorMetric.Voltage, 1), "V", 2);
-        var cableRatingW = Value(SensorComponent.GpuConnector, SensorMetric.PowerCapability, 1) is > 0 and var rating ? rating : 600;
+
+        var activeProfile = snapshot.SettingsProfile;
+        var profile = activeProfile?.AppliesToConnector(Id, deviceId) == true ? activeProfile.Profile : null;
+        var profileLimit = snapshot.PinWarningLimits is { } limits
+            ? limits.FirstOrDefault(limit => limit.PluginId == Id && limit.DeviceId == deviceId)?.OvercurrentAmperes
+            : IsAsus || profile?.UseWireViewOvercurrentFallback == true ? profile?.OvercurrentAmperes : null;
+        var deviceLimit = IsWireView || snapshot.PinWarningLimits is null ? _pinLimit : null;
+        var currentLimit = profileLimit is { } softwareLimit && deviceLimit is { } hardwareLimit
+            ? Math.Min(softwareLimit, hardwareLimit) : profileLimit ?? deviceLimit;
+        var cableRatingW = Value(SensorComponent.GpuConnector, SensorMetric.PowerCapability, 1);
+
         foreach (var pin in Pins)
         {
             pin.Update(Value(SensorComponent.GpuPin, SensorMetric.Current, pin.Channel), Value(SensorComponent.GpuPin, SensorMetric.Voltage, pin.Channel),
-                Value(SensorComponent.GpuPin, SensorMetric.Power, pin.Channel), preferences.PinMetric, _pinLimit, preferences.ShowPeakHold, preferences.ShowHeadroom, cableRatingW);
+                Value(SensorComponent.GpuPin, SensorMetric.Power, pin.Channel), preferences.PinMetric, currentLimit, preferences.ShowPeakHold, preferences.ShowHeadroom, cableRatingW, profile);
         }
+
         HasPins = Pins.Any(pin => pin.Current is not null || pin.Voltage is not null || pin.Power is not null);
 
         var currents = Pins.Where(pin => pin.Current is not null).ToArray();
         var highest = currents.MaxBy(pin => pin.Current);
         var lowest = currents.MinBy(pin => pin.Current);
+
         CurrentSpreadText = currents.Length >= 2 ? Format(highest!.Current - lowest!.Current, "A", 2) : "—";
         HighestCurrentText = highest is null ? "—" : $"P{highest.Channel} · {Format(highest.Current, "A", 2)}";
         LowestCurrentText = lowest is null ? "—" : $"P{lowest.Channel} · {Format(lowest.Current, "A", 2)}";
+
+        var softwareWarnings = snapshot.Warnings?.States.Where(warning => warning.ProfileId is not null
+            && warning.PluginId == Id && warning.DeviceId == deviceId && warning.Phase == Contracts.Warnings.WarningPhase.Active)
+            .Select(warning => $"{warning.Title}: {warning.Detail}").ToArray() ?? [];
 
         if (IsWireView)
         {
@@ -284,16 +320,25 @@ public sealed class HardwarePanelViewModel : ObservableObject
             var logValue = Value(SensorComponent.MonitorBoard, SensorMetric.FaultLog);
             var status = (ushort)(statusValue ?? 0);
             var log = (ushort)(logValue ?? 0);
+
             SetMetrics([
                 Format(Value(SensorComponent.GpuConnector, SensorMetric.PowerCapability, 1), "W", 0),
                 Pair(Temperature(Value(SensorComponent.MonitorBoard, SensorMetric.Temperature, 1), preferences),
                     Temperature(Value(SensorComponent.MonitorBoard, SensorMetric.Temperature, 2), preferences)),
+
                 Pair(Temperature(Value(SensorComponent.ExternalProbe, SensorMetric.Temperature, 1), preferences),
                     Temperature(Value(SensorComponent.ExternalProbe, SensorMetric.Temperature, 2), preferences)),
+
                 statusValue is null ? "Unavailable" : status == 0 ? "OK" : "Fault detected",
                 logValue is null ? "Unavailable" : log == 0 ? "OK" : "Faults logged"]);
+
             UpdateFaults(status, log);
-            WarningText = status == 0 ? string.Empty : FaultDescriptions.Describe(status);
+
+            WarningText = string.Join(Environment.NewLine, status == 0 ? softwareWarnings : [FaultDescriptions.Describe(status), .. softwareWarnings]);
+        }
+        else if (IsAsus && snapshot.PinWarningLimits is not null)
+        {
+            WarningText = string.Join(Environment.NewLine, softwareWarnings);
         }
         else if (IsAsus)
         {
@@ -350,7 +395,9 @@ public sealed class HardwarePanelViewModel : ObservableObject
         var enabled = IsWireView ? preferences.ShowWireViewPsuCurrent : IsAsus && preferences.ShowAsusPsuCurrent;
         var connector = IsWireView ? preferences.WireViewPsuConnector : preferences.AsusPsuConnector;
         var matching = readings.Where(reading => reading.Identity.ConnectorId == connector.ToString(CultureInfo.InvariantCulture)).ToArray();
+
         ShowPsuComparison = enabled && Enabled && IsReporting && HasPins && matching.Length > 0;
+
         if (_psuConnector != connector)
         {
             _psuConnector = connector;
@@ -378,12 +425,14 @@ public sealed class HardwarePanelViewModel : ObservableObject
     {
         _pinLimit = config.WireOcpFaultThresholdA;
         DeviceDetails.Clear();
+
         foreach (var metric in WireViewDeviceMetrics.Create(config))
         {
             DeviceDetails.Add(metric);
         }
 
         DeviceConfigurationStatus = $"Read from device · {DateTimeOffset.Now:HH:mm:ss}";
+
         Raise(nameof(DeviceConfigurationStatus));
     }
 
@@ -393,7 +442,9 @@ public sealed class HardwarePanelViewModel : ObservableObject
         {
             return;
         }
+
         DeviceConfigurationStatus = status;
+
         Raise(nameof(DeviceConfigurationStatus));
     }
 
@@ -406,10 +457,12 @@ public sealed class HardwarePanelViewModel : ObservableObject
         }
 
         Faults.Clear();
+
         foreach (var warning in warnings)
         {
             Faults.Add(warning);
         }
+
         Raise(nameof(HasFaults));
     }
 
@@ -421,6 +474,7 @@ public sealed class HardwarePanelViewModel : ObservableObject
         }
 
         IsReporting = false;
+
         if (IsWireView)
         {
             if (DeviceDetails.Count > 0)
@@ -429,18 +483,22 @@ public sealed class HardwarePanelViewModel : ObservableObject
             }
             SetDeviceConfigurationStatus("Device unavailable. Refresh after reconnecting.");
         }
+
         ShowPsuComparison = false;
         PowerText = CurrentText = VoltageText = BoardPowerText = GpuUsageText = "—";
         CurrentSpreadText = HighestCurrentText = LowestCurrentText = "—";
         ShowPeakHold = preferences.ShowPeakHold;
         ShowHeadroom = preferences.ShowHeadroom;
         WarningText = string.Empty;
+
         UpdateFaults(0, 0);
+
         foreach (var metric in Metrics)
         {
             metric.Value = "Unavailable";
             metric.IsWarning = false;
         }
+
         foreach (var pin in Pins)
         {
             pin.SetPsuCurrent(false, null);
@@ -457,7 +515,7 @@ public sealed class HardwarePanelViewModel : ObservableObject
     }
 
     private static string Temperature(double? value, AppPreferences preferences) =>
-        Format(preferences.Fahrenheit && value is not null ? value * 9 / 5 + 32 : value, preferences.Fahrenheit ? "°F" : "°C", 1);
+        Format(preferences.Fahrenheit && value is not null ? (value * 9 / 5) + 32 : value, preferences.Fahrenheit ? "°F" : "°C", 1);
 
     private static string Pair(string first, string second) => first == "Unavailable" && second == "Unavailable" ? "Unavailable"
         : $"{(first == "Unavailable" ? "—" : first)} / {(second == "Unavailable" ? "—" : second)}";

@@ -18,11 +18,6 @@ public sealed partial class PluginSettingsView : UserControl
         _runtime = runtime;
         Preferences = runtime.Settings;
         InitializeComponent();
-        OvercurrentInput.NumberFormatter = new Windows.Globalization.NumberFormatting.DecimalFormatter
-        {
-            FractionDigits = 0,
-            NumberRounder = new Windows.Globalization.NumberFormatting.IncrementNumberRounder { Increment = 0.0001 }
-        };
     }
 
     private async void RefreshDevices_Click(object sender, RoutedEventArgs args) => await _runtime.RefreshDevicesAsync();

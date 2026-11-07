@@ -2,7 +2,7 @@ using Rtx5090Monitoring.App.Platform.Interop;
 
 namespace Rtx5090Monitoring.App.Platform.Startup;
 
-internal sealed class SingleInstance : IDisposable
+internal sealed partial class SingleInstance : IDisposable
 {
     private readonly Mutex _mutex;
     public bool IsFirst { get; }

@@ -18,14 +18,13 @@ internal sealed partial class AppRuntime
     private DashboardViewModel _debugDashboard = new();
     private WarningTransitionTracker _debugWarnings = new();
     private DispatcherQueueTimer _debugTimer = null!;
-    private DebugWindow? _debugWindow;
     private DebugFrame? _debugFrame;
     private long _debugRevision = -1;
     private bool _wasDebugEnabled;
     private bool _publishingDebug;
     private Rtx5090Monitoring.Plugins.WireView.Contracts.Common.DeviceConfig? _liveWireViewConfiguration;
     public DebugSession Debug { get; } = new();
-    internal DebugWindow? DebugConsole => _debugWindow;
+    internal DebugWindow? DebugConsole { get; private set; }
     internal int DebugNotificationCount { get; private set; }
 
     private void InitializeDebugging()
@@ -40,27 +39,27 @@ internal sealed partial class AppRuntime
 
     internal void OpenDebugConsole()
     {
-        if (_debugWindow is not null)
+        if (DebugConsole is not null)
         {
-            _debugWindow.AppWindow.Show();
-            _debugWindow.Activate();
+            DebugConsole.AppWindow.Show();
+            DebugConsole.Activate();
             return;
         }
-        _debugWindow = new DebugWindow(this);
-        _debugWindow.Closed += (_, _) => _debugWindow = null;
+        DebugConsole = new DebugWindow(this);
+        DebugConsole.Closed += (_, _) => DebugConsole = null;
         if (_window is { } main)
         {
             var area = DisplayArea.GetFromWindowId(main.AppWindow.Id, DisplayAreaFallback.Primary).WorkArea;
             var scale = main.ThemeRoot.XamlRoot?.RasterizationScale ?? 1;
             var width = Math.Min(area.Width, (int)(640 * scale));
             var height = Math.Min(area.Height, (int)(850 * scale));
-            _debugWindow.AppWindow.Resize(new Windows.Graphics.SizeInt32(width, height));
+            DebugConsole.AppWindow.Resize(new Windows.Graphics.SizeInt32(width, height));
             var right = main.AppWindow.Position.X + main.AppWindow.Size.Width + 8;
             var left = main.AppWindow.Position.X - width - 8;
             var x = right + width <= area.X + area.Width ? right : left >= area.X ? left : area.X + area.Width - width;
-            _debugWindow.AppWindow.Move(new Windows.Graphics.PointInt32(x, Math.Clamp(main.AppWindow.Position.Y, area.Y, area.Y + area.Height - height)));
+            DebugConsole.AppWindow.Move(new Windows.Graphics.PointInt32(x, Math.Clamp(main.AppWindow.Position.Y, area.Y, area.Y + area.Height - height)));
         }
-        _debugWindow.Activate();
+        DebugConsole.Activate();
     }
 
     private void OnDebugChanged(bool structural)
@@ -145,7 +144,7 @@ internal sealed partial class AppRuntime
     {
         _debugTimer.Stop();
         Debug.Changed -= OnDebugChanged;
-        _debugWindow?.Close();
+        DebugConsole?.Close();
     }
 
     private void ApplyDebugDeviceConfiguration()
