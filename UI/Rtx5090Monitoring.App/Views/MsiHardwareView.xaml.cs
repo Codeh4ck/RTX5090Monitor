@@ -9,6 +9,8 @@ namespace Rtx5090Monitoring.App.Views;
 public sealed partial class MsiHardwareView : UserControl
 {
     private readonly AppRuntime _runtime;
+    private int _metricColumns;
+
     public HardwarePanelViewModel Model { get; }
 
     internal MsiHardwareView(HardwarePanelViewModel model, AppRuntime runtime)
@@ -16,25 +18,20 @@ public sealed partial class MsiHardwareView : UserControl
         Model = model;
         _runtime = runtime;
         InitializeComponent();
-        var metrics = new[] { Model.Msi.Temperature, Model.Msi.FanSpeed, Model.Msi.FanMode, Model.Msi.FanDuty };
-        for (var index = 0; index < metrics.Length; index++)
-        {
-            var tile = new MetricTile(metrics[index]);
-            Grid.SetRow(tile, index / 2);
-            Grid.SetColumn(tile, index % 2);
-            MetricsGrid.Children.Add(tile);
-        }
+
         foreach (var connector in Model.Msi.Connectors)
         {
             ConnectorGrid.Children.Add(new MsiConnectorCard(connector));
         }
 
-        SizeChanged += (_, _) => LayoutConnectors();
-        LayoutConnectors();
+        SizeChanged += (_, _) => LayoutPanels();
+        LayoutPanels();
     }
 
-    private void LayoutConnectors()
+    private void LayoutPanels()
     {
+        LayoutStatusCards();
+
         var stackedHeader = ActualWidth < 960;
         Grid.SetRow(DeviceActions, stackedHeader ? 1 : 0);
         Grid.SetColumn(DeviceActions, stackedHeader ? 0 : 1);
@@ -44,6 +41,35 @@ public sealed partial class MsiHardwareView : UserControl
         ConnectorGrid.ColumnDefinitions[1].Width = wide ? new GridLength(1, GridUnitType.Star) : new GridLength(0);
         Grid.SetColumn((FrameworkElement)ConnectorGrid.Children[1], wide ? 1 : 0);
         Grid.SetRow((FrameworkElement)ConnectorGrid.Children[1], wide ? 0 : 1);
+    }
+
+    private void LayoutStatusCards()
+    {
+        var columns = ActualWidth >= 1100 ? 4 : 2;
+
+        if (_metricColumns == columns)
+        {
+            return;
+        }
+
+        _metricColumns = columns;
+
+        MetricsGrid.ColumnDefinitions.Clear();
+
+        for (var index = 0; index < columns; index++)
+        {
+            MetricsGrid.ColumnDefinitions.Add(new ColumnDefinition
+            {
+                Width = new GridLength(1, GridUnitType.Star)
+            });
+        }
+
+        for (var index = 0; index < MetricsGrid.Children.Count; index++)
+        {
+            var card = (FrameworkElement)MetricsGrid.Children[index];
+            Grid.SetRow(card, index / columns);
+            Grid.SetColumn(card, index % columns);
+        }
     }
 
     private void ResetPeak_Click(object sender, RoutedEventArgs args) => Model.Msi.ResetPeaks();
