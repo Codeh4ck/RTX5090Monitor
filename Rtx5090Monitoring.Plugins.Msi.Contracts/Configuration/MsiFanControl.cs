@@ -4,5 +4,6 @@ public enum MsiFanControl
 {
     Unmanaged,
     Automatic,
-    Manual
+    Manual,
+    Curve
 }

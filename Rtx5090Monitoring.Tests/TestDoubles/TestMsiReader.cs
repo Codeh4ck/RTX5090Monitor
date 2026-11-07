@@ -12,9 +12,19 @@ internal sealed class TestMsiReader(MsiTestState state) : IMsiPsuReader
     {
         cancellationToken.ThrowIfCancellationRequested();
         state.LastOptions = options;
+        var controlled = options.FanControl is MsiFanControl.Manual or MsiFanControl.Curve;
+        var duty = options.FanControl == MsiFanControl.Curve
+            ? Rtx5090Monitoring.Plugins.Msi.Control.MsiFanCurveController.Interpolate(options.FanCurve.Points, 55)
+            : options.FanControl == MsiFanControl.Manual ? options.FanDutyPercent : 0;
+
+        duty = MsiFanCurve.EffectiveDutyPercent(duty);
+
         return !state.Available ? null : new MsiSnapshot("test-psu", "MPG Ai1300TS", "10", observedAt,
-            [[1, 2, 3, 4, 5, 6], [0, 0, 0, 0, 0, 0]], 55, 1100, options.FanControl != MsiFanControl.Manual,
-            options.FanControl == MsiFanControl.Manual ? options.FanDutyPercent : 0);
+            [[1, 2, 3, 4, 5, 6], [0, 0, 0, 0, 0, 0]], 55, 1100, !controlled || duty == 0, duty)
+        {
+            TargetFanDutyPercent = controlled ? duty : null,
+            FanControllerState = options.FanControl.ToString()
+        };
     }
     public void ReleaseFanControl() => state.ReleaseCount++;
     public void Dispose() => ReleaseFanControl();

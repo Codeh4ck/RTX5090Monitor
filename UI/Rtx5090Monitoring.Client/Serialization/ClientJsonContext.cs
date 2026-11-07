@@ -29,6 +29,7 @@ namespace Rtx5090Monitoring.Client.Serialization;
 [JsonSerializable(typeof(GenericNvidiaOptions))]
 [JsonSerializable(typeof(NvidiaDeviceInfo[]))]
 [JsonSerializable(typeof(MsiOptions))]
+[JsonSerializable(typeof(Rtx5090Monitoring.Plugins.Msi.Contracts.Telemetry.MsiSnapshot))]
 [JsonSerializable(typeof(MsiDeviceInfo[]))]
 [JsonSerializable(typeof(AsusDeviceInfo[]))]
 [JsonSerializable(typeof(DeviceConfig))]

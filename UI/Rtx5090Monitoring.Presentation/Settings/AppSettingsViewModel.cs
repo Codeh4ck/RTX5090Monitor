@@ -41,6 +41,12 @@ public sealed class AppSettingsViewModel(AppPreferences preferences) : Observabl
     public bool ReducedEffects { get => Value.ReducedEffects; set => Update(Value with { ReducedEffects = value }); }
     public bool MinimizeToTray { get => Value.MinimizeToTray; set => Update(Value with { MinimizeToTray = value }); }
     public bool CloseToTray { get => Value.CloseToTray; set => Update(Value with { CloseToTray = value }); }
+    public bool ConfirmBeforeExit
+    {
+        get => !Value.SuppressExitConfirmation;
+        set => Update(Value with { SuppressExitConfirmation = !value });
+    }
+
     public bool StartWithWindows { get => Value.StartWithWindows; set => Update(Value with { StartWithWindows = value }); }
     public bool StartMinimized { get => Value.StartMinimized; set => Update(Value with { StartMinimized = value }); }
     public bool AutomaticallyCheckForUpdates { get => Value.AutomaticallyCheckForUpdates; set => Update(Value with { AutomaticallyCheckForUpdates = value }); }

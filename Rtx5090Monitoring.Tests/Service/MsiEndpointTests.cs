@@ -45,6 +45,19 @@ internal static class MsiEndpointTests
         TestAssert.True(state.ReleaseCount > 0, "Disabling must release owned fan control.");
         using var disabled = await host.Client.GetAsync("/plugins/msi-psu/device");
         TestAssert.Equal(HttpStatusCode.ServiceUnavailable, disabled.StatusCode);
+        var curveOptions = new MsiOptions
+        {
+            FanControl = MsiFanControl.Curve,
+            FanCurve = new MsiFanCurve { Points = [new(30, 37), new(75, 100)], ResponseDelaySeconds = 8 }
+        };
+        var curveSettings = MsiSettings.WithOptions(options, curveOptions);
+        await host.SetPluginSettingsAsync("msi-psu", curveSettings);
+        var settingsJson = await host.Client.GetStringAsync("/plugins/msi-psu/settings");
+        var roundTrip = JsonSerializer.Deserialize(settingsJson,
+            Rtx5090Monitoring.Service.AppJsonContext.Default.PluginSettings);
+        TestAssert.True(roundTrip is not null && MsiSettings.GetOptions(roundTrip).FanCurve.Matches(curveOptions.FanCurve),
+            "Curve settings must round-trip through the service API.");
+
         var invalid = options with { PollIntervalMs = 100 };
         using var content = new StringContent(JsonSerializer.Serialize(invalid), System.Text.Encoding.UTF8, "application/json");
         using var rejected = await host.Client.PutAsync("/plugins/msi-psu/settings", content);

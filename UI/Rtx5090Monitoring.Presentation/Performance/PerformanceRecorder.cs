@@ -5,7 +5,7 @@ using Rtx5090Monitoring.Contracts.Sensors;
 
 namespace Rtx5090Monitoring.Presentation.Performance;
 
-public sealed class PerformanceRecorder(TimeProvider? timeProvider = null, int maximumSamples = 2_000_000)
+public sealed partial class PerformanceRecorder(TimeProvider? timeProvider = null, int maximumSamples = 2_000_000)
 {
     private readonly TimeProvider _clock = timeProvider ?? TimeProvider.System;
     private readonly Lock _gate = new();
@@ -27,6 +27,8 @@ public sealed class PerformanceRecorder(TimeProvider? timeProvider = null, int m
     private string _status = "Choose metrics and sources to record.";
     private string _mode = "live";
 
+    public event Action? Changed;
+
     public void SetConfiguration(ServiceConfiguration configuration)
     {
         lock (_gate)
@@ -38,6 +40,8 @@ public sealed class PerformanceRecorder(TimeProvider? timeProvider = null, int m
                 AddGap(state);
             }
         }
+
+        Changed?.Invoke();
     }
 
     public void SetCatalog(PluginCatalog catalog)
@@ -68,6 +72,8 @@ public sealed class PerformanceRecorder(TimeProvider? timeProvider = null, int m
             MarkUnavailable();
             _mode = mode;
         }
+
+        Changed?.Invoke();
     }
 
     public void Accept(SensorSnapshot snapshot)
@@ -75,6 +81,7 @@ public sealed class PerformanceRecorder(TimeProvider? timeProvider = null, int m
         lock (_gate)
         {
             var now = _clock.GetUtcNow();
+            UpdateMsiConnectors(snapshot, now);
             var ready = snapshot.Plugins.Where(plugin => plugin.State == PluginState.Ready)
                 .Select(plugin => plugin.PluginId).ToHashSet(StringComparer.Ordinal);
             var found = new HashSet<string>(StringComparer.Ordinal);
@@ -90,7 +97,7 @@ public sealed class PerformanceRecorder(TimeProvider? timeProvider = null, int m
 
                 if (!_traces.TryGetValue(identity.Key, out var state))
                 {
-                    if (!usable || _traces.Count >= 256)
+                    if (!usable || !IsActiveConnector(identity) || _traces.Count >= 256)
                     {
                         continue;
                     }
@@ -105,6 +112,7 @@ public sealed class PerformanceRecorder(TimeProvider? timeProvider = null, int m
                     _traces.Add(trace.Key, state);
                 }
 
+                usable &= IsActiveConnector(identity) || state.Samples.Count > 0;
                 found.Add(identity.Key);
                 state.Available = usable;
                 state.LastSeen = reading.ObservedAt;
@@ -133,7 +141,7 @@ public sealed class PerformanceRecorder(TimeProvider? timeProvider = null, int m
                     break;
                 }
 
-                var number = reading.Value!.Value * (state.Trace.Group == "GPU core voltage" ? 1000 : 1);
+                var number = state.Trace.ConvertValue(reading.Value!.Value);
                 state.Samples.Add(new(seconds, number));
                 state.LastRecorded = reading.ObservedAt;
                 state.HasOpenLine = true;
@@ -146,6 +154,8 @@ public sealed class PerformanceRecorder(TimeProvider? timeProvider = null, int m
                 AddGap(state);
             }
         }
+
+        Changed?.Invoke();
     }
 
     public void MarkDisconnected()
@@ -154,6 +164,8 @@ public sealed class PerformanceRecorder(TimeProvider? timeProvider = null, int m
         {
             MarkUnavailable();
         }
+
+        Changed?.Invoke();
     }
 
     public void Select(string key, bool selected)
@@ -172,6 +184,8 @@ public sealed class PerformanceRecorder(TimeProvider? timeProvider = null, int m
 
             state.Selected = selected;
         }
+
+        Changed?.Invoke();
     }
 
     public void Start()
@@ -184,7 +198,7 @@ public sealed class PerformanceRecorder(TimeProvider? timeProvider = null, int m
             }
 
             RefreshAvailability();
-            if (!_traces.Values.Any(state => state.Selected && state.Available))
+            if (!_traces.Values.Any(state => state.Selected && state.Available && IsActiveConnector(state.Trace)))
             {
                 throw new InvalidOperationException("Select at least one available metric before recording.");
             }
@@ -197,7 +211,9 @@ public sealed class PerformanceRecorder(TimeProvider? timeProvider = null, int m
             foreach (var state in _traces.Values)
             {
                 state.Samples.Clear();
+                state.DisplayCache = null;
                 state.Imported = false;
+                state.Available &= IsActiveConnector(state.Trace);
                 state.LastRecorded = null;
                 state.HasOpenLine = false;
             }
@@ -205,6 +221,8 @@ public sealed class PerformanceRecorder(TimeProvider? timeProvider = null, int m
             _recording = true;
             _status = _mode == "live" ? "Recording" : "Recording simulated telemetry";
         }
+
+        Changed?.Invoke();
     }
 
     public void Stop()
@@ -216,6 +234,44 @@ public sealed class PerformanceRecorder(TimeProvider? timeProvider = null, int m
                 StopCore("Recording complete.");
             }
         }
+
+        Changed?.Invoke();
+    }
+
+    public void Clear()
+    {
+        lock (_gate)
+        {
+            if (_recording)
+            {
+                throw new InvalidOperationException("Stop recording before clearing the session.");
+            }
+
+            RefreshAvailability();
+            foreach (var key in _traces.Where(pair => pair.Value.Imported && !pair.Value.Available)
+                .Select(pair => pair.Key).ToArray())
+            {
+                _traces.Remove(key);
+            }
+
+            foreach (var state in _traces.Values)
+            {
+                state.Samples.Clear();
+                state.DisplayCache = null;
+                state.Imported = false;
+                state.Available &= IsActiveConnector(state.Trace);
+                state.LastRecorded = null;
+                state.HasOpenLine = false;
+            }
+
+            _sessionId = Guid.NewGuid().ToString("N");
+            _startedAt = null;
+            _duration = 0;
+            _sampleCount = 0;
+            _status = "Choose metrics and sources to record.";
+        }
+
+        Changed?.Invoke();
     }
 
     public PerformanceChartFrame ReadFrame(string? previousSessionId, IDictionary<string, int> cursors, bool includeSamples = true,
@@ -232,7 +288,8 @@ public sealed class PerformanceRecorder(TimeProvider? timeProvider = null, int m
             }
 
             var visible = _traces.Values.Where(state => includeDisabled || state.Imported
-                || _settings.GetValueOrDefault(state.Trace.Identity.PluginId)?.Enabled == true).ToArray();
+                || _settings.GetValueOrDefault(state.Trace.Identity.PluginId)?.Enabled == true
+                    && (state.Samples.Count > 0 || IsActiveConnector(state.Trace))).ToArray();
             var visibleKeys = visible.Select(state => state.Trace.Key).ToHashSet(StringComparer.Ordinal);
             foreach (var key in cursors.Keys.Where(key => !visibleKeys.Contains(key)).ToArray())
             {
@@ -328,6 +385,8 @@ public sealed class PerformanceRecorder(TimeProvider? timeProvider = null, int m
             _sampleCount = session.SampleCount;
             _status = "Imported recording.";
         }
+
+        Changed?.Invoke();
     }
 
     private void RefreshAvailability()
@@ -342,6 +401,7 @@ public sealed class PerformanceRecorder(TimeProvider? timeProvider = null, int m
 
     private void MarkUnavailable()
     {
+        _activeMsiConnectors.Clear();
         foreach (var state in _traces.Values)
         {
             state.Available = false;
@@ -387,5 +447,6 @@ public sealed class PerformanceRecorder(TimeProvider? timeProvider = null, int m
         public DateTimeOffset? LastRecorded { get; set; }
         public bool HasOpenLine { get; set; }
         public List<PerformanceSample> Samples { get; } = [];
+        public (int Count, double Start, double End, int Width, PerformanceSample[] Points)? DisplayCache { get; set; }
     }
 }

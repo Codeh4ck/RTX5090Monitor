@@ -30,7 +30,7 @@ internal static class ConfigurationHelpSmokeTests
         await Task.Delay(500);
         var hardware = (HardwareView)window.CurrentView!;
         var hardwareScroll = VisualTreeQuery.Descendants<ScrollViewer>(hardware).First();
-        var restart = VisualTreeQuery.Descendants<Button>(hardware).Single(button => button.Content as string == "Restart plugin");
+        var restart = VisualTreeQuery.Descendants<Button>(hardware).Single(button => button.Name == "RestartButton");
         var restartBottom = restart.TransformToVisual(hardwareScroll).TransformPoint(new Point(0, restart.ActualHeight)).Y;
         measurements.Add($"ASUS hardware overflow: {hardwareScroll.ScrollableHeight:F1}; restart bottom: {restartBottom:F1}; viewport: {hardwareScroll.ViewportHeight:F1}");
         await SmokeTestRunner.CaptureElementAsync(window.ThemeRoot, Path.Combine(output, "asus-dashboard-default-height.png"));

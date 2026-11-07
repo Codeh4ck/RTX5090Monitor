@@ -6,8 +6,8 @@
     <UserControl.Resources><converters:BooleanVisibilityConverter x:Key="BoolVisibility" /></UserControl.Resources>
     <ScrollViewer HorizontalScrollBarVisibility="Disabled" Padding="12,12">
         <StackPanel Spacing="12">
-            <Grid x:Name="DeviceHeader" ColumnDefinitions="*,Auto" ColumnSpacing="16">
-                <StackPanel Orientation="Horizontal" Spacing="12">
+            <Grid x:Name="DeviceHeader" ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="16" RowSpacing="10">
+                <StackPanel x:Name="DeviceIdentity" Orientation="Horizontal" Spacing="12">
                     <controls:WidgetIcon IconName="{x:Bind DeviceIconName}" Width="42" Height="42" VerticalAlignment="Center" />
                     <StackPanel Spacing="3">
                         <TextBlock Text="{x:Bind Model.Name}" Style="{StaticResource MonitorHeading}" />
@@ -15,7 +15,33 @@
                         
                     </StackPanel>
                 </StackPanel>
-                <controls:StatusBadge Grid.Column="1" Text="{x:Bind Model.State, Mode=OneWay}" Tone="{x:Bind Model.Tone, Mode=OneWay}" ToolTipService.ToolTip="{x:Bind Model.Message, Mode=OneWay}" VerticalAlignment="Center" />
+                <StackPanel x:Name="DeviceActions" Grid.Column="1" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <Button x:Name="RestartButton" Click="Restart_Click" AutomationProperties.Name="Restart plugin" Visibility="{x:Bind Model.CanRestart, Mode=OneWay, Converter={StaticResource BoolVisibility}}">
+                        <StackPanel Orientation="Horizontal" Spacing="7">
+                            <Image Width="16" Height="16" VerticalAlignment="Center">
+                                <Image.Source><SvgImageSource UriSource="ms-appx:///Assets/Icons/refresh.svg" /></Image.Source>
+                            </Image>
+                            <TextBlock Text="Restart plugin" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+                    <Button x:Name="DeviceSettingsButton" Click="ReadDevice_Click" AutomationProperties.Name="Device settings..." Visibility="{x:Bind Model.CanReadDevice, Mode=OneWay, Converter={StaticResource BoolVisibility}}">
+                        <StackPanel Orientation="Horizontal" Spacing="7">
+                            <Image Width="16" Height="16" VerticalAlignment="Center">
+                                <Image.Source><SvgImageSource UriSource="ms-appx:///Assets/Icons/settings-action.svg" /></Image.Source>
+                            </Image>
+                            <TextBlock Text="Device settings..." VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+                    <Button x:Name="ClearFaultsButton" Click="ClearFaults_Click" AutomationProperties.Name="Clear faults" Visibility="{x:Bind Model.ShowClearFaults, Mode=OneWay, Converter={StaticResource BoolVisibility}}">
+                        <StackPanel Orientation="Horizontal" Spacing="7">
+                            <Image Width="16" Height="16" VerticalAlignment="Center">
+                                <Image.Source><SvgImageSource UriSource="ms-appx:///Assets/Icons/chart-clear.svg" /></Image.Source>
+                            </Image>
+                            <TextBlock Text="Clear faults" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+                    <controls:StatusBadge Text="{x:Bind Model.State, Mode=OneWay}" Tone="{x:Bind Model.Tone, Mode=OneWay}" ToolTipService.ToolTip="{x:Bind Model.Message, Mode=OneWay}" VerticalAlignment="Center" />
+                </StackPanel>
             </Grid>
             <StackPanel x:Name="FaultsHost" Spacing="8" Visibility="{x:Bind Model.HasFaults, Mode=OneWay, Converter={StaticResource BoolVisibility}}" />
             <InfoBar IsOpen="{x:Bind Model.HasWarning, Mode=OneWay}" IsClosable="False" Severity="Error"
@@ -84,22 +110,22 @@
                             Visibility="{x:Bind Model.ShowPeakHold, Mode=OneWay, Converter={StaticResource BoolVisibility}}" />
                     </StackPanel>
                 </Border>
-                <Border x:Name="DetailsCard" Grid.Row="1" Style="{StaticResource MonitorCard}" VerticalAlignment="Top">
-                    <StackPanel Spacing="14">
+                <StackPanel x:Name="DetailsColumn" Grid.Row="1" Spacing="14" VerticalAlignment="Top">
+                    <Border x:Name="DetailsCard" Style="{StaticResource MonitorCard}">
                         <StackPanel x:Name="GpuStatusHost" />
-                        <StackPanel x:Name="NativeStatusHeading" Orientation="Horizontal" Spacing="9">
-                            <controls:WidgetIcon x:Name="DetailsIcon" IconName="{x:Bind DetailsIconName}" Width="28" Height="28" />
-                            <TextBlock Text="{x:Bind DetailsHeading}" Style="{StaticResource MonitorSectionHeading}" VerticalAlignment="Center" />
+                    </Border>
+                    <Border x:Name="NativeDetailsCard" Style="{StaticResource MonitorCard}">
+                        <StackPanel Spacing="14">
+                            <StackPanel x:Name="NativeStatusHeading" Orientation="Horizontal" Spacing="9">
+                                <controls:WidgetIcon x:Name="DetailsIcon" IconName="{x:Bind DetailsIconName}" Width="28" Height="28" />
+                                <TextBlock Text="{x:Bind DetailsHeading}" Style="{StaticResource MonitorSectionHeading}" VerticalAlignment="Center" />
+                            </StackPanel>
+                            <StackPanel x:Name="MetricsHost" Spacing="8" />
                         </StackPanel>
-                        <StackPanel x:Name="MetricsHost" Spacing="8" />
-                    </StackPanel>
-                </Border>
+                    </Border>
+                </StackPanel>
             </Grid>
-            <StackPanel Orientation="Horizontal" Spacing="8">
-                <Button Content="Restart plugin" Click="Restart_Click" Visibility="{x:Bind Model.CanRestart, Converter={StaticResource BoolVisibility}}" />
-                <Button Content="Device settings..." Click="ReadDevice_Click" Visibility="{x:Bind Model.CanReadDevice, Converter={StaticResource BoolVisibility}}" />
-                <Button Content="Clear faults…" Click="ClearFaults_Click" Visibility="{x:Bind Model.CanClearFaults, Converter={StaticResource BoolVisibility}}" />
-            </StackPanel>
+
         </StackPanel>
     </ScrollViewer>
 </UserControl>

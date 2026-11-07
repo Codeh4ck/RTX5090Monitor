@@ -1,3 +1,4 @@
+using Rtx5090Monitoring.Contracts.Discovery;
 using Rtx5090Monitoring.Contracts.Enums;
 using Rtx5090Monitoring.Contracts.Sensors;
 using Rtx5090Monitoring.Plugins.WireView.Contracts.Common;
@@ -12,11 +13,48 @@ internal static class WireViewPanelTests
 {
     public static void Run(TestRunner runner)
     {
+        runner.Run(ClearFaultActionTracksCapabilitiesFaultsAndConnection);
         runner.Run(GroupsTemperaturesAndPutsCableRatingFirst);
         runner.Run(ShowsReadableActiveAndLoggedFaultsWithoutMasks);
         runner.Run(FaultRecoveryAndDisconnectClearWarnings);
         runner.Run(MissingFaultReadingsRemainUnavailable);
         runner.Run(FormatsDeviceSettingsAndClearsThemAfterDeviceLoss);
+    }
+
+    private static void ClearFaultActionTracksCapabilitiesFaultsAndConnection()
+    {
+        var (panel, healthy) = Create(0, 0);
+        var info = UiTestData.Plugin with
+        {
+            Id = "wireview-pro2",
+            Capabilities = [PluginCapability.Telemetry, PluginCapability.FaultClear]
+        };
+        panel.UpdateDiscovery(info);
+        panel.Apply(healthy, new AppPreferences(), healthy.Timestamp);
+        TestAssert.False(panel.ShowClearFaults, "Healthy hardware must not show Clear faults.");
+
+        var changes = 0;
+        panel.PropertyChanged += (_, args) =>
+        {
+            if (args.PropertyName == nameof(panel.ShowClearFaults)) changes++;
+        };
+        var (_, logged) = Create(0, 0x04);
+        panel.Apply(logged, new AppPreferences(), logged.Timestamp);
+        TestAssert.True(panel.ShowClearFaults, "Logged faults must be clearable.");
+        TestAssert.True(changes > 0, "Fault visibility must update live.");
+
+        panel.UpdateDiscovery(info with { Capabilities = [PluginCapability.Telemetry] });
+        TestAssert.False(panel.ShowClearFaults, "The action requires device support.");
+        panel.UpdateDiscovery(info);
+        TestAssert.True(panel.ShowClearFaults, "Restoring device support must restore the action.");
+        panel.MarkDisconnected(new AppPreferences());
+        TestAssert.False(panel.ShowClearFaults, "Disconnected devices must not show Clear faults.");
+
+        var (_, active) = Create(0x02, 0);
+        panel.Apply(active, new AppPreferences(), active.Timestamp);
+        TestAssert.True(panel.ShowClearFaults, "Active faults must be clearable.");
+        panel.Apply(healthy, new AppPreferences(), healthy.Timestamp);
+        TestAssert.False(panel.ShowClearFaults, "The action must disappear when faults clear.");
     }
 
     private static void GroupsTemperaturesAndPutsCableRatingFirst()

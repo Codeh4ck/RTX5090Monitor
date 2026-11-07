@@ -79,7 +79,14 @@ public sealed class PluginSettingsEditorViewModel : EditableObject
                 throw new ArgumentException("MSI polling must be at least 1000 ms.");
             }
 
-            result = result with { Options = JsonSerializer.SerializeToElement(Msi.Build(), ClientJsonContext.Default.MsiOptions) };
+            var msi = Msi.Build();
+
+            if (msi.FanControl == MsiFanControl.Curve && result.PollIntervalMs > 5000)
+            {
+                throw new ArgumentException("MSI fan curve control requires a polling interval of 1000-5000 ms.");
+            }
+
+            result = result with { Options = JsonSerializer.SerializeToElement(msi, ClientJsonContext.Default.MsiOptions) };
         }
 
         return result;

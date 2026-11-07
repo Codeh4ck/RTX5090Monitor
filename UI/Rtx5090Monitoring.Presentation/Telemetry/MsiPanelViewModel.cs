@@ -19,7 +19,7 @@ public sealed class MsiPanelViewModel : ObservableObject
         private set => Set(ref field, value);
     }
 
-    public void Update(SensorReading[] readings, AppPreferences preferences, DateTimeOffset now, int staleAfterMs)
+    public void Update(SensorReading[] readings, AppPreferences preferences, DateTimeOffset now, int staleAfterMs, bool updateDetails = true)
     {
         var valid = readings.Where(reading => reading is { Quality: ReadingQuality.Valid, Value: { } value } && double.IsFinite(value)
             && now - reading.ObservedAt <= TimeSpan.FromMilliseconds(staleAfterMs)).ToArray();
@@ -40,7 +40,12 @@ public sealed class MsiPanelViewModel : ObservableObject
         ShowPeakHold = preferences.ShowPeakHold;
         foreach (var connector in Connectors)
         {
-            connector.Update(valid, preferences);
+            connector.Update(valid, preferences, updateDetails);
+        }
+
+        if (!updateDetails)
+        {
+            return;
         }
 
         var temperature = Value(SensorMetric.Temperature);

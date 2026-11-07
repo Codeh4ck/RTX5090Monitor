@@ -27,6 +27,8 @@ public sealed partial class MainWindow : Window
     public DashboardViewModel Model { get; private set; }
     internal FrameworkElement ThemeRoot => Root;
     internal object? CurrentView => PageHost.Content;
+    internal bool HardwareDetailsVisible => _rendering && _page == "hardware";
+    internal bool ConfigurationVisible => _rendering && _page == "configuration";
     public Visibility WarningVisibility(bool hasWarning) => hasWarning ? Visibility.Visible : Visibility.Collapsed;
 
     internal void ApplyAppearance(AppPreferences preferences)
@@ -256,6 +258,7 @@ public sealed partial class MainWindow : Window
         }
 
         CloseCurrentChart();
+        _runtime.RefreshPresentation();
         PerformanceTab.IsChecked = _page == "performance";
         PageHost.Content = _page switch
         {

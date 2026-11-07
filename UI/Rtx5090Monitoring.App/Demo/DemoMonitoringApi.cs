@@ -55,6 +55,52 @@ internal sealed class DemoMonitoringApi : IMonitoringApi
         }
     }
 
+    public Task<Rtx5090Monitoring.Plugins.Msi.Contracts.Telemetry.MsiSnapshot> GetMsiSnapshotAsync(CancellationToken token)
+    {
+        token.ThrowIfCancellationRequested();
+
+        lock (_gate)
+        {
+            var settings = _configuration.Configuration.Plugins["msi-psu"];
+
+            if (!settings.Enabled || _unavailable.Contains("msi-psu"))
+            {
+                throw new MonitoringApiException(HttpStatusCode.ServiceUnavailable, "No current MSI PSU snapshot is available.");
+            }
+
+            var options = settings.Options?.Deserialize(ClientJsonContext.Default.MsiOptions) ?? new MsiOptions();
+            const double temperature = 48;
+            var duty = MsiFanDuty(options, temperature);
+
+            return Task.FromResult(new Rtx5090Monitoring.Plugins.Msi.Contracts.Telemetry.MsiSnapshot(
+                "demo-psu", "MPG Ai1300TS", "SIMULATED", DateTimeOffset.UtcNow,
+                [[1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0]], temperature, duty * 21,
+                options.FanControl is MsiFanControl.Automatic or MsiFanControl.Unmanaged || duty == 0, duty)
+            {
+                TargetFanDutyPercent = options.FanControl is MsiFanControl.Manual or MsiFanControl.Curve ? duty : null,
+                FanControllerState = options.FanControl + " (simulated)"
+            });
+        }
+    }
+
+    private static int MsiFanDuty(MsiOptions options, double temperature)
+    {
+        var duty = options.FanControl == MsiFanControl.Manual ? options.FanDutyPercent : 0;
+
+        if (options.FanControl == MsiFanControl.Curve)
+        {
+            var upperIndex = Array.FindIndex(options.FanCurve.Points, point => point.TemperatureC >= temperature);
+            var upper = options.FanCurve.Points[upperIndex < 0 ? ^1 : upperIndex];
+            var lower = options.FanCurve.Points[Math.Max(0, upperIndex - 1)];
+            duty = upperIndex <= 0 ? upper.DutyPercent
+                : (int)Math.Round(lower.DutyPercent + (temperature - lower.TemperatureC)
+                    / (upper.TemperatureC - lower.TemperatureC) * (upper.DutyPercent - lower.DutyPercent),
+                    MidpointRounding.AwayFromZero);
+        }
+
+        return MsiFanCurve.EffectiveDutyPercent(duty);
+    }
+
     public Uri Address { get; } = new("http://demo.invalid/");
 
     public Task<HealthResponse> GetHealthAsync(CancellationToken token) => Task.FromResult(new HealthResponse("ok", _started,
@@ -161,10 +207,11 @@ internal sealed class DemoMonitoringApi : IMonitoringApi
                             ConnectorId: connector.ToString()), SensorUnit.Amperes, sum, now));
                     }
                     var options = settings.Options?.Deserialize(ClientJsonContext.Default.MsiOptions) ?? new MsiOptions();
+                    var duty = MsiFanDuty(options, 48 + wave);
                     AddPsu(SensorMetric.Temperature, 48 + wave);
-                    AddPsu(SensorMetric.FanSpeed, options.FanControl == MsiFanControl.Manual ? options.FanDutyPercent * 21 : 0, 1);
-                    AddPsu(SensorMetric.FanDuty, options.FanControl == MsiFanControl.Manual ? options.FanDutyPercent : 0, 1);
-                    AddPsu(SensorMetric.FanAutomatic, options.FanControl == MsiFanControl.Manual ? 0 : 1, 1);
+                    AddPsu(SensorMetric.FanSpeed, duty * 21, 1);
+                    AddPsu(SensorMetric.FanDuty, duty, 1);
+                    AddPsu(SensorMetric.FanAutomatic, duty == 0 ? 1 : 0, 1);
                     continue;
 
                     void AddPsu(SensorMetric metric, double value, int? channel = null) => readings.Add(new SensorReading(

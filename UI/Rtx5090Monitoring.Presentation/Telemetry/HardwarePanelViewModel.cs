@@ -43,11 +43,18 @@ public sealed class HardwarePanelViewModel : ObservableObject
     public bool IsReporting
     {
         get;
-        private set => Set(ref field, value);
+        private set
+        {
+            if (Set(ref field, value))
+            {
+                Raise(nameof(ShowClearFaults));
+            }
+        }
     }
 
     public bool CanReadDevice => _capabilities.Contains(PluginCapability.DeviceConfigurationRead);
     public bool CanClearFaults => _capabilities.Contains(PluginCapability.FaultClear);
+    public bool ShowClearFaults => CanClearFaults && IsReporting && HasFaults;
     public bool CanRestart => _capabilities.Contains(PluginCapability.Restart);
 
     public bool HasPins
@@ -206,6 +213,7 @@ public sealed class HardwarePanelViewModel : ObservableObject
         _capabilities = plugin.Capabilities;
         Raise(nameof(CanReadDevice));
         Raise(nameof(CanClearFaults));
+        Raise(nameof(ShowClearFaults));
         Raise(nameof(CanRestart));
     }
 
@@ -218,7 +226,7 @@ public sealed class HardwarePanelViewModel : ObservableObject
         }
     }
 
-    public void Apply(SensorSnapshot snapshot, AppPreferences preferences, DateTimeOffset now)
+    public void Apply(SensorSnapshot snapshot, AppPreferences preferences, DateTimeOffset now, bool updateDetails = true)
     {
         ShowPeakHold = preferences.ShowPeakHold;
         ShowHeadroom = preferences.ShowHeadroom;
@@ -268,7 +276,7 @@ public sealed class HardwarePanelViewModel : ObservableObject
 
         if (IsMsi)
         {
-            Msi.Update(readings, preferences, now, _staleAfterMs);
+            Msi.Update(readings, preferences, now, _staleAfterMs, updateDetails);
             return;
         }
 
@@ -280,9 +288,12 @@ public sealed class HardwarePanelViewModel : ObservableObject
         var power = Value(SensorComponent.GpuConnector, SensorMetric.Power, 1);
         var current = Value(SensorComponent.GpuConnector, SensorMetric.Current, 1);
 
-        PowerText = Format(power, "W", 1);
-        CurrentText = Format(current, "A", 2);
-        VoltageText = Format(Value(SensorComponent.GpuConnector, SensorMetric.Voltage, 1), "V", 2);
+        if (updateDetails)
+        {
+            PowerText = Format(power, "W", 1);
+            CurrentText = Format(current, "A", 2);
+            VoltageText = Format(Value(SensorComponent.GpuConnector, SensorMetric.Voltage, 1), "V", 2);
+        }
 
         var activeProfile = snapshot.SettingsProfile;
         var profile = activeProfile?.AppliesToConnector(Id, deviceId) == true ? activeProfile.Profile : null;
@@ -297,10 +308,15 @@ public sealed class HardwarePanelViewModel : ObservableObject
         foreach (var pin in Pins)
         {
             pin.Update(Value(SensorComponent.GpuPin, SensorMetric.Current, pin.Channel), Value(SensorComponent.GpuPin, SensorMetric.Voltage, pin.Channel),
-                Value(SensorComponent.GpuPin, SensorMetric.Power, pin.Channel), preferences.PinMetric, currentLimit, preferences.ShowPeakHold, preferences.ShowHeadroom, cableRatingW, profile);
+                Value(SensorComponent.GpuPin, SensorMetric.Power, pin.Channel), preferences.PinMetric, currentLimit, preferences.ShowPeakHold, preferences.ShowHeadroom, cableRatingW, profile, updateDetails);
         }
 
         HasPins = Pins.Any(pin => pin.Current is not null || pin.Voltage is not null || pin.Power is not null);
+
+        if (!updateDetails)
+        {
+            return;
+        }
 
         var currents = Pins.Where(pin => pin.Current is not null).ToArray();
         var highest = currents.MaxBy(pin => pin.Current);
@@ -464,6 +480,7 @@ public sealed class HardwarePanelViewModel : ObservableObject
         }
 
         Raise(nameof(HasFaults));
+        Raise(nameof(ShowClearFaults));
     }
 
     private void ClearReadings(AppPreferences preferences)

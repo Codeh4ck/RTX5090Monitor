@@ -43,9 +43,16 @@
                         <ComboBoxItem Content="Unmanaged · leave existing fan control alone" />
                         <ComboBoxItem Content="Automatic · PSU-controlled cooling" />
                         <ComboBoxItem Content="Manual · fixed duty" />
+                        <ComboBoxItem Content="Fan curve - backend-controlled" />
                     </ComboBox>
                     <NumberBox Header="Manual fan duty (%)" Value="{x:Bind Model.Msi.FanDutyPercent, Mode=TwoWay}"
-                        Minimum="0" Maximum="100" SmallChange="5" SpinButtonPlacementMode="Inline" IsEnabled="{x:Bind Model.Msi.IsManual, Mode=OneWay}" />
+                        Minimum="0" Maximum="100" SmallChange="1" SpinButtonPlacementMode="Inline" IsEnabled="{x:Bind Model.Msi.IsManual, Mode=OneWay}" />
+                    <Button Click="FanCurve_Click" IsEnabled="{x:Bind Model.Msi.IsCurve, Mode=OneWay}">
+                        <StackPanel Orientation="Horizontal" Spacing="7">
+                            <controls:WidgetIcon IconName="vfan" Width="20" Height="20" />
+                            <TextBlock Text="Edit fan curve..." VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
                     <TextBlock Text="Fan control is applied live. Releasing control or stopping the plugin restores automatic mode. A 0% request does not guarantee 0 RPM. No save-to-flash command is sent."
                         Style="{StaticResource MonitorCaption}" />
                 </StackPanel>

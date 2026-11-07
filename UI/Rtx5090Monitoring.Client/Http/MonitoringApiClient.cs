@@ -95,6 +95,9 @@ public sealed class MonitoringApiClient(HttpClient http) : IMonitoringApi
     public Task<MsiDeviceInfo[]> GetMsiDevicesAsync(CancellationToken token) =>
         GetAsync("plugins/msi-psu/devices", ClientJsonContext.Default.MsiDeviceInfoArray, token);
 
+    public Task<Rtx5090Monitoring.Plugins.Msi.Contracts.Telemetry.MsiSnapshot> GetMsiSnapshotAsync(CancellationToken token) =>
+        GetAsync("plugins/msi-psu/device", ClientJsonContext.Default.MsiSnapshot, token);
+
     public async Task<ConfigurationSnapshot> SetConfigurationAsync(ServiceConfiguration configuration, string version, CancellationToken token)
     {
         if (string.IsNullOrWhiteSpace(version))

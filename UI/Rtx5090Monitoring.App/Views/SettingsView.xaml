@@ -37,6 +37,7 @@
                     <TextBlock Text="You can also resize or maximize the window. Its normal size is remembered automatically." Style="{StaticResource MonitorCaption}" TextWrapping="Wrap" />
                     <ToggleSwitch Header="Minimize to system tray" IsOn="{x:Bind Model.MinimizeToTray, Mode=TwoWay}"/>
                     <ToggleSwitch Header="Close to system tray" IsOn="{x:Bind Model.CloseToTray, Mode=TwoWay}"/>
+                    <ToggleSwitch Header="Confirm before exiting" IsOn="{x:Bind Model.ConfirmBeforeExit, Mode=TwoWay}"/>
                     <ToggleSwitch x:Name="StartupToggle" Header="Start with Windows" IsOn="{x:Bind Model.StartWithWindows, Mode=TwoWay}"/>
                     <TextBlock Text="Keep the portable folder in the same location when using startup registration." TextWrapping="Wrap" Style="{StaticResource MonitorCaption}"/>
                     <ToggleSwitch Header="Start minimized" IsOn="{x:Bind Model.StartMinimized, Mode=TwoWay}"/>

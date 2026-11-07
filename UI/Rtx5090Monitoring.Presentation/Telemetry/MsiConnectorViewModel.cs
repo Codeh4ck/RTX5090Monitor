@@ -23,14 +23,20 @@ public sealed class MsiConnectorViewModel(int connector) : ObservableObject
     } = "—";
     public ObservableCollection<PinViewModel> Pins { get; } = [.. Enumerable.Range(1, 6).Select(pin => new PinViewModel(pin))];
 
-    public void Update(SensorReading[] readings, AppPreferences preferences)
+    public void Update(SensorReading[] readings, AppPreferences preferences, bool updateDetails = true)
     {
         foreach (var pin in Pins)
         {
             var reading = readings.SingleOrDefault(item => item.Identity.Component == SensorComponent.PsuPin
                 && item.Identity.ConnectorId == Id && item.Identity.Channel == pin.Channel && item.Identity.Metric == SensorMetric.Current);
-            pin.Update(reading?.Value, null, null, PinMetric.Current, null, preferences.ShowPeakHold, false);
+            pin.Update(reading?.Value, null, null, PinMetric.Current, null, preferences.ShowPeakHold, false, notifyChanges: updateDetails);
         }
+
+        if (!updateDetails)
+        {
+            return;
+        }
+
         var currents = Pins.Select(pin => pin.Current).ToArray();
         var complete = currents.All(value => value.HasValue);
         var total = readings.FirstOrDefault(reading => reading.Identity is { Component: SensorComponent.PsuConnector, Metric: SensorMetric.Current } && reading.Identity.ConnectorId == Id)?.Value;

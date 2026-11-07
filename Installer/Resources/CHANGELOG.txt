@@ -1,3 +1,14 @@
+1.0.5 - MSI fan curves and desktop improvements
+- Add backend-managed MSI PSU fan curves with a separate graphical editor and live temperature, RPM and duty indicators
+- Support up to six curve points, rising or falling duty, and custom maximum duty. Fan response delay defaults to two seconds in both directions
+- Return fan control to the PSU when requested duty falls below 25%
+- Add exit confirmation with a persistent “Do not show this again” option. Preserve close-to-tray behavior
+- Improve Performance Chart responsiveness
+- Add optional legend values, plugin/category quick selections, Clear recording, and additional GPU clock, VRAM usage and fan traces
+- Group temperatures and fans together. Hide unused MSI connectors from live recording selectors while preserving recorded history
+- Update plugin buttons, SVG icons, device logos, MSI summary cards and WireView device settings
+- Move WireView temperatures and faults into a separate panel below GPU status
+
 1.0.4 - Performance recording and device warning profiles
 - Add Performance Chart with live recording, individually selectable source traces and unique trace colours.
 - Add time navigation, zoom, Follow latest and hover details with readings and timestamps.

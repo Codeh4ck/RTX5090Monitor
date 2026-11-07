@@ -104,7 +104,7 @@ public sealed class DashboardViewModel : ObservableObject
         RefreshPsuComparisons(DateTimeOffset.UtcNow);
     }
 
-    public void Apply(SensorSnapshot snapshot, AppPreferences preferences, DateTimeOffset now)
+    public void Apply(SensorSnapshot snapshot, AppPreferences preferences, DateTimeOffset now, bool updateDetails = true)
     {
         if (_configuration is { } configured)
         {
@@ -133,16 +133,22 @@ public sealed class DashboardViewModel : ObservableObject
         WarningSummary = snapshot.Warnings is null ? "Update the backend service to enable shared warning policies."
             : states.Length == 0 ? "No active warnings" : $"{states.Length} warning conditions - shared service state";
         Raise(nameof(WarningSummary));
-        GpuStatus.Apply(snapshot, _configuration, preferences, now);
+        if (updateDetails)
+        {
+            GpuStatus.Apply(snapshot, _configuration, preferences, now);
+        }
         _lastSnapshot = snapshot;
         _preferences = preferences;
         foreach (var panel in Panels)
         {
-            panel.Apply(snapshot, preferences, now);
+            panel.Apply(snapshot, preferences, now, updateDetails);
         }
 
         RefreshReportingPanels();
-        RefreshPsuComparisons(now);
+        if (updateDetails)
+        {
+            RefreshPsuComparisons(now);
+        }
     }
 
     public void RefreshFreshness(DateTimeOffset now, AppPreferences preferences)

@@ -102,7 +102,7 @@ internal sealed partial class WireViewDeviceWindow : Window
         {
             foreach (var metric in _model.DeviceDetails)
             {
-                RowsHost.Children.Add(new MetricTile(metric, showIcon: false));
+                RowsHost.Children.Add(new MetricTile(metric, valueMaxWidth: 260, usePanelBorder: true));
             }
         }
         UpdateStatus();

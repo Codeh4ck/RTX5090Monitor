@@ -9,6 +9,12 @@ if (args.Contains("--verify-msi-hardware"))
     return 0;
 }
 
+if (args.Contains("--verify-msi-curve-hardware"))
+{
+    await MsiCurveHardwareVerification.RunAsync();
+    return 0;
+}
+
 GenericNvidiaTests.Run(runner);
 ConnectorProfileTests.Run(runner);
 SettingsProfileTests.Run(runner);
@@ -26,6 +32,7 @@ WireViewConfigParserTests.Run(runner);
 AsusAlertTests.Run(runner);
 await AsusPluginTests.RunAsync(runner);
 await MsiPluginTests.RunAsync(runner);
+MsiFanCurveTests.Run(runner);
 await MsiEndpointTests.RunAsync(runner);
 
 await SettingsProfileTests.RunEndpointsAsync(runner);

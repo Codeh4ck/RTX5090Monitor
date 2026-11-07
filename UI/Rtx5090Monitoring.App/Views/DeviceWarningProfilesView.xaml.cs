@@ -7,7 +7,7 @@ using Rtx5090Monitoring.Presentation.Configuration;
 
 namespace Rtx5090Monitoring.App.Views;
 
-public sealed partial class DeviceWarningProfilesView : UserControl
+public sealed partial class DeviceWarningProfilesView
 {
     private static readonly SourceOption[] Sources =
     [
@@ -60,9 +60,12 @@ public sealed partial class DeviceWarningProfilesView : UserControl
     private async Task LoadAsync(string? selectedId = null)
     {
         _catalog = await _runtime.SettingsProfileApi.GetDeviceWarningProfilesAsync(_runtime.StopToken);
+
         var options = _catalog.Profiles.Select(profile => new ProfileOption(profile)).ToArray();
         var selected = options.FirstOrDefault(item => item.Profile.Id == selectedId) ?? options.FirstOrDefault();
+
         _loading = true;
+
         try
         {
             Profiles.ItemsSource = options.Select(item => item.Label).ToArray();
@@ -92,20 +95,27 @@ public sealed partial class DeviceWarningProfilesView : UserControl
             ProfileName.Text = profile.Name;
             Enabled.IsChecked = profile.Enabled;
             Source.SelectedIndex = Array.FindIndex(Sources, item => item.Id == profile.PluginId);
+
             PopulateDevices(profile.DeviceId);
+
             Connector.SelectedIndex = profile.ConnectorId == "2" ? 1 : 0;
 
             UseDefaults.IsChecked = profile.Limits is null;
+
             SetLimits(profile.Limits ?? DefaultLimits());
 
             OverridePolicy.IsChecked = profile.NotificationPolicy is not null;
+
             _policy.Load(profile.NotificationPolicy ?? _catalog!.DefaultPolicy);
+
             Shutdown.IsChecked = profile.ShutdownAfterSeconds is not null;
 
             var seconds = profile.ShutdownAfterSeconds ?? 30;
             Minutes.Value = seconds / 60;
             Seconds.Value = seconds % 60;
+
             DeleteButton.IsEnabled = _catalog!.Profiles.Any(item => item.Id == profile.Id);
+
             UpdateEditor();
         }
         finally
@@ -132,6 +142,7 @@ public sealed partial class DeviceWarningProfilesView : UserControl
     {
         var source = Sources[Source.SelectedIndex].Id;
         var available = _catalog!.Targets.Where(target => target.PluginId == source).ToList();
+
         if (selectedId is not null && available.All(target => target.DeviceId != selectedId))
         {
             available.Add(new(source, selectedId, $"{selectedId} (unavailable)"));
@@ -139,6 +150,7 @@ public sealed partial class DeviceWarningProfilesView : UserControl
 
         available.Insert(0, new(source, "", "Automatic (one reporting device)"));
         _devices = [.. available];
+
         Device.ItemsSource = _devices.Select(item => item.Name).ToArray();
         Device.SelectedIndex = Math.Max(0, Array.FindIndex(_devices, item => item.DeviceId == selectedId));
     }

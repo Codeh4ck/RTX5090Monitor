@@ -6,6 +6,17 @@ namespace Rtx5090Monitoring.Presentation.Performance;
 public sealed record PerformanceTrace(string Key, string Group, string Label, string Source, string DeviceId,
     string Unit, string Color, SensorIdentity Identity)
 {
+    public string Category => Identity.Metric is SensorMetric.Temperature or SensorMetric.FanSpeed
+        ? "Temperatures"
+        : Group.StartsWith("GPU ", StringComparison.Ordinal) || Group == "VRAM usage" ? "GPU metrics" : Group;
+
+    public double ConvertValue(double value) => Unit switch
+    {
+        "mV" => value * 1000,
+        "GB" => value / 1024,
+        _ => value
+    };
+
     public static PerformanceTrace? Create(SensorReading reading, string source, int colorIndex)
     {
         var identity = reading.Identity;
@@ -16,7 +27,12 @@ public sealed record PerformanceTrace(string Key, string Group, string Label, st
             (SensorComponent.GpuConnector or SensorComponent.PsuConnector, SensorMetric.Power) => "Connector power",
             (SensorComponent.GpuConnector or SensorComponent.PsuConnector, SensorMetric.Voltage) => "Connector voltage",
             (SensorComponent.GpuCore, SensorMetric.Voltage) => "GPU core voltage",
+            (SensorComponent.GpuCore, SensorMetric.Clock) => "GPU core clock",
+            (SensorComponent.GpuMemory, SensorMetric.Clock) => "GPU memory clock",
+            (SensorComponent.GpuMemory, SensorMetric.MemoryUsed) => "VRAM usage",
+            (SensorComponent.GpuFan, SensorMetric.FanSpeed) => "GPU fan speed",
             (SensorComponent.GpuCore or SensorComponent.GpuMemory or SensorComponent.GpuHotspot, SensorMetric.Temperature) => "GPU temperatures",
+            (SensorComponent.MonitorBoard or SensorComponent.ExternalProbe, SensorMetric.Temperature) => "Device temperatures",
             _ => null
         };
 
@@ -31,6 +47,9 @@ public sealed record PerformanceTrace(string Key, string Group, string Label, st
             "Connector power" => "W",
             "GPU core voltage" => "mV",
             "Connector voltage" => "V",
+            "GPU core clock" or "GPU memory clock" => "MHz",
+            "VRAM usage" => "GB",
+            "GPU fan speed" => "RPM",
             _ => "°C"
         };
         if (reading.Unit != SensorUnits.For(identity.Metric))
@@ -41,10 +60,19 @@ public sealed record PerformanceTrace(string Key, string Group, string Label, st
         var connector = identity.ConnectorId is { } id ? $" · Connector {id}"
             : identity.Component == SensorComponent.GpuConnector && identity.Channel is > 1 ? $" · Connector {identity.Channel}" : "";
         var metric = group == "Pin current" ? $"P{identity.Channel}"
+            : group == "GPU fan speed" ? identity.Channel is { } fan ? $"Fan {fan}" : "Fan"
+            : group == "VRAM usage" ? "VRAM used"
             : identity.Metric == SensorMetric.Temperature ? identity.Component switch
             {
                 SensorComponent.GpuMemory => "VRAM",
                 SensorComponent.GpuHotspot => "Hotspot",
+                SensorComponent.MonitorBoard => identity.Channel switch
+                {
+                    1 => "Board temp in",
+                    2 => "Board temp out",
+                    _ => "Board temp"
+                },
+                SensorComponent.ExternalProbe => identity.Channel is { } probe ? $"External temp {probe}" : "External temp",
                 _ => "Core"
             }
             : group;

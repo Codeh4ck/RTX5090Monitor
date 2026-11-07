@@ -15,6 +15,11 @@ public static class MsiSettings
 
         options.Validate();
 
+        if (options.FanControl == MsiFanControl.Curve && settings.PollIntervalMs > 5000)
+        {
+            throw new ArgumentException("MSI fan curve control requires a polling interval of 1000-5000 ms.");
+        }
+
         return settings.PollIntervalMs < 1000 ? throw new ArgumentException("MSI polling must be at least 1000 ms.") : options;
     }
 
