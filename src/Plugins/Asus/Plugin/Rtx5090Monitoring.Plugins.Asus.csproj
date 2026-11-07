@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <ItemGroup>
+        <ProjectReference Include="../../../Common/NvidiaHardware/Rtx5090Monitoring.Hardware.Nvidia.csproj" />
+        <ProjectReference Include="../../../Core/Rtx5090Monitoring.Core.csproj" />
+        <ProjectReference Include="../Contracts/Rtx5090Monitoring.Plugins.Asus.Contracts.csproj" />
+        <ProjectReference Include="../Analysis/Rtx5090Monitoring.Plugins.Asus.Analysis.csproj" />
+        <ProjectReference Include="../../../Common/Contracts/Rtx5090Monitoring.Contracts.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+        <InternalsVisibleTo Include="Rtx5090Monitoring.Tests" />
+    </ItemGroup>
+</Project>

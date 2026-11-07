@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <ItemGroup>
+        <ProjectReference Include="../../../Common/Warnings/Rtx5090Monitoring.Warnings.csproj" />
+        <ProjectReference Include="../Contracts/Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.csproj" />
+    </ItemGroup>
+</Project>

@@ -8,7 +8,7 @@ $ErrorActionPreference = 'Stop'
 
 $packages = @{}
 
-foreach ($project in @('Rtx5090Monitoring.Service', 'UI/Rtx5090Monitoring.App', 'Installer/Rtx5090Monitoring.Installer.Actions'))
+foreach ($project in @('src/Service', 'src/Desktop/App', 'installer/Actions'))
 {
     $assets = Get-Content -LiteralPath (Join-Path $SolutionDirectory "$project/obj/project.assets.json") -Raw | ConvertFrom-Json -AsHashtable
 
@@ -33,7 +33,7 @@ foreach ($project in @('Rtx5090Monitoring.Service', 'UI/Rtx5090Monitoring.App', 
 }
 
 $sections = [Collections.Generic.List[string]]::new()
-$sections.Add((Get-Content -LiteralPath (Join-Path $SolutionDirectory 'Installer/Resources/THIRD-PARTY-NOTICES.txt') -Raw))
+$sections.Add((Get-Content -LiteralPath (Join-Path $SolutionDirectory 'installer/Resources/THIRD-PARTY-NOTICES.txt') -Raw))
 
 foreach ($entry in $packages.GetEnumerator() | Sort-Object Key)
 {
@@ -98,6 +98,6 @@ foreach ($entry in $packages.GetEnumerator() | Sort-Object Key)
     $sections.Add($text)
 }
 
-$sections.Add((Get-Content -LiteralPath (Join-Path $SolutionDirectory 'XeneonEdgeWidget/THIRD-PARTY-NOTICES.md') -Raw))
+$sections.Add((Get-Content -LiteralPath (Join-Path $SolutionDirectory 'src/Widget/THIRD-PARTY-NOTICES.md') -Raw))
 
 $sections | Set-Content -LiteralPath $OutputPath -Encoding UTF8

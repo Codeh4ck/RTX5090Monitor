@@ -1,34 +1,34 @@
 <Solution>
     <Folder Name="/Installer/">
-        <File Path="docs/releases.md" />
-        <File Path="Installer/Rtx5090Monitoring.Bootstrapper/Bundle.wxs" />
-        <File Path="Installer/Rtx5090Monitoring.Bootstrapper/Rtx5090Monitoring.Bootstrapper.wixproj" />
-        <File Path="Installer/Rtx5090Monitoring.Installer/Package.wxs" />
-        <File Path="Installer/Rtx5090Monitoring.Installer/Rtx5090Monitoring.Installer.wixproj" />
+        <File Path="installer/Resources/ReleaseReadme.txt" />
+        <File Path="installer/Bootstrapper/Bundle.wxs" />
+        <File Path="installer/Bootstrapper/Rtx5090Monitoring.Bootstrapper.wixproj" />
+        <File Path="installer/Package/Package.wxs" />
+        <File Path="installer/Package/Rtx5090Monitoring.Installer.wixproj" />
         <File Path="scripts/Build-Release.ps1" />
-        <File Path="uninstall.ps1" />
-        <Project Path="Installer/Rtx5090Monitoring.Installer.Actions/Rtx5090Monitoring.Installer.Actions.csproj" />
-        <Project Path="Installer/Rtx5090Monitoring.Installer.Tests/Rtx5090Monitoring.Installer.Tests.csproj" />
+        <File Path="scripts/uninstall.ps1" />
+        <Project Path="installer/Actions/Rtx5090Monitoring.Installer.Actions.csproj" />
+        <Project Path="tests/Installer/Rtx5090Monitoring.Installer.Tests.csproj" />
     </Folder>
     <Folder Name="/Plugins/" />
     <Folder Name="/Plugins/Asus/">
-        <Project Path="Rtx5090Monitoring.Plugins.Asus.Analysis/Rtx5090Monitoring.Plugins.Asus.Analysis.csproj" />
-        <Project Path="Rtx5090Monitoring.Plugins.Asus.Contracts/Rtx5090Monitoring.Plugins.Asus.Contracts.csproj" />
-        <Project Path="Rtx5090Monitoring.Plugins.Asus/Rtx5090Monitoring.Plugins.Asus.csproj" />
+        <Project Path="src/Plugins/Asus/Analysis/Rtx5090Monitoring.Plugins.Asus.Analysis.csproj" />
+        <Project Path="src/Plugins/Asus/Contracts/Rtx5090Monitoring.Plugins.Asus.Contracts.csproj" />
+        <Project Path="src/Plugins/Asus/Plugin/Rtx5090Monitoring.Plugins.Asus.csproj" />
     </Folder>
     <Folder Name="/Plugins/MSI/">
-        <Project Path="Rtx5090Monitoring.Plugins.Msi.Contracts/Rtx5090Monitoring.Plugins.Msi.Contracts.csproj" />
-        <Project Path="Rtx5090Monitoring.Plugins.Msi/Rtx5090Monitoring.Plugins.Msi.csproj" />
+        <Project Path="src/Plugins/Msi/Contracts/Rtx5090Monitoring.Plugins.Msi.Contracts.csproj" />
+        <Project Path="src/Plugins/Msi/Plugin/Rtx5090Monitoring.Plugins.Msi.csproj" />
     </Folder>
     <Folder Name="/Plugins/Nvidia/">
-        <Project Path="Rtx5090Monitoring.Plugins.GenericNvidia.Analysis/Rtx5090Monitoring.Plugins.GenericNvidia.Analysis.csproj" />
-        <Project Path="Rtx5090Monitoring.Plugins.GenericNvidia.Contracts/Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.csproj" />
-        <Project Path="Rtx5090Monitoring.Plugins.GenericNvidia/Rtx5090Monitoring.Plugins.GenericNvidia.csproj" />
+        <Project Path="src/Plugins/Nvidia/Analysis/Rtx5090Monitoring.Plugins.GenericNvidia.Analysis.csproj" />
+        <Project Path="src/Plugins/Nvidia/Contracts/Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.csproj" />
+        <Project Path="src/Plugins/Nvidia/Plugin/Rtx5090Monitoring.Plugins.GenericNvidia.csproj" />
     </Folder>
     <Folder Name="/Plugins/WireView/">
-        <Project Path="Rtx5090Monitoring.Plugins.WireView.Analysis/Rtx5090Monitoring.Plugins.WireView.Analysis.csproj" />
-        <Project Path="Rtx5090Monitoring.Plugins.WireView.Contracts/Rtx5090Monitoring.Plugins.WireView.Contracts.csproj" />
-        <Project Path="Rtx5090Monitoring.Plugins.WireView/Rtx5090Monitoring.Plugins.WireView.csproj" />
+        <Project Path="src/Plugins/WireView/Analysis/Rtx5090Monitoring.Plugins.WireView.Analysis.csproj" />
+        <Project Path="src/Plugins/WireView/Contracts/Rtx5090Monitoring.Plugins.WireView.Contracts.csproj" />
+        <Project Path="src/Plugins/WireView/Plugin/Rtx5090Monitoring.Plugins.WireView.csproj" />
     </Folder>
     <Folder Name="/Solution Items/">
         <File Path=".editorconfig" />
@@ -36,25 +36,24 @@
         <File Path="Directory.Packages.props" />
     </Folder>
     <Folder Name="/UI/">
-        <Project Path="UI/Rtx5090Monitoring.Debugging/Rtx5090Monitoring.Debugging.csproj" />
-        <Project Path="UI/Rtx5090Monitoring.App/Rtx5090Monitoring.App.csproj" />
-        <Project Path="UI/Rtx5090Monitoring.Client/Rtx5090Monitoring.Client.csproj" />
-        <Project Path="UI/Rtx5090Monitoring.Presentation/Rtx5090Monitoring.Presentation.csproj" />
-        <Project Path="UI/Rtx5090Monitoring.UI.Tests/Rtx5090Monitoring.UI.Tests.csproj" />
+        <Project Path="src/Desktop/Debugging/Rtx5090Monitoring.Debugging.csproj" />
+        <Project Path="src/Desktop/App/Rtx5090Monitoring.App.csproj" />
+        <Project Path="src/Desktop/Client/Rtx5090Monitoring.Client.csproj" />
+        <Project Path="src/Desktop/Presentation/Rtx5090Monitoring.Presentation.csproj" />
+        <Project Path="tests/Desktop/Rtx5090Monitoring.UI.Tests.csproj" />
     </Folder>
     <Folder Name="/Common/">
-        <Project Path="Rtx5090Monitoring.Contracts/Rtx5090Monitoring.Contracts.csproj" />
-        <Project Path="Rtx5090Monitoring.Hardware.Nvidia/Rtx5090Monitoring.Hardware.Nvidia.csproj" />
-        <Project Path="Rtx5090Monitoring.Warnings/Rtx5090Monitoring.Warnings.csproj" />
+        <Project Path="src/Common/Contracts/Rtx5090Monitoring.Contracts.csproj" />
+        <Project Path="src/Common/NvidiaHardware/Rtx5090Monitoring.Hardware.Nvidia.csproj" />
+        <Project Path="src/Common/Warnings/Rtx5090Monitoring.Warnings.csproj" />
     </Folder>
-    <Project Path="Rtx5090Monitoring.Core/Rtx5090Monitoring.Core.csproj" />
-    <Project Path="Rtx5090Monitoring.Service/Rtx5090Monitoring.Service.csproj" />
-    <Project Path="Rtx5090Monitoring.Tests/Rtx5090Monitoring.Tests.csproj" />
+    <Project Path="src/Core/Rtx5090Monitoring.Core.csproj" />
+    <Project Path="src/Service/Rtx5090Monitoring.Service.csproj" />
+    <Project Path="tests/Backend/Rtx5090Monitoring.Tests.csproj" />
     <Folder Name="/Xeneon Edge/">
-        <File Path="XeneonEdgeWidget/README.md" />
-        <File Path="XeneonEdgeWidget/INSTALL.md" />
-        <File Path="XeneonEdgeWidget/package.json" />
-        <File Path="XeneonEdgeWidget/manifest.json" />
-        <File Path="XeneonEdgeWidget/tsconfig.json" />
+        <File Path="src/Widget/INSTALL.md" />
+        <File Path="src/Widget/package.json" />
+        <File Path="src/Widget/manifest.json" />
+        <File Path="src/Widget/tsconfig.json" />
     </Folder>
 </Solution>

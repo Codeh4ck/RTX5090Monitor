@@ -82,7 +82,7 @@ Use the desktop app's **Configuration** page for plugin settings, Sensor stream,
 
 Backend configuration is stored at `%ProgramData%\Rtx5090Monitoring\appsettings.json`. Desktop preferences are stored under `%LocalAppData%\Rtx5090Monitoring`. Configuration changes apply live through the desktop app or service API.
 
-The widget's iCUE settings affect presentation only. Double tap outside its controls to open the scrollable, read-only backend configuration view. See the included [widget setup instructions](XeneonEdgeWidget/INSTALL.md) for operation and display settings.
+The widget's iCUE settings affect presentation only. Double tap outside its controls to open the scrollable, read-only backend configuration view. See the included [widget setup instructions](src/Widget/INSTALL.md) for operation and display settings.
 
 ## Build from source
 
@@ -91,13 +91,13 @@ Build on Windows with the .NET 10 SDK. Widget builds additionally require Node.j
 ### Service
 
 ```powershell
-dotnet build Rtx5090Monitoring.Service -c Release
+dotnet build src/Service -c Release
 ```
 
 ### Desktop app
 
 ```powershell
-dotnet publish UI/Rtx5090Monitoring.App -c Release -p:PublishProfile=Portable -p:EnableTelemetryDebug=false
+dotnet publish src/Desktop/App -c Release -p:PublishProfile=Portable -p:EnableTelemetryDebug=false
 ```
 
 The portable app is written to `artifacts/desktop/win-x64/`. Keep that entire directory together, including assets, native libraries and runtime files.
@@ -107,7 +107,7 @@ For development, open `Rtx5090Monitoring.slnx` in Rider or Visual Studio. Debug 
 ### Xeneon Edge widget
 
 ```powershell
-cd XeneonEdgeWidget
+cd src/Widget
 npm ci
 npm run build
 npm run verify
@@ -142,11 +142,11 @@ Use **Settings > Software updates** in the desktop app. Widget scheduling is und
 From the solution root:
 
 ```powershell
-dotnet run --project Rtx5090Monitoring.Tests -c Release
-dotnet run --project UI/Rtx5090Monitoring.UI.Tests -c Release -p:EnableTelemetryDebug=false
-dotnet run --project Installer/Rtx5090Monitoring.Installer.Tests -c Release
+dotnet run --project tests/Backend -c Release
+dotnet run --project tests/Desktop -c Release -p:EnableTelemetryDebug=false
+dotnet run --project tests/Installer -c Release
 
-cd XeneonEdgeWidget
+cd src/Widget
 npm ci
 npm run check
 npm test
@@ -158,12 +158,14 @@ Normal automated tests use simulated hardware. Explicit hardware verification an
 
 | Path | Purpose |
 |---|---|
-| `Rtx5090Monitoring.Service/` | Windows service, configuration persistence and HTTP/WebSocket host. |
-| `Rtx5090Monitoring.Core/`, `Rtx5090Monitoring.Contracts/`, `Rtx5090Monitoring.Warnings/` | Shared contracts, plugin lifecycle, sensor state and warning scheduling. |
-| `Rtx5090Monitoring.Plugins.*/` | Hardware plugins, their contracts and analysis code. |
-| `UI/` | WinUI desktop app, service client, presentation models, debug support and UI tests. |
-| `XeneonEdgeWidget/` | Widget source, resources, tests and build tools. |
-| `Installer/`, `scripts/` | Setup/uninstall implementation and release tooling. |
+| `src/Service/` | Windows service, configuration persistence and HTTP/WebSocket host. |
+| `src/Core/`, `src/Common/` | Plugin lifecycle, sensor state, shared contracts, NVIDIA hardware access and warning scheduling. |
+| `src/Plugins/` | ASUS, MSI, NVIDIA and WireView plugin implementations, contracts and analysis projects. |
+| `src/Desktop/` | WinUI desktop app, service client, presentation models and debug support. |
+| `src/Widget/` | Widget source, resources, tests and build tools. |
+| `tests/` | Backend, desktop and installer test projects. |
+| `installer/` | MSI package, bootstrapper, custom actions and installer resources. |
+| `scripts/` | Build, setup/uninstall, diagnostics and release tooling. |
 | `assets/screenshots/` | Screenshots used by this README. |
 
 ## Local API
@@ -186,4 +188,4 @@ Plugin IDs are `wireview-pro2`, `asus-astral` and `msi-psu`. Device-specific rou
 
 ## License
 
-See [LICENSE.md](LICENSE.md). Third-party attribution is included in the [installer notices](Installer/Resources/THIRD-PARTY-NOTICES.txt) and [widget notices](XeneonEdgeWidget/THIRD-PARTY-NOTICES.md).
+See [LICENSE.md](LICENSE.md). Third-party attribution is included in the [installer notices](installer/Resources/THIRD-PARTY-NOTICES.txt) and [widget notices](src/Widget/THIRD-PARTY-NOTICES.md).

@@ -61,26 +61,26 @@ try
 {
     if (-not $SkipChecks)
     {
-        Invoke-ReleaseCommand dotnet @('run', '--project', 'Rtx5090Monitoring.Tests', '-c', 'Release')
+        Invoke-ReleaseCommand dotnet @('run', '--project', 'tests/Backend', '-c', 'Release')
 
-        Invoke-ReleaseCommand dotnet @('run', '--project', 'UI/Rtx5090Monitoring.UI.Tests', '-c', 'Release', '-p:EnableTelemetryDebug=false')
+        Invoke-ReleaseCommand dotnet @('run', '--project', 'tests/Desktop', '-c', 'Release', '-p:EnableTelemetryDebug=false')
 
-        Invoke-ReleaseCommand dotnet @('run', '--project', 'Installer/Rtx5090Monitoring.Installer.Tests', '-c', 'Release')
+        Invoke-ReleaseCommand dotnet @('run', '--project', 'tests/Installer', '-c', 'Release')
     }
 
-    Invoke-ReleaseCommand dotnet @('publish', 'Rtx5090Monitoring.Service', '-c', 'Release', '-r', 'win-x64', '--self-contained', 'true',
+    Invoke-ReleaseCommand dotnet @('publish', 'src/Service', '-c', 'Release', '-r', 'win-x64', '--self-contained', 'true',
         '-p:PublishSingleFile=false', '-p:PublishTrimmed=false', '-o', (Join-Path $payload 'Service'))
 
-    Invoke-ReleaseCommand dotnet @('publish', 'UI/Rtx5090Monitoring.App', '-c', 'Release', '-p:PublishProfile=Portable',
+    Invoke-ReleaseCommand dotnet @('publish', 'src/Desktop/App', '-c', 'Release', '-p:PublishProfile=Portable',
         '-p:EnableTelemetryDebug=false', '-o', (Join-Path $payload 'Desktop'), '-m:1')
 
     if (-not $SkipChecks)
     {
-        Invoke-ReleaseCommand dotnet @('run', '--project', 'UI/Rtx5090Monitoring.UI.Tests', '-c', 'Release', '-p:EnableTelemetryDebug=false',
+        Invoke-ReleaseCommand dotnet @('run', '--project', 'tests/Desktop', '-c', 'Release', '-p:EnableTelemetryDebug=false',
             '--', '--verify-release', (Join-Path $payload 'Desktop'))
     }
 
-    Push-Location (Join-Path $solution 'XeneonEdgeWidget')
+    Push-Location (Join-Path $solution 'src/Widget')
 
     try
     {
@@ -122,9 +122,9 @@ try
 
     $buildProperties = @('-t:Rebuild', '-c', 'Release', "-p:InstallerVersion=$Version", "-p:PayloadDirectory=$payload")
 
-    Invoke-ReleaseCommand dotnet (@('build', 'Installer/Rtx5090Monitoring.Installer/Rtx5090Monitoring.Installer.wixproj') + $buildProperties)
+    Invoke-ReleaseCommand dotnet (@('build', 'installer/Package/Rtx5090Monitoring.Installer.wixproj') + $buildProperties)
 
-    $msi = Join-Path $solution "Installer\Rtx5090Monitoring.Installer\bin\x64\Release\RtxMonitor-$Version-win-x64.msi"
+    $msi = Join-Path $solution "installer\Package\bin\x64\Release\RtxMonitor-$Version-win-x64.msi"
 
     if ($SigningCertificateThumbprint)
     {
@@ -133,14 +133,14 @@ try
 
     if (-not $SkipChecks)
     {
-        Invoke-ReleaseCommand dotnet @('run', '--project', 'Installer/Rtx5090Monitoring.Installer.Tests', '-c', 'Release', '--', '--msi', $msi, $payload)
+        Invoke-ReleaseCommand dotnet @('run', '--project', 'tests/Installer', '-c', 'Release', '--', '--msi', $msi, $payload)
     }
 
-    Invoke-ReleaseCommand dotnet (@('build', 'Installer/Rtx5090Monitoring.Bootstrapper/Rtx5090Monitoring.Bootstrapper.wixproj') + $buildProperties +
+    Invoke-ReleaseCommand dotnet (@('build', 'installer/Bootstrapper/Rtx5090Monitoring.Bootstrapper.wixproj') + $buildProperties +
         @('-p:BuildProjectReferences=false', "-p:VcRedistPath=$VcRedistPath", "-p:VcRedistVersion=$vcVersion",
             "-p:SigningCertificateThumbprint=$SigningCertificateThumbprint", "-p:TimestampUrl=$TimestampUrl", "-p:SignToolPath=$signTool"))
 
-    $setup = Join-Path $solution "Installer\Rtx5090Monitoring.Bootstrapper\bin\x64\Release\RtxMonitor-Setup-$Version-win-x64.exe"
+    $setup = Join-Path $solution "installer\Bootstrapper\bin\x64\Release\RtxMonitor-Setup-$Version-win-x64.exe"
 
     if (-not $SkipChecks)
     {
@@ -152,12 +152,12 @@ try
     Copy-Item -LiteralPath $manifestPath -Destination (Join-Path $release 'version.json') -Force
     Copy-Item -LiteralPath $setup -Destination $release -Force
     Copy-Item -LiteralPath (Join-Path $solution '.dist\rtx5090monitor.icuewidget') -Destination $release -Force
-    Copy-Item -LiteralPath (Join-Path $solution 'Installer\Resources\ReleaseReadme.txt') -Destination (Join-Path $release 'README.txt') -Force
-    Copy-Item -LiteralPath (Join-Path $solution 'Installer\Resources\CHANGELOG.txt') -Destination $release -Force
+    Copy-Item -LiteralPath (Join-Path $solution 'installer\Resources\ReleaseReadme.txt') -Destination (Join-Path $release 'README.txt') -Force
+    Copy-Item -LiteralPath (Join-Path $solution 'installer\Resources\CHANGELOG.txt') -Destination $release -Force
 
     & (Join-Path $PSScriptRoot 'Collect-Licenses.ps1') -SolutionDirectory $solution -OutputPath (Join-Path $release 'THIRD-PARTY-NOTICES.txt')
 
-    Copy-Item -LiteralPath (Join-Path $solution 'uninstall.ps1') -Destination (Join-Path $release 'Uninstall-RTXMonitor.ps1') -Force
+    Copy-Item -LiteralPath (Join-Path $solution 'scripts/uninstall.ps1') -Destination (Join-Path $release 'Uninstall-RTXMonitor.ps1') -Force
 
     $widget = Get-Content -LiteralPath (Join-Path $solution '.dist\latest.json') -Raw | ConvertFrom-Json
     $commit = 'unavailable'

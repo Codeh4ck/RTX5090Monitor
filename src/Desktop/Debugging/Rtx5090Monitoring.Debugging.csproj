@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <ItemGroup Condition="'$(EnableTelemetryDebug)' == 'true'">
+        <ProjectReference Include="../../Plugins/Nvidia/Analysis/Rtx5090Monitoring.Plugins.GenericNvidia.Analysis.csproj" />
+        <ProjectReference Include="../../Plugins/WireView/Analysis/Rtx5090Monitoring.Plugins.WireView.Analysis.csproj" />
+        <ProjectReference Include="../../Common/Warnings/Rtx5090Monitoring.Warnings.csproj" />
+        <ProjectReference Include="../Presentation/Rtx5090Monitoring.Presentation.csproj" />
+        <ProjectReference Include="../../Plugins/Asus/Analysis/Rtx5090Monitoring.Plugins.Asus.Analysis.csproj" />
+        <Compile Include="../../Core/ConnectorProfileResolver.cs" Link="Processing/ConnectorProfileResolver.cs" />
+        <Compile Include="../../Core/Plugins/IConnectorSourceProvider.cs" Link="Processing/IConnectorSourceProvider.cs" />
+        <Compile Include="../../Plugins/Msi/Plugin/Mapping/MsiConnectorSelection.cs" Link="Processing/MsiConnectorSelection.cs" />
+        <Compile Include="../../Core/SourceResolver.cs" Link="Processing/SourceResolver.cs" />
+    </ItemGroup>
+    <ItemGroup Condition="'$(EnableTelemetryDebug)' != 'true'">
+        <Compile Remove="**/*.cs" />
+    </ItemGroup>
+</Project>
