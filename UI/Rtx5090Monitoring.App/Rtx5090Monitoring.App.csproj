@@ -34,6 +34,15 @@
         <Compile Remove="Debugging/**/*.cs;Demo/**/*.cs;Diagnostics/**/*.cs" />
         <Page Remove="Debugging/**/*.xaml" />
     </ItemGroup>
+    <!-- Keep SDK runtime files in the output without showing their links as project sources. -->
+    <Target Name="HideWindowsAppSdkPayloadInExplorer"
+            AfterTargets="AddMicrosoftWindowsAppSDKPayloadFilesFromComponents"
+            Condition="'$(WindowsAppSDKSelfContained)' == 'true'">
+        <ItemGroup>
+            <None Update="@(MicrosoftWindowsAppSDKFiles)" Visible="false" />
+            <ReferenceCopyLocalPaths Update="@(MicrosoftWindowsAppSDKFilesRes)" Visible="false" />
+        </ItemGroup>
+    </Target>
     <Target Name="IncludeCompiledXamlInPortablePublish" AfterTargets="ComputeFilesToPublish">
         <Error Condition="!Exists('$(OutDir)$(AssemblyName).pri')" Text="The app resource index is missing. Build the WinUI project before publishing." />
         <ItemGroup>
