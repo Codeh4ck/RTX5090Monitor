@@ -319,7 +319,7 @@ export class PanelPresenter {
         if (this.settings.enabled('showAxis')) {
             const ticks = [1, 0.75, 0.5, 0.25, 0].map(fraction => min + (max - min) * fraction);
             data.axis = ticks.map((tick) =>
-                this.format.value(tick, unit, unit === 'V' ? 1 : 2)
+                this.format.value(tick, unit, 1)
             );
         }
 

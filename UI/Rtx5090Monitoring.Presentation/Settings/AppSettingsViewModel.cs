@@ -92,7 +92,7 @@ public sealed class AppSettingsViewModel(AppPreferences preferences) : Observabl
         }
     }
 
-    private static readonly string[] StartupTabs = ["", "wireview-pro2", "asus-astral", "generic-nvidia", "msi-psu"];
+    private static readonly string[] StartupTabs = ["", "wireview-pro2", "asus-astral", "generic-nvidia", "msi-psu", "performance"];
 
     public int StartupTabIndex
     {

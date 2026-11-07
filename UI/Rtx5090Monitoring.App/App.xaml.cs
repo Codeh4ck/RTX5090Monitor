@@ -160,6 +160,7 @@ public sealed partial class App : Application
         if (_runtime is not null && _window is not null)
         {
             _window.SaveNormalWindowSize();
+            await _window.CloseViewsAsync();
             try { await _runtime.StopAsync(); }
             catch (Exception exception) when (exception is IOException or UnauthorizedAccessException) { System.Diagnostics.Debug.WriteLine(exception); }
         }

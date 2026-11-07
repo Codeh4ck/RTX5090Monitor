@@ -37,6 +37,12 @@ internal static class SmokeTestRunner
         {
             throw new InvalidOperationException("No demo telemetry received.");
         }
+        if (Environment.GetCommandLineArgs().Contains("--performance-chart-only"))
+        {
+            await PerformanceChartSmokeTests.RunAsync(window, runtime, output);
+            return;
+        }
+
         if (Environment.GetCommandLineArgs().Contains("--gpu-status-only"))
         {
             await WaitUntilAsync(() => !runtime.Dashboard.GpuStatus.IsUnavailable && runtime.Dashboard.SelectedPanel is not null);

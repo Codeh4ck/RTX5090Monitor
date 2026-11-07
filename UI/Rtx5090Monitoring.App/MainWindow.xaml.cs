@@ -21,6 +21,7 @@ public sealed partial class MainWindow : Window
     private string? _configurationSection;
     private bool _selectionQueued;
     private bool _rememberWindowSize;
+    private Task _closingCharts = Task.CompletedTask;
     private readonly Microsoft.UI.Dispatching.DispatcherQueueTimer _sizeSaveTimer;
     public Rtx5090Monitoring.Presentation.Updates.UpdateViewModel Updates => _runtime.Updates;
     public DashboardViewModel Model { get; private set; }
@@ -54,6 +55,7 @@ public sealed partial class MainWindow : Window
     {
         _runtime = runtime;
         _preferredPanelId = runtime.Preferences.StartupTabId;
+        _page = _preferredPanelId == "performance" ? "performance" : "hardware";
         Model = runtime.Dashboard;
         InitializeComponent();
         _windowHandle = WinRT.Interop.WindowNative.GetWindowHandle(this);
@@ -91,6 +93,10 @@ public sealed partial class MainWindow : Window
 
         Model.ReportingPanels.CollectionChanged += OnReportingPanelsChanged;
         SelectInitialPanel();
+        if (_page == "performance")
+        {
+            RenderPage();
+        }
     }
 
     private void OnReportingPanelsChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs args)
@@ -180,6 +186,8 @@ public sealed partial class MainWindow : Window
         button.IsChecked = true;
     }
 
+    private void Performance_Click(object sender, RoutedEventArgs args) => Navigate("performance");
+
     private void Configuration_Click(object sender, RoutedEventArgs args) => Navigate("configuration");
     private void Settings_Click(object sender, RoutedEventArgs args) => Navigate("settings");
 
@@ -210,7 +218,25 @@ public sealed partial class MainWindow : Window
         else
         {
             RememberConfigurationSection();
+            CloseCurrentChart();
             PageHost.Content = null;
+        }
+    }
+
+    internal async Task CloseViewsAsync()
+    {
+        CloseCurrentChart();
+        await _closingCharts;
+        PageHost.Content = null;
+    }
+
+    private void CloseCurrentChart()
+    {
+        if (PageHost.Content is PerformanceChartView chart)
+        {
+            var closing = chart.CloseAsync();
+            _closingCharts = _closingCharts.IsCompletedSuccessfully
+                ? closing : Task.WhenAll(_closingCharts, closing);
         }
     }
 
@@ -229,8 +255,11 @@ public sealed partial class MainWindow : Window
             return;
         }
 
+        CloseCurrentChart();
+        PerformanceTab.IsChecked = _page == "performance";
         PageHost.Content = _page switch
         {
+            "performance" => new PerformanceChartView(_runtime),
             "settings" => new SettingsView(_runtime),
             "configuration" => new ConfigurationView(_runtime),
             _ when Model.ReportingPanels.FirstOrDefault(panel => panel.Id == _panelId) is { IsMsi: true } msi => new MsiHardwareView(msi, _runtime),

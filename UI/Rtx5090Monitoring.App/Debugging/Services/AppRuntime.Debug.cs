@@ -66,6 +66,15 @@ internal sealed partial class AppRuntime
     {
         var transition = _wasDebugEnabled != Debug.Enabled;
         _wasDebugEnabled = Debug.Enabled;
+        if (transition)
+        {
+            Performance.SwitchMode(Debug.Enabled ? "simulation" : "live");
+            if (!Debug.Enabled && _performanceLiveConfiguration is { } configuration)
+            {
+                Performance.SetConfiguration(configuration);
+            }
+        }
+
         if (transition && Debug.Enabled)
         {
             _debugDashboard = new DashboardViewModel();
@@ -116,6 +125,9 @@ internal sealed partial class AppRuntime
         {
             var now = DateTimeOffset.UtcNow;
             _debugFrame = Debug.Compose(now);
+            Performance.SetCatalog(_debugFrame.Catalog);
+            Performance.SetConfiguration(_debugFrame.Configuration.Configuration);
+            Performance.Accept(_debugFrame.Snapshot);
             _debugDashboard.SetCatalog(_debugFrame.Catalog);
             if (_debugRevision != _debugFrame.Configuration.Revision)
             {

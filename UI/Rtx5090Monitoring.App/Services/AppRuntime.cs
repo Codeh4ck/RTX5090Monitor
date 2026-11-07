@@ -8,6 +8,7 @@ using Rtx5090Monitoring.Presentation.Configuration;
 using Rtx5090Monitoring.Presentation.Notifications;
 using Rtx5090Monitoring.Presentation.Settings;
 using Rtx5090Monitoring.Presentation.Telemetry;
+using Rtx5090Monitoring.Presentation.Performance;
 
 namespace Rtx5090Monitoring.App.Services;
 
@@ -33,6 +34,11 @@ internal sealed partial class AppRuntime
     private string? _address;
     private bool _startupEnabled;
     private Contracts.Sensors.SensorSnapshot? _rendered;
+
+    public PerformanceRecorder Performance { get; } = new();
+    private Contracts.Configuration.ServiceConfiguration? _performanceLiveConfiguration;
+    internal nint MainWindowHandle => _window is { } window
+        ? WinRT.Interop.WindowNative.GetWindowHandle(window) : 0;
 
     public bool IsDemo { get; }
     public AppPreferences Preferences => Settings.Value;
@@ -208,6 +214,31 @@ internal sealed partial class AppRuntime
                 new MonitoringApiClient(_http);
             var session = new MonitoringSession(_api);
             _session = session;
+            session.StatusChanged += status =>
+            {
+#if TELEMETRY_DEBUG
+                if (Debug.Enabled)
+                {
+                    return;
+                }
+#endif
+                if (!status.Connected)
+                {
+                    Performance.MarkDisconnected();
+                }
+            };
+            session.CatalogReceived += Performance.SetCatalog;
+            session.ConfigurationReceived += configuration =>
+            {
+                _performanceLiveConfiguration = configuration.Configuration;
+#if TELEMETRY_DEBUG
+                if (Debug.Enabled)
+                {
+                    return;
+                }
+#endif
+                Performance.SetConfiguration(configuration.Configuration);
+            };
             session.StatusChanged += status => Dispatch(session, () =>
             {
                 var connectedNow = status.Connected && !_connected;
@@ -284,6 +315,8 @@ internal sealed partial class AppRuntime
                     return;
                 }
 #endif
+                Performance.Accept(snapshot);
+
                 if (notifications.Length > 0)
                 {
                     Dispatch(session, () =>
@@ -481,6 +514,7 @@ internal sealed partial class AppRuntime
 
     public async Task StopAsync()
     {
+        Performance.Stop();
         _timer.Stop();
         _updateTimer?.Stop();
         Updates.Cancel();
