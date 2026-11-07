@@ -8,6 +8,7 @@ using Rtx5090Monitoring.Presentation.Configuration;
 using Rtx5090Monitoring.Presentation.Notifications;
 using Rtx5090Monitoring.Presentation.Settings;
 using Rtx5090Monitoring.Presentation.Telemetry;
+using Rtx5090Monitoring.Presentation.Performance;
 
 namespace Rtx5090Monitoring.App.Services;
 
@@ -34,6 +35,11 @@ internal sealed partial class AppRuntime
     private bool _startupEnabled;
     private Contracts.Sensors.SensorSnapshot? _rendered;
 
+    public PerformanceRecorder Performance { get; } = new();
+    private Contracts.Configuration.ServiceConfiguration? _performanceLiveConfiguration;
+    internal nint MainWindowHandle => _window is { } window
+        ? WinRT.Interop.WindowNative.GetWindowHandle(window) : 0;
+
     public bool IsDemo { get; }
     public AppPreferences Preferences => Settings.Value;
     public AppSettingsViewModel Settings { get; }
@@ -54,6 +60,7 @@ internal sealed partial class AppRuntime
         Debug.Enabled ? _debugApi :
 #endif
         _api;
+    internal IMonitoringApi SettingsProfileApi => CurrentApi;
     public CancellationToken StopToken => _stop.Token;
     internal long LatestSequence => _session?.Latest?.Sequence ?? 0;
     internal long RenderTicks { get; private set; }
@@ -91,6 +98,14 @@ internal sealed partial class AppRuntime
         _tray = tray;
         window.ThemeRoot.ActualThemeChanged += (_, _) => window.ApplyAppearance(Preferences);
         window.ApplyAppearance(Preferences);
+        window.Activated += (_, args) =>
+        {
+            if (args.WindowActivationState != Microsoft.UI.Xaml.WindowActivationState.Deactivated)
+            {
+                _ = ShowLastWarningShutdownAsync();
+            }
+        };
+
         if (!IsDemo && Preferences.StartWithWindows)
         {
             try
@@ -128,6 +143,11 @@ internal sealed partial class AppRuntime
 
     public void SetRendering(bool enabled)
     {
+        if (_rendering == enabled)
+        {
+            return;
+        }
+
         _rendering = enabled;
         _window?.SetRendering(enabled);
         if (enabled)
@@ -135,6 +155,7 @@ internal sealed partial class AppRuntime
             _refresh = true;
             RenderLatest();
             _timer.Start();
+            _ = ShowLastWarningShutdownAsync();
         }
         else
         {
@@ -149,9 +170,9 @@ internal sealed partial class AppRuntime
             ConfigureUpdates();
             _ = Updates.CheckAsync(false, StopToken);
             _window?.ApplyAppearance(preferences);
-            _wireViewWindow?.ApplyAppearance(preferences);
+            WireViewSettingsWindow?.ApplyAppearance(preferences);
 #if TELEMETRY_DEBUG
-            _debugWindow?.ApplyAppearance(preferences);
+            DebugConsole?.ApplyAppearance(preferences);
 #endif
             _refresh = true;
             if (!IsDemo && _startupEnabled != preferences.StartWithWindows)
@@ -193,6 +214,31 @@ internal sealed partial class AppRuntime
                 new MonitoringApiClient(_http);
             var session = new MonitoringSession(_api);
             _session = session;
+            session.StatusChanged += status =>
+            {
+#if TELEMETRY_DEBUG
+                if (Debug.Enabled)
+                {
+                    return;
+                }
+#endif
+                if (!status.Connected)
+                {
+                    Performance.MarkDisconnected();
+                }
+            };
+            session.CatalogReceived += Performance.SetCatalog;
+            session.ConfigurationReceived += configuration =>
+            {
+                _performanceLiveConfiguration = configuration.Configuration;
+#if TELEMETRY_DEBUG
+                if (Debug.Enabled)
+                {
+                    return;
+                }
+#endif
+                Performance.SetConfiguration(configuration.Configuration);
+            };
             session.StatusChanged += status => Dispatch(session, () =>
             {
                 var connectedNow = status.Connected && !_connected;
@@ -201,6 +247,7 @@ internal sealed partial class AppRuntime
                 if (connectedNow)
                 {
                     _ = Updates.RefreshServiceAsync(StopToken);
+                    _ = ReadLastWarningShutdownAsync();
                 }
 
                 _liveDashboard.Connection = status.Message;
@@ -268,6 +315,8 @@ internal sealed partial class AppRuntime
                     return;
                 }
 #endif
+                Performance.Accept(snapshot);
+
                 if (notifications.Length > 0)
                 {
                     Dispatch(session, () =>
@@ -347,7 +396,7 @@ internal sealed partial class AppRuntime
         }
 
         Settings.SetGpuStatusTabRequired(!Dashboard.HasAlternativeGpuStatus);
-        _wireViewWindow?.SetPanel(Dashboard.Panels.FirstOrDefault(panel => panel.IsWireView));
+        WireViewSettingsWindow?.SetPanel(Dashboard.Panels.FirstOrDefault(panel => panel.IsWireView));
         _refresh = false;
     }
 
@@ -465,11 +514,12 @@ internal sealed partial class AppRuntime
 
     public async Task StopAsync()
     {
+        Performance.Stop();
         _timer.Stop();
         _updateTimer?.Stop();
         Updates.Cancel();
         _updateHttp.Dispose();
-        _wireViewWindow?.Close();
+        WireViewSettingsWindow?.Close();
 #if TELEMETRY_DEBUG
         StopDebugging();
 #endif

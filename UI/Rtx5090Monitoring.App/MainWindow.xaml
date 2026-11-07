@@ -27,6 +27,9 @@
             BorderThickness="1" CornerRadius="8" Padding="6">
             <Grid ColumnSpacing="16">
                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled"
+                    HorizontalScrollMode="Enabled" VerticalScrollMode="Disabled">
+                <StackPanel Orientation="Horizontal" Spacing="8">
                 <ItemsControl x:Name="Tabs" ItemsSource="{x:Bind Model.ReportingPanels}" HorizontalAlignment="Left">
                     <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal" Spacing="8"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate><DataTemplate x:DataType="telemetry:HardwarePanelViewModel">
@@ -34,6 +37,10 @@
                             Style="{StaticResource MonitorNavigationTab}" Click="HardwareTab_Click" />
                     </DataTemplate></ItemsControl.ItemTemplate>
                 </ItemsControl>
+                    <ToggleButton x:Name="PerformanceTab" Content="Performance Chart"
+                        Style="{StaticResource MonitorNavigationTab}" Click="Performance_Click" />
+                </StackPanel>
+                </ScrollViewer>
                 <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
                     <Button Content="Configuration" Click="Configuration_Click"/><Button Content="Settings" Click="Settings_Click"/>
                 </StackPanel>

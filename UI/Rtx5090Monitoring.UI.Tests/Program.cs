@@ -10,7 +10,15 @@ if (args is ["--verify-release", var directory])
     return 0;
 }
 
+if (args is ["--performance-fixture", var output])
+{
+    File.WriteAllText(output, Rtx5090Monitoring.Presentation.Performance.PerformanceHtmlExporter.Export(
+        Rtx5090Monitoring.UI.Tests.Performance.PerformanceRecordingTests.Fixture()));
+    return 0;
+}
+
 var runner = new TestRunner();
+Rtx5090Monitoring.UI.Tests.Performance.PerformanceRecordingTests.Run(runner);
 TelemetryTests.Run(runner);
 HardwarePanelTests.Run(runner);
 WireViewPanelTests.Run(runner);

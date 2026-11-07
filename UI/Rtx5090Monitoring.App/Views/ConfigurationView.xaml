@@ -41,7 +41,15 @@
             </TabViewItem>
             <TabViewItem Header="Warnings" Tag="warnings" IsClosable="False" Style="{StaticResource MonitorConfigurationTab}">
                 <ScrollViewer Padding="0,16,16,8" HorizontalScrollBarVisibility="Disabled" VerticalContentAlignment="Top">
-                    <ContentControl x:Name="WarningsHost" HorizontalContentAlignment="Stretch" />
+                    <StackPanel Spacing="14">
+                        <ContentControl x:Name="DeviceWarningProfilesHost" HorizontalContentAlignment="Stretch" />
+                        <ContentControl x:Name="WarningsHost" HorizontalContentAlignment="Stretch" />
+                    </StackPanel>
+                </ScrollViewer>
+            </TabViewItem>
+            <TabViewItem Header="GPU chart profiles" Tag="gpu-profiles" IsClosable="False" Style="{StaticResource MonitorConfigurationTab}">
+                <ScrollViewer Padding="0,16,0,8" HorizontalScrollBarVisibility="Disabled" VerticalContentAlignment="Top">
+                    <ContentControl x:Name="SettingsProfilesHost" HorizontalContentAlignment="Stretch" />
                 </ScrollViewer>
             </TabViewItem>
             <TabViewItem Header="Source selections" Tag="sources" IsClosable="False" Style="{StaticResource MonitorConfigurationTab}">

@@ -28,6 +28,7 @@
                         <ComboBoxItem Content="ROG Astral" />
                         <ComboBoxItem Content="GPU status" />
                         <ComboBoxItem Content="MSI PSU" />
+                        <ComboBoxItem Content="Performance Chart" />
                     </ComboBox>
                     <TextBlock Text="Opens the selected tab at startup when it is reporting. Otherwise, opens the first available tab." Style="{StaticResource MonitorCaption}" TextWrapping="Wrap" />
                     <NumberBox Header="Window width" Value="{x:Bind Model.WindowWidth, Mode=TwoWay}" Minimum="720" Maximum="7680" SmallChange="10" SpinButtonPlacementMode="Compact" Width="240" HorizontalAlignment="Left" />

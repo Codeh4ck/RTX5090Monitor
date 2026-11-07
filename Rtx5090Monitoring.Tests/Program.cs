@@ -11,6 +11,8 @@ if (args.Contains("--verify-msi-hardware"))
 
 GenericNvidiaTests.Run(runner);
 ConnectorProfileTests.Run(runner);
+SettingsProfileTests.Run(runner);
+await DeviceWarningProfileTests.RunAsync(runner);
 HardwareDiscoveryTests.Run(runner);
 WarningEngineTests.Run(runner);
 WarningRegistryTests.Run(runner);
@@ -26,6 +28,7 @@ await AsusPluginTests.RunAsync(runner);
 await MsiPluginTests.RunAsync(runner);
 await MsiEndpointTests.RunAsync(runner);
 
+await SettingsProfileTests.RunEndpointsAsync(runner);
 await WarningConfigurationTests.RunAsync(runner);
 await HealthEndpointTests.RunAsync(runner);
 await TestHostConfigurationTests.RunAsync(runner);

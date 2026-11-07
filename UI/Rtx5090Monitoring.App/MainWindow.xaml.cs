@@ -17,8 +17,11 @@ public sealed partial class MainWindow : Window
     private string _page = "hardware";
     private string? _panelId;
     private bool _rendering = true;
-    private bool _startupTabPending = true;
+    private string? _preferredPanelId;
+    private string? _configurationSection;
+    private bool _selectionQueued;
     private bool _rememberWindowSize;
+    private Task _closingCharts = Task.CompletedTask;
     private readonly Microsoft.UI.Dispatching.DispatcherQueueTimer _sizeSaveTimer;
     public Rtx5090Monitoring.Presentation.Updates.UpdateViewModel Updates => _runtime.Updates;
     public DashboardViewModel Model { get; private set; }
@@ -36,6 +39,12 @@ public sealed partial class MainWindow : Window
 
     internal void ShowPanel(string id)
     {
+        _preferredPanelId = id;
+        DisplayPanel(id);
+    }
+
+    private void DisplayPanel(string id)
+    {
         Model.SelectedPanel = Model.ReportingPanels.First(panel => panel.Id == id);
         _panelId = id;
         _page = "hardware";
@@ -45,6 +54,8 @@ public sealed partial class MainWindow : Window
     internal MainWindow(AppRuntime runtime)
     {
         _runtime = runtime;
+        _preferredPanelId = runtime.Preferences.StartupTabId;
+        _page = _preferredPanelId == "performance" ? "performance" : "hardware";
         Model = runtime.Dashboard;
         InitializeComponent();
         _windowHandle = WinRT.Interop.WindowNative.GetWindowHandle(this);
@@ -82,9 +93,25 @@ public sealed partial class MainWindow : Window
 
         Model.ReportingPanels.CollectionChanged += OnReportingPanelsChanged;
         SelectInitialPanel();
+        if (_page == "performance")
+        {
+            RenderPage();
+        }
     }
 
-    private void OnReportingPanelsChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs args) => SelectInitialPanel();
+    private void OnReportingPanelsChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs args)
+    {
+        if (_selectionQueued)
+        {
+            return;
+        }
+
+        _selectionQueued = DispatcherQueue.TryEnqueue(() =>
+        {
+            _selectionQueued = false;
+            SelectInitialPanel();
+        });
+    }
 
     internal void RefreshRuntime(bool simulated)
     {
@@ -136,18 +163,12 @@ public sealed partial class MainWindow : Window
 
         if (Model.ReportingPanels.Count > 0)
         {
-            var preferred = _startupTabPending
-                ? Model.ReportingPanels.FirstOrDefault(panel => panel.Id == _runtime.Preferences.StartupTabId) : null;
-            var selected = preferred ?? Model.ReportingPanels.FirstOrDefault(panel => panel.Id == _panelId) ?? Model.ReportingPanels[0];
-
-            if (preferred is not null)
-            {
-                _startupTabPending = false;
-            }
+            var selected = Model.ReportingPanels.FirstOrDefault(panel => panel.Id == _preferredPanelId)
+                ?? Model.ReportingPanels.FirstOrDefault(panel => panel.Id == _panelId) ?? Model.ReportingPanels[0];
 
             if (_panelId != selected.Id || Model.SelectedPanel != selected)
             {
-                ShowPanel(selected.Id);
+                DisplayPanel(selected.Id);
             }
         }
         else
@@ -160,17 +181,19 @@ public sealed partial class MainWindow : Window
 
     private void HardwareTab_Click(object sender, RoutedEventArgs args)
     {
-        _startupTabPending = false;
         var button = (ToggleButton)sender;
         ShowPanel((string)button.Tag);
         button.IsChecked = true;
     }
+
+    private void Performance_Click(object sender, RoutedEventArgs args) => Navigate("performance");
 
     private void Configuration_Click(object sender, RoutedEventArgs args) => Navigate("configuration");
     private void Settings_Click(object sender, RoutedEventArgs args) => Navigate("settings");
 
     internal void Navigate(string page)
     {
+        RememberConfigurationSection();
         _page = page;
         if (page != "hardware")
         {
@@ -182,6 +205,11 @@ public sealed partial class MainWindow : Window
 
     internal void SetRendering(bool enabled)
     {
+        if (_rendering == enabled)
+        {
+            return;
+        }
+
         _rendering = enabled;
         if (enabled)
         {
@@ -189,7 +217,34 @@ public sealed partial class MainWindow : Window
         }
         else
         {
+            RememberConfigurationSection();
+            CloseCurrentChart();
             PageHost.Content = null;
+        }
+    }
+
+    internal async Task CloseViewsAsync()
+    {
+        CloseCurrentChart();
+        await _closingCharts;
+        PageHost.Content = null;
+    }
+
+    private void CloseCurrentChart()
+    {
+        if (PageHost.Content is PerformanceChartView chart)
+        {
+            var closing = chart.CloseAsync();
+            _closingCharts = _closingCharts.IsCompletedSuccessfully
+                ? closing : Task.WhenAll(_closingCharts, closing);
+        }
+    }
+
+    private void RememberConfigurationSection()
+    {
+        if (PageHost.Content is ConfigurationView view)
+        {
+            _configurationSection = view.SelectedSection;
         }
     }
 
@@ -200,8 +255,11 @@ public sealed partial class MainWindow : Window
             return;
         }
 
+        CloseCurrentChart();
+        PerformanceTab.IsChecked = _page == "performance";
         PageHost.Content = _page switch
         {
+            "performance" => new PerformanceChartView(_runtime),
             "settings" => new SettingsView(_runtime),
             "configuration" => new ConfigurationView(_runtime),
             _ when Model.ReportingPanels.FirstOrDefault(panel => panel.Id == _panelId) is { IsMsi: true } msi => new MsiHardwareView(msi, _runtime),
@@ -209,5 +267,10 @@ public sealed partial class MainWindow : Window
             _ => new TextBlock { Text = "No plugins are reporting. Open Configuration to check device and plugin settings.", TextWrapping = TextWrapping.Wrap,
                 VerticalAlignment = VerticalAlignment.Center, HorizontalAlignment = HorizontalAlignment.Center, Margin = new Thickness(24) }
         };
+
+        if (PageHost.Content is ConfigurationView configuration && _configurationSection is { } section)
+        {
+            configuration.TrySelectSection(section);
+        }
     }
 }

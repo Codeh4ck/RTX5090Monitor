@@ -27,6 +27,12 @@ public static class MonitoringServices
         services.AddSingleton<RuntimeConfigurationService>();
         services.AddSingleton<IRuntimeConfiguration>(provider => provider.GetRequiredService<RuntimeConfigurationService>());
         services.AddHostedService(provider => provider.GetRequiredService<RuntimeConfigurationService>());
+        services.AddSingleton<ActiveSettingsProfileState>();
+        services.AddSingleton<SettingsProfileStore>();
+        services.AddSingleton<SettingsProfileResolver>();
+        services.AddSingleton<DeviceWarningProfileStore>();
+        services.AddSingleton<IWarningShutdown, WindowsWarningShutdown>();
+        services.AddSingleton<WarningShutdownCoordinator>();
         services.AddHostedService<SnapshotBroadcastService>();
         services.AddHostedService<HardwareDiscoveryService>();
         services.AddSingleton<IServiceRestart, ServiceRestart>();

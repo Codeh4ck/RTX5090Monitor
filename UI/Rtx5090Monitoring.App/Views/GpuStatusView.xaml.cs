@@ -41,7 +41,7 @@ public sealed partial class GpuStatusView : UserControl
         MetricsHost.Children.Clear();
         foreach (var metric in ShowSummary ? Model.DetailedMetrics : Model.Metrics)
         {
-            MetricsHost.Children.Add(new MetricTile(metric, valueMaxWidth: 260));
+            MetricsHost.Children.Add(new MetricTile(metric, valueMaxWidth: 260, usePanelBorder: true));
         }
     }
 }

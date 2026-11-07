@@ -8,6 +8,7 @@ using System.Text.Json;
 using Microsoft.Extensions.Configuration;
 using Rtx5090Monitoring.Contracts.Configuration;
 using Rtx5090Monitoring.Core.Plugins;
+using Rtx5090Monitoring.Core.Configuration;
 using Rtx5090Monitoring.Plugins.Asus.Configuration;
 using Rtx5090Monitoring.Plugins.Asus.Device;
 using Rtx5090Monitoring.Plugins.Asus.Streaming;
@@ -16,7 +17,7 @@ using Rtx5090Monitoring.Contracts.Discovery;
 
 namespace Rtx5090Monitoring.Plugins.Asus.Factories;
 
-public sealed class AsusPluginFactory(TimeProvider clock, AsusStream stream, NvidiaTelemetryReader reader) : ISensorPluginFactory, IConnectorSourceProvider
+public sealed class AsusPluginFactory(TimeProvider clock, AsusStream stream, NvidiaTelemetryReader reader, ActiveSettingsProfileState? profiles = null) : ISensorPluginFactory, IConnectorSourceProvider
 {
     public IWarningSource WarningSource { get; } = new AsusWarningSource();
     public string Id => AsusPlugin.PluginId;
@@ -30,7 +31,7 @@ public sealed class AsusPluginFactory(TimeProvider clock, AsusStream stream, Nvi
         section.Get<AsusOptions>(binding => binding.ErrorOnUnknownConfiguration = true) ?? new AsusOptions(), AsusJsonContext.Default.AsusOptions);
 
     public void ValidateSettings(PluginSettings settings) => AsusSettings.GetOptions(settings);
-    public ISensorPlugin Create(PluginSettings settings) => new AsusPlugin(settings, clock, new AsusGpuReader(reader), stream);
+    public ISensorPlugin Create(PluginSettings settings) => new AsusPlugin(settings, clock, new AsusGpuReader(reader), stream, profiles);
 
     public int? Priority(SensorMetric metric) => metric switch
     {

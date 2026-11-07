@@ -72,7 +72,7 @@ internal static class EditorTests
     {
         var editor = new AsusSettingsEditorViewModel(new AsusOptions { DeviceId = "missing-gpu" });
         editor.SetDevices([new AsusDeviceInfo("gpu0", "RTX 5090")]);
-        TestAssert.Equal("missing-gpu", editor.Build(1000).DeviceId);
+        TestAssert.Equal("missing-gpu", editor.Build().DeviceId);
     }
 
     private static void RefreshDoesNotDirtyTheConfiguration()

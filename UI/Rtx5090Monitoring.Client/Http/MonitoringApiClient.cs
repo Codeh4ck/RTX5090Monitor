@@ -39,6 +39,50 @@ public sealed class MonitoringApiClient(HttpClient http) : IMonitoringApi
 
     public Task<HealthResponse> GetHealthAsync(CancellationToken token) => GetAsync("health", ClientJsonContext.Default.HealthResponse, token);
     public Task<PluginCatalog> GetPluginsAsync(CancellationToken token) => GetAsync("plugins", ClientJsonContext.Default.PluginCatalog, token);
+    public Task<SettingsProfileCatalog> GetSettingsProfilesAsync(CancellationToken token) =>
+        GetAsync("settings-profiles", ClientJsonContext.Default.SettingsProfileCatalog, token);
+
+    public async Task<SettingsProfileCatalog> ApplySettingsProfileAsync(SettingsProfileRequest request, CancellationToken token)
+    {
+        using var response = await http.PutAsJsonAsync("settings-profiles", request, ClientJsonContext.Default.SettingsProfileRequest, token);
+        await EnsureSuccessAsync(response, token);
+        return await response.Content.ReadFromJsonAsync(ClientJsonContext.Default.SettingsProfileCatalog, token)
+            ?? throw new InvalidDataException("The service returned an empty GPU settings profile response.");
+    }
+
+    public Task<DeviceWarningProfileCatalog> GetDeviceWarningProfilesAsync(CancellationToken token) =>
+        GetAsync("warning-profiles", ClientJsonContext.Default.DeviceWarningProfileCatalog, token);
+
+    public async Task SaveDeviceWarningProfileAsync(DeviceWarningProfile profile, CancellationToken token)
+    {
+        using var response = await http.PutAsJsonAsync("warning-profiles", profile, ClientJsonContext.Default.DeviceWarningProfile, token);
+        await EnsureSuccessAsync(response, token);
+    }
+
+    public Task DeleteDeviceWarningProfileAsync(string id, CancellationToken token) =>
+        DeleteAsync($"warning-profiles/{Uri.EscapeDataString(id)}", token);
+
+    public async Task<WarningShutdownReason?> GetWarningShutdownAsync(CancellationToken token)
+    {
+        using var response = await http.GetAsync("warning-shutdown", token);
+        if (response.StatusCode is System.Net.HttpStatusCode.NoContent or System.Net.HttpStatusCode.NotFound)
+        {
+            return null;
+        }
+
+        await EnsureSuccessAsync(response, token);
+        return await response.Content.ReadFromJsonAsync(ClientJsonContext.Default.WarningShutdownReason, token);
+    }
+
+    public Task AcknowledgeWarningShutdownAsync(string id, CancellationToken token) =>
+        DeleteAsync($"warning-shutdown/{Uri.EscapeDataString(id)}", token);
+
+    private async Task DeleteAsync(string path, CancellationToken token)
+    {
+        using var response = await http.DeleteAsync(path, token);
+        await EnsureSuccessAsync(response, token);
+    }
+
     public async Task<ConfigurationSnapshot> GetConfigurationAsync(CancellationToken token) =>
         NormalizeConfiguration(await GetAsync("configuration", ClientJsonContext.Default.ConfigurationSnapshot, token));
     public Task<DeviceConfig> GetWireViewConfigurationAsync(CancellationToken token) =>

@@ -1,0 +1,947 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'">
+<title>RTX Monitor - Performance Chart</title>
+<style>
+:root {
+    color-scheme: dark;
+    --background: #090e17;
+    --panel: #111927;
+    --border: #29384d;
+    --text: #e6eefb;
+    --muted: #abbcd0;
+    --accent: #39eed1;
+}
+body.light {
+    color-scheme: light;
+    --background: #f3f6fa;
+    --panel: #fff;
+    --border: #d1dce9;
+    --text: #172235;
+    --muted: #52647b;
+    --accent: #007f76;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--background); color: var(--text); font: 14px "Segoe UI", sans-serif; }
+header { padding: 16px; border-bottom: 1px solid var(--border); }
+h1 { margin: 0 0 6px; font-size: 22px; }
+header p { color: var(--muted); margin: 4px 0; overflow-wrap: anywhere; }
+body.embedded header { display: none; }
+nav { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 10px 12px; }
+button {
+    border: 1px solid var(--border); border-radius: 5px; padding: 7px 12px;
+    color: var(--text); background: var(--panel); font: inherit; cursor: pointer;
+}
+button:hover { border-color: var(--accent); }
+#window-label { color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+#chart-controls { position: sticky; top: 0; z-index: 10; background: var(--background); border-bottom: 1px solid var(--border); margin-bottom: 12px; }
+button[aria-pressed="true"] { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, var(--panel)); }
+button:disabled { opacity: 0.4; cursor: default; }
+#follow-indicator { font-size: 11px; margin-left: 5px; padding: 2px 5px; border-radius: 3px; background: var(--border); }
+#follow[aria-pressed="true"] #follow-indicator { background: var(--accent); color: var(--background); font-weight: 700; }
+#info { display: inline-flex; align-items: center; color: var(--accent); padding: 7px; }
+#timeline-row { display: grid; grid-template-columns: auto minmax(80px, 1fr) auto; gap: 10px; padding: 0 12px 10px; align-items: center; color: var(--muted); font-size: 12px; }
+#timeline-scroll { height: 20px; overflow-x: scroll; overflow-y: hidden; scrollbar-color: var(--muted) var(--panel); scrollbar-width: auto; border: 1px solid var(--border); border-radius: 4px; }
+#timeline-scroll::-webkit-scrollbar { height: 16px; }
+#timeline-scroll::-webkit-scrollbar-track { background: var(--panel); }
+#timeline-scroll::-webkit-scrollbar-thumb { background: var(--muted); border: 3px solid var(--panel); border-radius: 8px; }
+#timeline-space { height: 1px; }
+dialog { color: var(--text); background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 22px; max-width: 520px; line-height: 1.55; }
+dialog::backdrop { background: #0008; }
+dialog h2 { font-size: 20px; }
+dialog form { text-align: right; }
+#hover { position: fixed; z-index: 30; width: max-content; max-width: min(580px, calc(100vw - 24px)); max-height: 70vh; overflow: auto; background: var(--panel); border: 1px solid var(--accent); box-shadow: 0 6px 24px #0006; border-radius: 7px; padding: 12px; font-size: 13px; }
+#hover[hidden], #file-error[hidden] { display: none; }
+#hover-time { font-weight: 600; font-variant-numeric: tabular-nums; margin-bottom: 4px; }
+#hover-date { color: var(--muted); font-size: 12px; margin-bottom: 8px; }
+.hover-group { color: var(--muted); font-size: 12px; font-weight: 600; margin: 8px 0 5px; }
+.hover-row { display: grid; grid-template-columns: 10px minmax(100px, 1fr) auto; align-items: center; gap: 7px; margin: 4px 0; }
+.hover-row i { width: 10px; height: 3px; }
+.hover-row strong { padding-left: 12px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+#file-error { color: #ff819a; padding: 0 12px 10px; margin: 0; }
+body.embedded #open-recording { display: none; }
+#empty { color: var(--muted); padding: 32px 20px; text-align: center; }
+section { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; margin: 0 10px 12px; padding: 12px; }
+h2 { font-size: 15px; margin: 0 0 10px; }
+canvas { display: block; width: 100%; height: 220px; touch-action: none; cursor: crosshair; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 10px; }
+.legend label { display: flex; align-items: center; gap: 6px; font-size: 12px; cursor: pointer; }
+.legend input { margin: 0; }
+.legend strong { color: var(--text); font-variant-numeric: tabular-nums; min-width: 60px; text-align: right; }
+.legend span { overflow-wrap: anywhere; }
+.legend i { width: 14px; height: 3px; flex-shrink: 0; }
+body.embedded .legend input { display: none; }
+footer { margin: 12px; color: var(--muted); font-size: 12px; }
+</style>
+</head>
+<body>
+<header><h1>RTX Monitor - Performance Chart</h1><p id="session-info">No session</p><p id="status"></p></header>
+<div id="chart-controls">
+<nav aria-label="Chart navigation">
+    <button id="open-recording" type="button">Open recording</button>
+    <input id="recording-file" type="file" accept=".rtxchart,.json,.html,text/html,application/json" hidden>
+    <button id="start" type="button" title="Go to the start of the recording">Start</button>
+    <button id="back" type="button" title="Move back by half the visible time range">Back</button>
+    <button id="forward" type="button" title="Move forward by half the visible time range">Forward</button>
+    <button id="end" type="button" title="Go to the end of the recording">End</button>
+    <button id="zoom-in" type="button">Zoom in</button>
+    <button id="zoom-out" type="button">Zoom out</button>
+    <button id="fit" type="button">Fit session</button>
+    <button id="follow" type="button" aria-pressed="false">Follow latest <span id="follow-indicator">Off</span></button>
+    <button id="info" type="button" aria-label="Chart controls" title="Chart controls">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"></circle><path d="M12 10v7m0-11v1"></path>
+        </svg>
+    </button>
+    <span id="window-label"></span>
+</nav>
+<div id="timeline-row">
+    <span id="timeline-start">00:00</span>
+    <div id="timeline-scroll" role="scrollbar" aria-label="Time position" aria-controls="plots" aria-orientation="horizontal" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0" tabindex="0">
+        <div id="timeline-space"></div>
+    </div>
+    <span id="timeline-end">00:00</span>
+</div>
+<p id="file-error" role="alert" hidden></p>
+</div>
+<dialog id="controls-help" aria-labelledby="controls-title">
+    <h2 id="controls-title">Chart controls</h2>
+    <p>In the app, select each metric and source with its checkbox, then use <strong>Start recording</strong>. Selection changes during recording apply from that moment. <strong>Stop recording</strong> keeps the session for review.</p>
+    <p><strong>Start / End</strong> move to the beginning or end of the recording. <strong>Back / Forward</strong> move by half the visible time range.</p>
+    <p>Drag the horizontal time scrollbar to browse the recording. With the scrollbar focused, use the arrow keys, Home, or End.</p>
+    <p><strong>Zoom in / Zoom out</strong> change the visible time range. You can also scroll over a plot to zoom or drag across it to select a range. Shift-drag or Shift-scroll pans through time.</p>
+    <p><strong>Fit session</strong> shows the complete recording. <strong>Follow latest</strong> toggles automatic movement to the newest readings. Browsing earlier times turns it off.</p>
+    <p>Hover over a plot to see the timestamp and nearest recorded values for all selected traces. Gaps display a dash. You can move into the popup to scroll a long list.</p>
+    <p>In the app, <strong>Export recording</strong> saves a recording data file or interactive HTML. <strong>Import recording</strong> reopens either format. In the HTML viewer, use <strong>Open recording</strong> to load saved recordings.</p>
+    <form method="dialog"><button type="submit">Close</button></form>
+</dialog>
+<div id="hover" role="tooltip" aria-live="off" hidden>
+    <div id="hover-time"></div><div id="hover-date"></div><div id="hover-values"></div>
+</div>
+<p id="empty">Select metrics and start a recording.</p>
+<main id="plots"></main>
+<footer id="summary"></footer>
+<script id="session-data" type="application/json">/*SESSION_DATA*/null</script>
+<script>
+(() => {
+    "use strict";
+
+    const embedded = Boolean(window.chrome && window.chrome.webview);
+    document.body.classList.toggle("embedded", embedded);
+    const traces = new Map();
+    const plots = new Map();
+    let sessionId = "";
+    let frame = null;
+    let follow = embedded;
+    let autoFit = !embedded;
+    let viewStart = 0;
+    let viewEnd = 60;
+    let cursor = null;
+    let scheduled = false;
+    let drag = null;
+    let hoverPosition = null;
+    let hoverKeys = "";
+    const hoverRows = new Map();
+    const hover = document.getElementById("hover");
+    const timeline = document.getElementById("timeline-scroll");
+    const timelineSpace = document.getElementById("timeline-space");
+    let expectedScrollLeft = 0;
+
+    const palette = () => {
+        const style = getComputedStyle(document.body);
+        return Object.fromEntries(["text", "muted", "border", "accent"].map(name =>
+            [name, style.getPropertyValue("--" + name).trim()]));
+    };
+
+    function time(seconds) {
+        const sign = seconds < 0 ? "-" : "";
+        const value = Math.abs(seconds);
+        const hours = Math.floor(value / 3600);
+        const minutes = Math.floor(value / 60) % 60;
+        const wholeSeconds = Math.floor(value) % 60;
+        const tail = String(minutes).padStart(2, "0") + ":" + String(wholeSeconds).padStart(2, "0");
+        return sign + (hours ? hours + ":" : "") + tail;
+    }
+
+    function accept(update) {
+        if (!update || !Array.isArray(update.series)) {
+            return;
+        }
+
+        if (sessionId !== update.sessionId) {
+            sessionId = update.sessionId;
+            traces.clear();
+            for (const plot of plots.values()) {
+                plot.section.remove();
+            }
+            plots.clear();
+            hideHover();
+            hoverKeys = "";
+            hoverRows.clear();
+            follow = Boolean(update.recording);
+            autoFit = !update.recording;
+        }
+
+        if (frame && frame.recording && !update.recording) {
+            follow = false;
+            autoFit = true;
+        }
+
+        frame = update;
+        const visibleKeys = new Set(update.series.map(series => series.trace.key));
+        for (const key of traces.keys()) {
+            if (!visibleKeys.has(key)) {
+                traces.delete(key);
+            }
+        }
+
+        for (const series of update.series) {
+            let trace = traces.get(series.trace.key);
+            if (!trace || series.offset === 0) {
+                trace = { ...series, samples: [] };
+                traces.set(series.trace.key, trace);
+            }
+
+            trace.selected = series.selected;
+            trace.available = series.available;
+            if (trace.samples.length === series.offset) {
+                for (const sample of series.samples) {
+                    trace.samples.push(sample);
+                }
+            }
+        }
+
+        document.getElementById("session-info").textContent = update.startedAt
+            ? new Date(update.startedAt).toLocaleString() + " - " + time(update.durationSeconds)
+            : "No session";
+        document.getElementById("status").textContent = update.status;
+        document.getElementById("summary").textContent = update.sampleCount.toLocaleString()
+            + " readings - " + time(update.durationSeconds) + (update.recording ? " - Recording" : "");
+
+        syncPlots();
+        requestDraw();
+    }
+
+    function syncPlots() {
+        const groups = new Map();
+        for (const trace of traces.values()) {
+            if (trace.samples.length === 0) {
+                continue;
+            }
+
+            const group = trace.trace.group;
+            if (!groups.has(group)) {
+                groups.set(group, []);
+            }
+            groups.get(group).push(trace);
+        }
+
+        for (const [name, plot] of plots) {
+            if (!groups.has(name)) {
+                plot.section.remove();
+                plots.delete(name);
+            }
+        }
+
+        const empty = document.getElementById("empty");
+        empty.textContent = "Select metrics and start a recording.";
+        empty.hidden = groups.size > 0;
+        for (const [name, series] of groups) {
+            let plot = plots.get(name);
+            if (!plot) {
+                plot = createPlot(name);
+                plots.set(name, plot);
+            }
+
+            plot.series = series;
+            const keys = new Set(series.map(trace => trace.trace.key));
+            for (const [key, row] of plot.rows) {
+                if (!keys.has(key)) {
+                    row.label.remove();
+                    plot.rows.delete(key);
+                }
+            }
+
+            plot.section.hidden = embedded && !series.some(trace => trace.selected);
+            for (const trace of series) {
+                let row = plot.rows.get(trace.trace.key);
+                if (!row) {
+                    row = createLegend(trace);
+                    plot.rows.set(trace.trace.key, row);
+                    plot.legend.append(row.label);
+                }
+
+                row.input.checked = trace.selected;
+                row.label.hidden = embedded && !trace.selected;
+            }
+        }
+
+        const noVisible = [...plots.values()].every(plot => plot.section.hidden);
+        if (groups.size > 0 && noVisible) {
+            const empty = document.getElementById("empty");
+            empty.textContent = embedded ? "Enable a recorded metric to display its trace." : "Use the checkboxes below to show recorded traces.";
+            empty.hidden = false;
+            if (!embedded) {
+                for (const plot of plots.values()) {
+                    plot.section.hidden = false;
+                }
+            }
+        }
+    }
+
+    function createLegend(trace) {
+        const label = document.createElement("label");
+        label.title = trace.trace.deviceId;
+        const input = document.createElement("input");
+        input.type = "checkbox";
+        input.checked = trace.selected;
+        const swatch = document.createElement("i");
+        swatch.style.background = trace.trace.color;
+        const text = document.createElement("span");
+        text.textContent = trace.trace.label;
+        const value = document.createElement("strong");
+        value.textContent = "-";
+        label.append(input, swatch, text, value);
+
+        input.addEventListener("change", () => {
+            trace.selected = input.checked;
+            syncPlots();
+            requestDraw();
+        });
+
+        return { label, input, value };
+    }
+
+    function createPlot(name) {
+        const section = document.createElement("section");
+        const title = document.createElement("h2");
+        title.textContent = name;
+        const canvas = document.createElement("canvas");
+        canvas.setAttribute("aria-label", name + " against elapsed session time");
+        const legend = document.createElement("div");
+        legend.className = "legend";
+        section.append(title, canvas, legend);
+        document.getElementById("plots").append(section);
+
+        const plot = { section, canvas, legend, series: [], rows: new Map(), area: null };
+        new ResizeObserver(requestDraw).observe(canvas);
+        canvas.addEventListener("wheel", event => zoom(event, plot), { passive: false });
+        canvas.addEventListener("pointerdown", event => beginDrag(event, plot));
+        canvas.addEventListener("pointermove", event => movePointer(event, plot));
+        canvas.addEventListener("pointerup", event => endDrag(event, plot));
+        canvas.addEventListener("pointercancel", () => {
+            drag = null;
+            hideHover();
+            requestDraw();
+        });
+        canvas.addEventListener("pointerleave", event => {
+            if (!drag && !hover.contains(event.relatedTarget)) {
+                hideHover();
+                requestDraw();
+            }
+        });
+
+        return plot;
+    }
+
+    function requestDraw() {
+        if (scheduled) {
+            return;
+        }
+
+        scheduled = true;
+        requestAnimationFrame(() => {
+            scheduled = false;
+            draw();
+        });
+    }
+
+    function draw() {
+        if (!frame) {
+            updateNavigation();
+            return;
+        }
+
+        if (follow) {
+            viewEnd = Math.max(10, frame.durationSeconds);
+            viewStart = Math.max(0, viewEnd - 60);
+        } else if (autoFit) {
+            viewStart = 0;
+            viewEnd = Math.max(1, frame.durationSeconds);
+        }
+
+        updateNavigation();
+        const colors = palette();
+        for (const plot of plots.values()) {
+            if (!plot.section.hidden) {
+                drawPlot(plot, colors);
+            }
+        }
+
+        updateHover();
+    }
+
+    function lowerBound(samples, seconds) {
+        let low = 0;
+        let high = samples.length;
+        while (low < high) {
+            const middle = (low + high) >>> 1;
+            if (samples[middle].seconds < seconds) {
+                low = middle + 1;
+            } else {
+                high = middle;
+            }
+        }
+        return low;
+    }
+
+    function bounds(series) {
+        let minimum = Infinity;
+        let maximum = -Infinity;
+        for (const trace of series) {
+            const samples = trace.samples;
+            const first = Math.max(0, lowerBound(samples, viewStart) - 1);
+            const last = Math.min(samples.length, lowerBound(samples, viewEnd) + 1);
+            for (let index = first; index < last; index++) {
+                const value = samples[index].value;
+                if (value !== null) {
+                    minimum = Math.min(minimum, value);
+                    maximum = Math.max(maximum, value);
+                }
+            }
+        }
+
+        if (!Number.isFinite(minimum)) {
+            return [0, 1];
+        }
+
+        const padding = Math.max((maximum - minimum) * 0.08, Math.abs(maximum) * 0.02, 0.05);
+        return [Math.max(0, minimum - padding), maximum + padding];
+    }
+
+    function drawPlot(plot, colors) {
+        const canvas = plot.canvas;
+        const width = Math.max(200, canvas.clientWidth);
+        const height = 220;
+        const ratio = window.devicePixelRatio || 1;
+        if (canvas.width !== Math.round(width * ratio) || canvas.height !== Math.round(height * ratio)) {
+            canvas.width = Math.round(width * ratio);
+            canvas.height = Math.round(height * ratio);
+        }
+
+        const context = canvas.getContext("2d");
+        context.setTransform(ratio, 0, 0, ratio, 0, 0);
+        context.clearRect(0, 0, width, height);
+        const selected = plot.series.filter(trace => trace.selected);
+        const [minimum, maximum] = bounds(selected);
+        const area = { left: 68, top: 12, width: Math.max(20, width - 82), height: height - 45 };
+        plot.area = area;
+        const x = seconds => area.left + (seconds - viewStart) / (viewEnd - viewStart) * area.width;
+        const y = value => area.top + area.height * (1 - (value - minimum) / (maximum - minimum));
+
+        context.font = "12px Segoe UI, sans-serif";
+        context.lineWidth = 1;
+        for (let index = 0; index <= 4; index++) {
+            const fraction = index / 4;
+            const axisY = area.top + fraction * area.height;
+            const value = maximum - fraction * (maximum - minimum);
+            context.strokeStyle = colors.border;
+            context.beginPath();
+            context.moveTo(area.left, axisY);
+            context.lineTo(area.left + area.width, axisY);
+            context.stroke();
+            context.fillStyle = colors.muted;
+            context.textAlign = "right";
+            context.fillText(format(value) + " " + (selected[0]?.trace.unit ?? ""), area.left - 8, axisY + 4);
+            context.textAlign = "center";
+            const seconds = viewStart + fraction * (viewEnd - viewStart);
+            context.fillText(time(seconds), x(seconds), height - 9);
+        }
+
+        context.save();
+        context.beginPath();
+        context.rect(area.left, area.top, area.width, area.height);
+        context.clip();
+        for (const trace of selected) {
+            drawTrace(context, trace, x, y);
+        }
+
+        if (cursor !== null) {
+            context.strokeStyle = colors.muted;
+            context.setLineDash([4, 4]);
+            context.beginPath();
+            context.moveTo(x(cursor), area.top);
+            context.lineTo(x(cursor), area.top + area.height);
+            context.stroke();
+            context.setLineDash([]);
+        }
+
+        if (drag && drag.plot === plot && !drag.pan) {
+            context.fillStyle = "rgba(57,238,209,0.16)";
+            context.fillRect(Math.min(drag.start, drag.end), area.top, Math.abs(drag.end - drag.start), area.height);
+        }
+        context.restore();
+
+        for (const trace of plot.series) {
+            const sample = nearestSample(trace.samples, cursor ?? Infinity);
+            plot.rows.get(trace.trace.key).value.textContent = sample?.value == null ? "-" : format(sample.value) + " " + trace.trace.unit;
+        }
+    }
+
+    function drawTrace(context, trace, x, y) {
+        const samples = trace.samples;
+        const first = Math.max(0, lowerBound(samples, viewStart) - 1);
+        const last = Math.min(samples.length, lowerBound(samples, viewEnd) + 1);
+        context.strokeStyle = trace.trace.color;
+        context.fillStyle = trace.trace.color;
+        context.lineWidth = 1.7;
+        context.beginPath();
+        let connected = false;
+        let bucket = [];
+
+        function flush() {
+            if (bucket.length === 0) {
+                return;
+            }
+
+            const minimum = bucket.reduce((best, sample) => sample.value < best.value ? sample : best);
+            const maximum = bucket.reduce((best, sample) => sample.value > best.value ? sample : best);
+            const points = [...new Set([bucket[0], minimum, maximum, bucket[bucket.length - 1]])]
+                .sort((left, right) => left.seconds - right.seconds);
+            for (const sample of points) {
+                if (connected) {
+                    context.lineTo(x(sample.seconds), y(sample.value));
+                } else {
+                    context.moveTo(x(sample.seconds), y(sample.value));
+                    connected = true;
+                }
+            }
+            bucket = [];
+        }
+
+        let pixel = null;
+        let singlePoint = null;
+        let count = 0;
+        for (let index = first; index < last; index++) {
+            const sample = samples[index];
+            if (sample.value === null) {
+                flush();
+                connected = false;
+                pixel = null;
+                continue;
+            }
+
+            singlePoint = sample;
+            count++;
+            const nextPixel = Math.floor(x(sample.seconds));
+            if (pixel !== null && pixel !== nextPixel) {
+                flush();
+            }
+
+            pixel = nextPixel;
+            bucket.push(sample);
+        }
+
+        flush();
+        context.stroke();
+        if (count === 1) {
+            context.beginPath();
+            context.arc(x(singlePoint.seconds), y(singlePoint.value), 2.5, 0, Math.PI * 2);
+            context.fill();
+        }
+    }
+
+    function nearestSample(samples, seconds) {
+        if (samples.length === 0) {
+            return null;
+        }
+
+        const index = lowerBound(samples, seconds);
+        if (index === samples.length) {
+            return samples[samples.length - 1];
+        }
+        if (samples[index].seconds === seconds) {
+            return samples[index];
+        }
+        if (index === 0) {
+            return null;
+        }
+        if (samples[index - 1].value === null) {
+            return null;
+        }
+        if (samples[index].value === null) {
+            return samples[index - 1].seconds === seconds ? samples[index - 1] : null;
+        }
+
+        return seconds - samples[index - 1].seconds <= samples[index].seconds - seconds ? samples[index - 1] : samples[index];
+    }
+
+    function format(value) {
+        return value.toLocaleString(undefined, { maximumFractionDigits: 2 });
+    }
+
+    function pointerX(event, plot) {
+        return Math.max(plot.area.left, Math.min(plot.area.left + plot.area.width,
+            event.clientX - plot.canvas.getBoundingClientRect().left));
+    }
+
+    function secondsAt(pixel, plot) {
+        return viewStart + (pixel - plot.area.left) / plot.area.width * (viewEnd - viewStart);
+    }
+
+    function setRange(start, span) {
+        const duration = Math.max(1, frame?.durationSeconds ?? 1);
+        const range = Math.max(0.1, Math.min(duration, span));
+        viewStart = Math.max(0, Math.min(duration - range, start));
+        viewEnd = viewStart + range;
+        follow = autoFit = false;
+        hideHover();
+        requestDraw();
+    }
+
+    function moveTime(fraction) {
+        setRange(viewStart + (viewEnd - viewStart) * fraction, viewEnd - viewStart);
+    }
+
+    function zoomRange(factor, fraction = 0.5) {
+        const anchor = viewStart + (viewEnd - viewStart) * fraction;
+        const duration = Math.max(1, frame?.durationSeconds ?? 1);
+        const range = Math.max(0.1, Math.min(duration, (viewEnd - viewStart) * factor));
+        setRange(anchor - range * fraction, range);
+    }
+
+    function zoom(event, plot) {
+        if (!plot.area || !frame) {
+            return;
+        }
+
+        event.preventDefault();
+        if (event.shiftKey || Math.abs(event.deltaX) > Math.abs(event.deltaY)) {
+            const delta = event.deltaX || event.deltaY;
+            moveTime(Math.sign(delta) * 0.15);
+        } else {
+            const fraction = (pointerX(event, plot) - plot.area.left) / plot.area.width;
+            zoomRange(Math.exp(Math.max(-1, Math.min(1, event.deltaY / 300))), fraction);
+        }
+    }
+
+    function updateNavigation() {
+        const span = viewEnd - viewStart;
+        const duration = Math.max(span, frame?.durationSeconds ?? 0, 1);
+        const maximumStart = Math.max(0, duration - span);
+        document.getElementById("window-label").textContent = preciseTime(viewStart) + " - " + preciseTime(viewEnd);
+        document.getElementById("timeline-end").textContent = time(frame?.durationSeconds ?? 0);
+        document.getElementById("start").disabled = document.getElementById("back").disabled = viewStart <= 0.0001;
+        document.getElementById("end").disabled = document.getElementById("forward").disabled = viewStart >= maximumStart - 0.0001;
+        document.getElementById("follow").setAttribute("aria-pressed", String(follow));
+        document.getElementById("follow-indicator").textContent = follow ? "On" : "Off";
+
+        const width = timeline.clientWidth;
+        timelineSpace.style.width = Math.min(10000000, Math.max(width, width * duration / span)) + "px";
+        const scrollRange = timeline.scrollWidth - timeline.clientWidth;
+        timeline.scrollLeft = maximumStart > 0 ? viewStart / maximumStart * scrollRange : 0;
+        expectedScrollLeft = timeline.scrollLeft;
+        timeline.setAttribute("aria-valuemax", maximumStart.toFixed(3));
+        timeline.setAttribute("aria-valuenow", viewStart.toFixed(3));
+        timeline.setAttribute("aria-valuetext", preciseTime(viewStart) + " to " + preciseTime(viewEnd));
+        timeline.setAttribute("aria-disabled", String(maximumStart <= 0));
+    }
+
+    function preciseTime(seconds) {
+        const milliseconds = Math.max(0, Math.floor((seconds - Math.floor(seconds)) * 1000 + 0.0001));
+        return time(seconds) + "." + String(milliseconds).padStart(3, "0");
+    }
+
+    function hideHover() {
+        cursor = null;
+        hoverPosition = null;
+        hover.hidden = true;
+    }
+
+    function updateHover() {
+        if (cursor === null || !hoverPosition || !frame) {
+            hover.hidden = true;
+            return;
+        }
+
+        const selected = [...traces.values()].filter(trace => trace.selected);
+        const keys = selected.map(trace => trace.trace.key).join("\n");
+        if (keys !== hoverKeys) {
+            hoverKeys = keys;
+            hoverRows.clear();
+            const container = document.getElementById("hover-values");
+            container.replaceChildren();
+            const groups = new Map();
+            for (const trace of selected) {
+                const group = trace.trace.group;
+                if (!groups.has(group)) {
+                    const heading = document.createElement("div");
+                    heading.className = "hover-group";
+                    heading.textContent = group;
+                    const rows = document.createElement("div");
+                    container.append(heading, rows);
+                    groups.set(group, rows);
+                }
+
+                const row = document.createElement("div");
+                row.className = "hover-row";
+                const swatch = document.createElement("i");
+                swatch.style.background = trace.trace.color;
+                const label = document.createElement("span");
+                label.textContent = trace.trace.label;
+                label.title = trace.trace.deviceId;
+                const value = document.createElement("strong");
+                row.append(swatch, label, value);
+                groups.get(group).append(row);
+                hoverRows.set(trace.trace.key, value);
+            }
+        }
+
+        document.getElementById("hover-time").textContent = "Time " + preciseTime(cursor);
+        const date = new Date(Date.parse(frame.startedAt) + cursor * 1000);
+        document.getElementById("hover-date").textContent = Number.isFinite(date.getTime())
+            ? date.toLocaleString(undefined, {
+                year: "numeric", month: "numeric", day: "numeric",
+                hour: "2-digit", minute: "2-digit", second: "2-digit", fractionalSecondDigits: 3
+            }) : "";
+        for (const trace of selected) {
+            const sample = nearestSample(trace.samples, cursor);
+            hoverRows.get(trace.trace.key).textContent = sample?.value == null ? "-" : format(sample.value) + " " + trace.trace.unit;
+        }
+
+        hover.hidden = selected.length === 0;
+        const width = hover.offsetWidth;
+        const height = hover.offsetHeight;
+        const left = hoverPosition.x + width + 18 <= innerWidth ? hoverPosition.x + 18 : hoverPosition.x - width - 18;
+        const top = hoverPosition.y + height + 18 <= innerHeight ? hoverPosition.y + 18 : hoverPosition.y - height - 18;
+        hover.style.left = Math.max(12, Math.min(innerWidth - width - 12, left)) + "px";
+        hover.style.top = Math.max(12, Math.min(innerHeight - height - 12, top)) + "px";
+    }
+
+    function beginDrag(event, plot) {
+        if (!plot.area || event.button !== 0) {
+            return;
+        }
+
+        hideHover();
+        const start = pointerX(event, plot);
+        drag = { plot, start, end: start, pan: event.shiftKey, viewStart, viewEnd };
+        plot.canvas.setPointerCapture(event.pointerId);
+    }
+
+    function movePointer(event, plot) {
+        if (!plot.area) {
+            return;
+        }
+
+        const pixel = pointerX(event, plot);
+        cursor = secondsAt(pixel, plot);
+        hoverPosition = { x: event.clientX, y: event.clientY };
+        if (drag && drag.plot === plot) {
+            hover.hidden = true;
+            hoverPosition = null;
+            drag.end = pixel;
+            if (drag.pan) {
+                const range = drag.viewEnd - drag.viewStart;
+                const shift = (drag.start - pixel) / plot.area.width * range;
+                viewStart = Math.max(0, Math.min(Math.max(0, frame.durationSeconds - range), drag.viewStart + shift));
+                viewEnd = viewStart + range;
+                follow = autoFit = false;
+            }
+        }
+
+        requestDraw();
+    }
+
+    function endDrag(event, plot) {
+        if (!drag || drag.plot !== plot) {
+            return;
+        }
+
+        if (!drag.pan && Math.abs(drag.end - drag.start) > 6) {
+            const start = secondsAt(Math.min(drag.start, drag.end), plot);
+            const end = secondsAt(Math.max(drag.start, drag.end), plot);
+            viewStart = start;
+            viewEnd = Math.max(start + 0.1, end);
+            follow = autoFit = false;
+        }
+
+        drag = null;
+        plot.canvas.releasePointerCapture(event.pointerId);
+        requestDraw();
+    }
+
+    document.getElementById("start").addEventListener("click", () => setRange(0, viewEnd - viewStart));
+    document.getElementById("back").addEventListener("click", () => moveTime(-0.5));
+    document.getElementById("forward").addEventListener("click", () => moveTime(0.5));
+    document.getElementById("end").addEventListener("click", () => {
+        if (frame) {
+            setRange(frame.durationSeconds - (viewEnd - viewStart), viewEnd - viewStart);
+        }
+    });
+    document.getElementById("zoom-in").addEventListener("click", () => zoomRange(0.5));
+    document.getElementById("zoom-out").addEventListener("click", () => zoomRange(2));
+    document.getElementById("fit").addEventListener("click", () => {
+        follow = false;
+        autoFit = true;
+        hideHover();
+        requestDraw();
+    });
+    document.getElementById("follow").addEventListener("click", () => {
+        follow = !follow;
+        autoFit = false;
+        hideHover();
+        requestDraw();
+    });
+
+    timeline.addEventListener("scroll", () => {
+        if (!frame || Math.abs(timeline.scrollLeft - expectedScrollLeft) < 0.5) {
+            return;
+        }
+
+        const span = viewEnd - viewStart;
+        const maximumStart = Math.max(0, frame.durationSeconds - span);
+        const scrollRange = timeline.scrollWidth - timeline.clientWidth;
+        if (scrollRange > 0) {
+            setRange(timeline.scrollLeft / scrollRange * maximumStart, span);
+        }
+    });
+    timeline.addEventListener("wheel", event => {
+        event.preventDefault();
+        moveTime(Math.sign(event.deltaX || event.deltaY) * 0.15);
+    }, { passive: false });
+    timeline.addEventListener("keydown", event => {
+        const actions = {
+            Home: () => setRange(0, viewEnd - viewStart),
+            End: () => setRange(frame.durationSeconds - (viewEnd - viewStart), viewEnd - viewStart),
+            ArrowLeft: () => moveTime(-0.1),
+            ArrowRight: () => moveTime(0.1),
+            PageUp: () => moveTime(-0.5),
+            PageDown: () => moveTime(0.5)
+        };
+        if (frame && actions[event.key]) {
+            event.preventDefault();
+            actions[event.key]();
+        }
+    });
+
+    const help = document.getElementById("controls-help");
+    document.getElementById("info").addEventListener("click", () => {
+        hideHover();
+        help.showModal();
+    });
+    hover.addEventListener("pointerleave", event => {
+        if (event.relatedTarget?.tagName !== "CANVAS") {
+            hideHover();
+            requestDraw();
+        }
+    });
+    document.addEventListener("scroll", event => {
+        if (event.target !== hover && !hover.contains(event.target)) {
+            hideHover();
+            requestDraw();
+        }
+    }, true);
+
+    function readRecording(text) {
+        let data = text.trimStart();
+        if (data.startsWith("<")) {
+            const match = data.match(/<script\b[^>]*\bid\s*=\s*(["'])session-data\1[^>]*>([\s\S]*?)<\/script\s*>/i);
+            data = match?.[2] ?? "";
+        }
+
+        let recording = JSON.parse(data);
+        if (recording.schemaVersion !== undefined) {
+            if (recording.schemaVersion !== 1) {
+                throw new Error("This recording file version is unsupported.");
+            }
+            recording = recording.session;
+        }
+        if (!recording || recording.recording !== false || !Number.isFinite(recording.durationSeconds)
+            || recording.durationSeconds < 0 || !Number.isFinite(Date.parse(recording.startedAt))
+            || !Array.isArray(recording.series) || recording.series.length > 256) {
+            throw new Error("The file does not contain a completed RTX Monitor recording.");
+        }
+
+        const keys = new Set();
+        let count = 0;
+        let points = 0;
+        for (const series of recording.series) {
+            const trace = series.trace;
+            if (!trace || typeof trace.key !== "string" || keys.has(trace.key)
+                || typeof trace.label !== "string" || typeof trace.group !== "string"
+                || typeof trace.unit !== "string" || typeof trace.deviceId !== "string"
+                || !/^#[0-9a-f]{6}$/i.test(trace.color) || !Array.isArray(series.samples)
+                || series.offset !== 0 || series.count !== series.samples.length || typeof series.selected !== "boolean") {
+                throw new Error("The recording contains an invalid trace.");
+            }
+
+            keys.add(trace.key);
+            let previous = -1;
+            for (const sample of series.samples) {
+                points++;
+                if (points > 4000000 || !Number.isFinite(sample.seconds) || sample.seconds < previous || sample.seconds < 0
+                    || sample.seconds > recording.durationSeconds + 0.1
+                    || sample.value !== null && !Number.isFinite(sample.value)) {
+                    throw new Error("The recording contains invalid or excessive samples.");
+                }
+                previous = sample.seconds;
+                if (sample.value !== null) {
+                    count++;
+                }
+            }
+        }
+        if (count === 0 || count > 2000000 || count !== recording.sampleCount) {
+            throw new Error("The recording sample count is invalid.");
+        }
+
+        return recording;
+    }
+
+    document.getElementById("open-recording").addEventListener("click", () => document.getElementById("recording-file").click());
+    document.getElementById("recording-file").addEventListener("change", async event => {
+        const file = event.target.files[0];
+        const error = document.getElementById("file-error");
+        error.hidden = true;
+        if (!file) {
+            return;
+        }
+
+        try {
+            if (file.size > 256 * 1024 * 1024) {
+                throw new Error("The recording file exceeds 256 MB.");
+            }
+            const recording = readRecording(await file.text());
+            sessionId = "";
+            accept(recording);
+        } catch (problem) {
+            error.textContent = problem.message || "The recording could not be opened.";
+            error.hidden = false;
+        } finally {
+            event.target.value = "";
+        }
+    });
+
+    if (embedded) {
+        window.chrome.webview.addEventListener("message", event => {
+            if (event.data.type === "appearance") {
+                document.body.classList.toggle("light", Boolean(event.data.light));
+                requestDraw();
+            } else {
+                accept(event.data);
+            }
+        });
+        window.chrome.webview.postMessage("ready");
+    } else {
+        const initial = JSON.parse(document.getElementById("session-data").textContent);
+        if (initial) {
+            accept(initial);
+        }
+    }
+})();
+</script>
+</body>
+</html>

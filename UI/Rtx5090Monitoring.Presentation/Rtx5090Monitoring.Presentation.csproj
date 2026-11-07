@@ -1,5 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <ItemGroup>
+        <EmbeddedResource Include="Performance/PerformanceChart.html" LogicalName="Rtx5090Monitoring.PerformanceChart.html" />
         <ProjectReference Include="../../Rtx5090Monitoring.Plugins.Msi.Contracts/Rtx5090Monitoring.Plugins.Msi.Contracts.csproj" />
         <ProjectReference Include="../Rtx5090Monitoring.Client/Rtx5090Monitoring.Client.csproj" />
         <ProjectReference Include="../../Rtx5090Monitoring.Plugins.Asus.Contracts/Rtx5090Monitoring.Plugins.Asus.Contracts.csproj" />

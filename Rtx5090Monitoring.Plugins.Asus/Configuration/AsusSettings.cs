@@ -14,12 +14,7 @@ public static class AsusSettings
             : new AsusOptions();
 
         options.Validate();
-        var maximumDuration = Math.Max(settings.PollIntervalMs, 10000);
-        if (options.ImbalanceDurationThresholdMs < settings.PollIntervalMs || options.ImbalanceDurationThresholdMs > maximumDuration
-            || options.WireOvercurrentThresholdMs < settings.PollIntervalMs || options.WireOvercurrentThresholdMs > maximumDuration)
-        {
-            throw new ArgumentException("ASUS detection durations must be between the polling interval and max(polling interval, 10000 ms).");
-        }
+
 
         return options;
     }

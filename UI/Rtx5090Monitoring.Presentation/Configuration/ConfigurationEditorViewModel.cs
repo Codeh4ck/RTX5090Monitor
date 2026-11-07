@@ -28,6 +28,8 @@ public sealed class ConfigurationEditorViewModel(Func<IMonitoringApi> api, bool 
     public ObservableCollection<SelectionEditorViewModel> Selections { get; } = [];
     public ObservableCollection<SensorChoice> AvailableSensors { get; } = [];
 
+    public GenericNvidiaSettingsEditorViewModel? NvidiaWarnings => Plugins.FirstOrDefault(plugin => plugin.IsNvidia)?.Nvidia;
+    public bool HasNvidiaWarnings => NvidiaWarnings is not null;
     public bool CanEdit => !IsBusy && _baseline is not null;
     public string Title => localOnly ? "Local simulation configuration" : "Service configuration";
 
@@ -276,6 +278,8 @@ public sealed class ConfigurationEditorViewModel(Func<IMonitoringApi> api, bool 
                 : "Changes are applied live to the service and all consumers.");
             Raise(nameof(StreamIntervalMs));
             Raise(nameof(RevisionText));
+            Raise(nameof(NvidiaWarnings));
+            Raise(nameof(HasNvidiaWarnings));
             Raise(nameof(CanEdit));
         }
         finally

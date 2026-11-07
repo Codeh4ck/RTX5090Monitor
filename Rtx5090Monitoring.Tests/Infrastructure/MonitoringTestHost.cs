@@ -187,7 +187,8 @@ internal sealed class MonitoringTestHost : IAsyncDisposable
 
         var settings = new Dictionary<string, string?>
         {
-            ["RuntimeConfiguration:FilePath"] = configurationPath
+            ["RuntimeConfiguration:FilePath"] = configurationPath,
+            ["SettingsProfiles:Directory"] = Path.Combine(Path.GetDirectoryName(configurationPath)!, "profiles")
         };
 
         if (bootstrapFile is null)

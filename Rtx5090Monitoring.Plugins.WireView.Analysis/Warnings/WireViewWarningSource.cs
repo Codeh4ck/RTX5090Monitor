@@ -13,6 +13,7 @@ public sealed class WireViewWarningSource : IWarningSource
     public IReadOnlyList<WarningDefinition> Definitions => [
         new(WireViewWarningIds.Overtemperature, PluginId, "Overtemperature", "temperature") { LegacyIds = ["WireViewOvertemperature"] },
         new(WireViewWarningIds.Overcurrent, PluginId, "Total overcurrent", "current") { LegacyIds = ["WireViewOvercurrent"] },
+        new(ActiveSettingsProfile.WireViewProfileOvercurrent, PluginId, "GPU profile pin overcurrent", "current"),
         new(WireViewWarningIds.PinOvercurrent, PluginId, "Pin overcurrent", "current") { LegacyIds = ["WireViewPinOvercurrent"] },
         new(WireViewWarningIds.Overpower, PluginId, "Overpower", "power") { LegacyIds = ["WireViewOverpower"] },
         new(WireViewWarningIds.Imbalance, PluginId, "Current imbalance", "imbalance") { LegacyIds = ["WireViewImbalance"] },
@@ -48,6 +49,24 @@ public sealed class WireViewWarningSource : IWarningSource
                 true, (flags & mask) != 0, "Reported by WireView firmware."));
         }
         
+        var currentPins = snapshot.Sensors.Where(reading => reading.Identity.PluginId == PluginId
+            && reading.Identity is { Component: SensorComponent.GpuPin, Metric: SensorMetric.Current }).ToArray();
+
+        foreach (var deviceId in currentPins.Select(reading => reading.Identity.DeviceId)
+            .Concat(statuses.Select(reading => reading.Identity.DeviceId)).Distinct(StringComparer.Ordinal))
+        {
+            var active = snapshot.SettingsProfile is { Profile.UseWireViewOvercurrentFallback: true } applied && applied.WireViewDeviceId == deviceId;
+            var alert = active ? snapshot.Alerts.FirstOrDefault(item => item.PluginId == PluginId && item.DeviceId == deviceId
+                && item.Kind == ActiveSettingsProfile.WireViewProfileOvercurrent) : null;
+            var complete = !active || currentPins.Count(reading => reading.Identity.DeviceId == deviceId
+                && reading is { Quality: ReadingQuality.Valid, Value: >= 0 }
+                && snapshot.Timestamp - reading.ObservedAt <= TimeSpan.FromMilliseconds(settings.StaleAfterMs)) == 6;
+            var detail = alert is null ? "" : string.Join(" / ", alert.Pins.Select(pin => $"P{pin.Channel}: {pin.CurrentA:0.##} A"));
+
+            observations.Add(new WarningObservation(PluginId, deviceId, ActiveSettingsProfile.WireViewProfileOvercurrent,
+                alert is not null || complete, alert is not null, detail));
+        }
+
         return [.. observations];
     }
 }

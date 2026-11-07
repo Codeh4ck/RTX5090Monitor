@@ -13,4 +13,10 @@ namespace Rtx5090Monitoring.Service;
 [JsonSerializable(typeof(Rtx5090Monitoring.Contracts.Configuration.ConfigurationSnapshot))]
 [JsonSerializable(typeof(Rtx5090Monitoring.Contracts.Configuration.ServiceConfiguration))]
 [JsonSerializable(typeof(Rtx5090Monitoring.Contracts.Configuration.PluginSettings))]
+[JsonSerializable(typeof(Rtx5090Monitoring.Contracts.Configuration.SettingsProfile))]
+[JsonSerializable(typeof(Rtx5090Monitoring.Contracts.Configuration.SettingsProfileCatalog))]
+[JsonSerializable(typeof(Rtx5090Monitoring.Contracts.Configuration.SettingsProfileRequest))]
+[JsonSerializable(typeof(Rtx5090Monitoring.Contracts.Configuration.DeviceWarningProfile[]))]
+[JsonSerializable(typeof(Rtx5090Monitoring.Contracts.Configuration.DeviceWarningProfileCatalog))]
+[JsonSerializable(typeof(Rtx5090Monitoring.Contracts.Configuration.WarningShutdownReason))]
 internal partial class AppJsonContext : JsonSerializerContext;

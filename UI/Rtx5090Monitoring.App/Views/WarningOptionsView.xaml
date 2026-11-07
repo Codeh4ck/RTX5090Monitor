@@ -4,6 +4,23 @@
     xmlns:warnings="using:Rtx5090Monitoring.Contracts.Warnings"
     xmlns:controls="using:Rtx5090Monitoring.App.Controls">
     <StackPanel Spacing="14">
+        <controls:SectionPanel x:Name="NvidiaTemperaturePanel" Header="NVIDIA GPU temperature warnings"
+            x:Load="{x:Bind Editor.HasNvidiaWarnings, Mode=OneWay}">
+            <ContentControl IsEnabled="{x:Bind Editor.CanEdit, Mode=OneWay}" HorizontalContentAlignment="Stretch">
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="14">
+                    <StackPanel Spacing="8">
+                        <CheckBox Content="Core temperature warning" IsChecked="{x:Bind Editor.NvidiaWarnings.CoreWarningEnabled, Mode=TwoWay}" />
+                        <NumberBox Header="Core warning threshold (°C)" Value="{x:Bind Editor.NvidiaWarnings.CoreTemperatureWarningC, Mode=TwoWay}"
+                            IsEnabled="{x:Bind Editor.NvidiaWarnings.CoreWarningEnabled, Mode=OneWay}" Minimum="30" Maximum="120" SmallChange="1" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Spacing="8">
+                        <CheckBox Content="VRAM temperature warning" IsChecked="{x:Bind Editor.NvidiaWarnings.MemoryWarningEnabled, Mode=TwoWay}" />
+                        <NumberBox Header="VRAM warning threshold (°C)" Value="{x:Bind Editor.NvidiaWarnings.MemoryTemperatureWarningC, Mode=TwoWay}"
+                            IsEnabled="{x:Bind Editor.NvidiaWarnings.MemoryWarningEnabled, Mode=OneWay}" Minimum="30" Maximum="120" SmallChange="1" />
+                    </StackPanel>
+                </Grid>
+            </ContentControl>
+        </controls:SectionPanel>
         <controls:SectionPanel Header="Warning notifications">
             <controls:SectionPanel.HeaderActions>
                 <Button x:Name="WarningInfoButton" Click="Info_Click" Padding="6" ToolTipService.ToolTip="How warning notifications work"
@@ -26,7 +43,7 @@
                     <ComboBox x:Name="WarningPicker" Header="Warning type" ItemsSource="{x:Bind Model.Overrides}" DisplayMemberPath="Name"
                         SelectionChanged="Warning_Changed" HorizontalAlignment="Stretch" />
                     <ContentControl x:Name="OverrideHost" HorizontalContentAlignment="Stretch" />
-                    <TextBlock Text="The service builds this list from installed plugin definitions, including disabled plugins. Detection thresholds belong to each plugin. If the list is empty, update the backend service or install a plugin that declares warnings."
+                    <TextBlock Text="The service builds this list from installed plugin definitions, including disabled plugins. If the list is empty, update the backend service or install a plugin that declares warnings."
                         Style="{StaticResource MonitorCaption}" />
                 </StackPanel>
             </ContentControl>

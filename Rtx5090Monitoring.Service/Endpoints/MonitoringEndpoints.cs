@@ -8,6 +8,7 @@ internal static class MonitoringEndpoints
         app.MapVersionEndpoint();
         app.MapSensorsEndpoint().WithDescription("Streams sensor data to the client via WebSocket");
         app.MapConfigurationEndpoints();
+        app.MapWarningProfileEndpoints();
         app.MapPluginEndpoints();
         app.MapPost("/restart", (Services.IServiceRestart restart) =>
         {

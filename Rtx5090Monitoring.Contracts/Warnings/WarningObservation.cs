@@ -2,5 +2,8 @@ namespace Rtx5090Monitoring.Contracts.Warnings;
 
 public sealed record WarningObservation(string PluginId, string DeviceId, string TypeId, bool Available, bool Active, string Detail)
 {
-    public string Id => PluginId + "/" + Uri.EscapeDataString(DeviceId) + "/" + TypeId;
+    public string? ProfileId { get; init; }
+
+    public string Id => PluginId + "/" + Uri.EscapeDataString(DeviceId) + "/" + TypeId
+        + (ProfileId is null ? "" : "/" + Uri.EscapeDataString(ProfileId));
 }

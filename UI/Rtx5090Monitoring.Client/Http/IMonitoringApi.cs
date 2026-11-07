@@ -16,6 +16,19 @@ public interface IMonitoringApi
     Task<Rtx5090Monitoring.Contracts.Updates.ServiceVersionResponse?> GetVersionAsync(CancellationToken token);
     Task<HealthResponse> GetHealthAsync(CancellationToken token);
     Task<PluginCatalog> GetPluginsAsync(CancellationToken token);
+    Task<SettingsProfileCatalog> GetSettingsProfilesAsync(CancellationToken token) =>
+        Task.FromException<SettingsProfileCatalog>(new NotSupportedException("GPU settings profiles require a running monitoring service."));
+    Task<SettingsProfileCatalog> ApplySettingsProfileAsync(SettingsProfileRequest request, CancellationToken token) =>
+        Task.FromException<SettingsProfileCatalog>(new NotSupportedException("GPU settings profiles require a running monitoring service."));
+    Task<DeviceWarningProfileCatalog> GetDeviceWarningProfilesAsync(CancellationToken token) =>
+        Task.FromException<DeviceWarningProfileCatalog>(new NotSupportedException("Warning profiles require a running monitoring service."));
+    Task SaveDeviceWarningProfileAsync(DeviceWarningProfile profile, CancellationToken token) =>
+        Task.FromException(new NotSupportedException("Warning profiles require a running monitoring service."));
+    Task DeleteDeviceWarningProfileAsync(string id, CancellationToken token) =>
+        Task.FromException(new NotSupportedException("Warning profiles require a running monitoring service."));
+    Task<WarningShutdownReason?> GetWarningShutdownAsync(CancellationToken token) => Task.FromResult<WarningShutdownReason?>(null);
+    Task AcknowledgeWarningShutdownAsync(string id, CancellationToken token) => Task.CompletedTask;
+
     Task<ConfigurationSnapshot> GetConfigurationAsync(CancellationToken token);
     Task<ConfigurationSnapshot> SetConfigurationAsync(ServiceConfiguration configuration, string version, CancellationToken token);
     Task<DeviceConfig> GetWireViewConfigurationAsync(CancellationToken token);

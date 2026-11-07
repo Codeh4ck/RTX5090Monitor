@@ -1,3 +1,16 @@
+1.0.4 - Performance recording and device warning profiles
+- Add Performance Chart with live recording, individually selectable source traces and unique trace colours.
+- Add time navigation, zoom, Follow latest and hover details with readings and timestamps.
+- Export interactive offline HTML or recording data, and import recordings for review.
+- Hide disabled plugins from live chart sources while preserving recorded history.
+- Add detected RTX 5090 and RTX 5080 chart-scale profiles shared by the desktop app and widget.
+- Add independent device warning profiles for Astral, MSI PSU and WireView, with source-labelled notifications.
+- Add optional warning-triggered shutdown with a configurable delay and a saved shutdown reason shown on next launch.
+- Consolidate connector warning thresholds under warning profiles and clarify chart-scale settings.
+- Preserve the selected desktop tab when resizing, maximizing or minimizing the window.
+- Unify desktop metric borders and update widget Y-axis labels to exactly one decimal place.
+- Update dependencies.
+
 1.0.3 - Shared connector source profiles
 - Add Automatic and WireView profiles shared by GPU status in the desktop app and widget.
 - Configure Power, Total current and Voltage priorities and fallback independently.

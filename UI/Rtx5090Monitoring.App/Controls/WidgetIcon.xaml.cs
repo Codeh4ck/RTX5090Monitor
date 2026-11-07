@@ -10,6 +10,7 @@ public sealed partial class WidgetIcon : UserControl
     private static readonly Dictionary<string, SvgImageSource> Sources = new(StringComparer.Ordinal);
     private static readonly Dictionary<string, string> Failures = new(StringComparer.Ordinal);
     internal static IReadOnlyDictionary<string, string> LoadFailures => Failures;
+
     public static readonly DependencyProperty IconNameProperty = DependencyProperty.Register(nameof(IconName), typeof(string), typeof(WidgetIcon),
         new PropertyMetadata("vcore", OnIconChanged));
 
@@ -22,7 +23,9 @@ public sealed partial class WidgetIcon : UserControl
     public WidgetIcon()
     {
         InitializeComponent();
+
         GlyphImage.ImageFailed += (_, args) => Failures[IconName] = args.ErrorMessage;
+
         LoadIcon();
         Loaded += (_, _) => UpdateTone();
     }

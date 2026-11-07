@@ -56,8 +56,12 @@ public sealed class AsusWarningSource : IWarningSource
 
             var voltages = pins.Where(sensor => sensor.Identity.Metric == SensorMetric.Voltage).ToArray();
 
-            Voltage(AsusWarningIds.LowVoltage, [.. voltages.Where(sensor => sensor.Value is > 0 and <= 11.5)]);
-            Voltage(AsusWarningIds.HighVoltage, [.. voltages.Where(sensor => sensor.Value >= 12.5)]);
+            var active = snapshot.SettingsProfile;
+            var profile = active?.AppliesToConnector(PluginId, device.Key) == true ? active.Profile : null;
+            var lowVoltage = profile?.LowPinVoltage ?? 11.5;
+            var highVoltage = profile?.HighPinVoltage ?? 12.5;
+            Voltage(AsusWarningIds.LowVoltage, [.. voltages.Where(sensor => sensor.Value is > 0 && sensor.Value <= lowVoltage)]);
+            Voltage(AsusWarningIds.HighVoltage, [.. voltages.Where(sensor => sensor.Value >= highVoltage)]);
 
             continue;
 

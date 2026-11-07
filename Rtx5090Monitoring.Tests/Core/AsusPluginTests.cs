@@ -48,8 +48,10 @@ internal static class AsusPluginTests
     private static void ValidatesTheOriginalPersistedThresholdBounds()
     {
         TestAssert.Throws<ArgumentException>(() => AsusSettings.WithOptions(new PluginSettings(), new AsusOptions { ImbalancePercentageThreshold = 51 }));
-        TestAssert.Throws<ArgumentException>(() => AsusSettings.GetOptions(new PluginSettings { PollIntervalMs = 5000 }));
-        var tooLong = new PluginSettings { Options = JsonSerializer.SerializeToElement(new { wireOvercurrentThresholdMs = 11000 }) };
+        var slow = AsusSettings.GetOptions(new PluginSettings { PollIntervalMs = 5000 });
+        TestAssert.Equal(3000, slow.WireOvercurrentThresholdMs);
+
+        var tooLong = new PluginSettings { Options = JsonSerializer.SerializeToElement(new { wireOvercurrentThresholdMs = 30001 }) };
         TestAssert.Throws<ArgumentException>(() => AsusSettings.GetOptions(tooLong));
     }
 

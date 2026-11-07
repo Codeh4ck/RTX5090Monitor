@@ -38,12 +38,12 @@ internal static class DeviceRefreshTests
             for (var refresh = 0; refresh < 3; refresh++)
             {
                 editor.SetDevices(refresh == 1 ? [] : [new AsusDeviceInfo("gpu0", "RTX 5090")]);
-                TestAssert.Equal(id, asus.Build(1000).DeviceId);
+                TestAssert.Equal(id, asus.Build().DeviceId);
                 TestAssert.True(asus.Devices.Contains(asus.SelectedDevice), "The restored GPU selection must belong to the refreshed list.");
                 TestAssert.False(editor.IsDirty, "Binding callbacks during discovery must not create configuration changes.");
             }
             asus.SelectedDevice = null!;
-            TestAssert.Equal(id, asus.Build(1000).DeviceId);
+            TestAssert.Equal(id, asus.Build().DeviceId);
         }
     }
 
@@ -85,7 +85,7 @@ internal static class DeviceRefreshTests
         TestAssert.True(editor.IsDirty, "User device selections must remain editable.");
         editor.SetDevices([]);
         editor.SetMsiDevices([]);
-        TestAssert.Equal("gpu0", asus.Build(1000).DeviceId);
+        TestAssert.Equal("gpu0", asus.Build().DeviceId);
         TestAssert.Equal("psu0", msi.Build().DevicePath);
         TestAssert.True(editor.IsDirty, "Refresh must preserve existing device-selection drafts.");
         asus.SelectedDevice = asus.Devices.Single(device => device.Id is null);
