@@ -8,12 +8,58 @@
                 <TextBlock Text="Performance Chart" Style="{StaticResource MonitorHeading}" />
                 <TextBlock x:Name="SessionStatus" TextWrapping="Wrap" Style="{StaticResource MonitorCaption}" />
             </StackPanel>
-            <Grid x:Name="SessionActions" Grid.Column="1" ColumnDefinitions="Auto,Auto,Auto,Auto"
-                RowDefinitions="Auto,Auto" ColumnSpacing="8" VerticalAlignment="Center">
-                <Button x:Name="StartButton" Content="Start recording" Click="Start_Click" />
-                <Button x:Name="StopButton" Grid.Column="1" Content="Stop recording" Click="Stop_Click" IsEnabled="False" />
-                <Button x:Name="ImportButton" Grid.Column="2" Content="Import recording" Click="Import_Click" />
-                <Button x:Name="ExportButton" Grid.Column="3" Content="Export recording" Click="Export_Click" IsEnabled="False" />
+            <Grid x:Name="SessionActions" Grid.Column="1" ColumnDefinitions="Auto,Auto,Auto,Auto,Auto"
+                RowDefinitions="Auto,Auto,Auto" ColumnSpacing="8" VerticalAlignment="Center">
+                <Button x:Name="StartButton" Grid.Column="0" Click="Start_Click" AutomationProperties.Name="Start recording">
+                    <StackPanel Orientation="Horizontal" Spacing="7">
+                        <Image Width="16" Height="16" VerticalAlignment="Center">
+                            <Image.Source>
+                                <SvgImageSource UriSource="ms-appx:///Assets/Icons/chart-record.svg" />
+                            </Image.Source>
+                        </Image>
+                        <TextBlock x:Name="StartLabel" Text="Start recording" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+                <Button x:Name="StopButton" Grid.Column="1" Click="Stop_Click" IsEnabled="False" AutomationProperties.Name="Stop recording">
+                    <StackPanel Orientation="Horizontal" Spacing="7">
+                        <Image Width="16" Height="16" VerticalAlignment="Center">
+                            <Image.Source>
+                                <SvgImageSource UriSource="ms-appx:///Assets/Icons/chart-stop.svg" />
+                            </Image.Source>
+                        </Image>
+                        <TextBlock Text="Stop recording" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+                <Button x:Name="ClearButton" Grid.Column="2" Click="Clear_Click" IsEnabled="False" AutomationProperties.Name="Clear recording">
+                    <StackPanel Orientation="Horizontal" Spacing="7">
+                        <Image Width="16" Height="16" VerticalAlignment="Center">
+                            <Image.Source>
+                                <SvgImageSource UriSource="ms-appx:///Assets/Icons/chart-clear.svg" />
+                            </Image.Source>
+                        </Image>
+                        <TextBlock Text="Clear recording" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+                <Button x:Name="ImportButton" Grid.Column="3" Click="Import_Click" AutomationProperties.Name="Import recording">
+                    <StackPanel Orientation="Horizontal" Spacing="7">
+                        <Image Width="16" Height="16" VerticalAlignment="Center">
+                            <Image.Source>
+                                <SvgImageSource UriSource="ms-appx:///Assets/Icons/chart-import.svg" />
+                            </Image.Source>
+                        </Image>
+                        <TextBlock Text="Import recording" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+                <Button x:Name="ExportButton" Grid.Column="4" Click="Export_Click" IsEnabled="False" AutomationProperties.Name="Export recording">
+                    <StackPanel Orientation="Horizontal" Spacing="7">
+                        <Image Width="16" Height="16" VerticalAlignment="Center">
+                            <Image.Source>
+                                <SvgImageSource UriSource="ms-appx:///Assets/Icons/chart-export.svg" />
+                            </Image.Source>
+                        </Image>
+                        <TextBlock Text="Export recording" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
             </Grid>
         </Grid>
         <InfoBar x:Name="Notice" Grid.Row="1" IsOpen="False" IsClosable="True" Severity="Warning" />
@@ -30,7 +76,15 @@
                     </StackPanel>
                     <ScrollViewer x:Name="SourcesScroll" Grid.Row="1" Padding="0,0,20,0"
                         HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Visible">
-                        <StackPanel x:Name="SourcesHost" Spacing="10" />
+                        <StackPanel Spacing="10">
+                            <Border x:Name="PluginSelectionPanel" Style="{StaticResource MonitorCard}" Padding="10" Visibility="Collapsed">
+                                <StackPanel Spacing="6">
+                                    <TextBlock Text="Select by plugin" Style="{StaticResource MonitorSectionHeading}" />
+                                    <StackPanel x:Name="PluginSelectionsHost" Spacing="4" />
+                                </StackPanel>
+                            </Border>
+                            <StackPanel x:Name="SourcesHost" Spacing="10" />
+                        </StackPanel>
                     </ScrollViewer>
                 </Grid>
             </Border>

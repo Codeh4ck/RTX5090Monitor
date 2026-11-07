@@ -56,7 +56,7 @@ internal static class WireViewPresentationSmokeTests
             {
                 throw new InvalidOperationException("The inline device configuration expander must be removed.");
             }
-            var button = VisualTreeQuery.Descendants<Button>(hardware).Single(item => item.Content as string == "Device settings...");
+            var button = VisualTreeQuery.Descendants<Button>(hardware).Single(item => item.Name == "DeviceSettingsButton");
             ((IInvokeProvider)new ButtonAutomationPeer(button).GetPattern(PatternInterface.Invoke)).Invoke();
             await WaitAsync(() => runtime.WireViewSettingsWindow is { } device && VisualTreeQuery.Descendants<MetricTile>(device.ThemeRoot).Count() == 20);
             var deviceWindow = runtime.WireViewSettingsWindow!;
@@ -74,10 +74,10 @@ internal static class WireViewPresentationSmokeTests
             var rows = VisualTreeQuery.Descendants<MetricTile>(deviceWindow.ThemeRoot).ToArray();
             var scrollbar = VisualTreeQuery.Descendants<ScrollBar>(scroll).Single(bar => bar.Orientation == Orientation.Vertical);
             var scrollbarLeft = scrollbar.TransformToVisual(scroll).TransformPoint(new Point()).X;
-            if (rows.Any(row => VisualTreeQuery.Descendants<WidgetIcon>(row).Any()
+            if (rows.Any(row => !row.ShowIcon || !VisualTreeQuery.Descendants<WidgetIcon>(row).Any()
                 || row.TransformToVisual(scroll).TransformPoint(new Point(row.ActualWidth, 0)).X > scrollbarLeft - 2))
             {
-                throw new InvalidOperationException("Device settings must have no icons and must leave a clear gutter before the scrollbar.");
+                throw new InvalidOperationException("Device settings must show metric icons and leave a clear gutter before the scrollbar.");
             }
             await SmokeTestRunner.CaptureElementAsync(deviceWindow.ThemeRoot, Path.Combine(output, "wireview-device-window-" + suffix + ".png"));
             scroll.ChangeView(null, scroll.ScrollableHeight, null, true);

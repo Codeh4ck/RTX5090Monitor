@@ -360,6 +360,8 @@ internal sealed partial class AppRuntime
         }
     });
 
+    internal void RefreshPresentation() => _refresh = true;
+
     private void RenderLatest()
     {
         if (!_rendering)
@@ -375,11 +377,14 @@ internal sealed partial class AppRuntime
             _session?.Latest;
         if (snapshot is not null && (_refresh || !ReferenceEquals(snapshot, _rendered)))
         {
-            Dashboard.Apply(snapshot, Preferences, DateTimeOffset.UtcNow);
+            Dashboard.Apply(snapshot, Preferences, DateTimeOffset.UtcNow, _window?.HardwareDetailsVisible != false);
 #if TELEMETRY_DEBUG
             ApplyDebugDeviceConfiguration();
 #endif
-            Configuration.SetAvailableSensors(snapshot);
+            if (_window?.ConfigurationVisible == true)
+            {
+                Configuration.SetAvailableSensors(snapshot);
+            }
             _rendered = snapshot;
         }
         else if (!_connected

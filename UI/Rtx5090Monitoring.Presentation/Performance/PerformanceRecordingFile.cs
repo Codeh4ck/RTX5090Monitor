@@ -75,7 +75,7 @@ public static class PerformanceRecordingFile
 
     public static void Validate(PerformanceChartFrame? session)
     {
-        if (session is not { Recording: false, StartedAt: not null, Series: { Length: > 0 and <= 256 }, SampleCount: > 0 and <= 2_000_000 }
+        if (session is not { DisplayOnly: false, Recording: false, StartedAt: not null, Series: { Length: > 0 and <= 256 }, SampleCount: > 0 and <= 2_000_000 }
             || !double.IsFinite(session.DurationSeconds) || session.DurationSeconds < 0
             || session.DurationSeconds >= TimeSpan.MaxValue.TotalSeconds)
         {

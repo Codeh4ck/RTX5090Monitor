@@ -35,6 +35,11 @@ public sealed partial class MsiHardwareView : UserControl
 
     private void LayoutConnectors()
     {
+        var stackedHeader = ActualWidth < 960;
+        Grid.SetRow(DeviceActions, stackedHeader ? 1 : 0);
+        Grid.SetColumn(DeviceActions, stackedHeader ? 0 : 1);
+        Grid.SetColumnSpan(DeviceActions, stackedHeader ? 2 : 1);
+
         var wide = ActualWidth >= 800;
         ConnectorGrid.ColumnDefinitions[1].Width = wide ? new GridLength(1, GridUnitType.Star) : new GridLength(0);
         Grid.SetColumn((FrameworkElement)ConnectorGrid.Children[1], wide ? 1 : 0);

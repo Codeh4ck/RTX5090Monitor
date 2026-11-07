@@ -31,6 +31,10 @@ h1 { margin: 0 0 6px; font-size: 22px; }
 header p { color: var(--muted); margin: 4px 0; overflow-wrap: anywhere; }
 body.embedded header { display: none; }
 nav { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 10px 12px; }
+.nav-main { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; flex: 1 1 600px; min-width: 0; }
+.nav-options { display: flex; align-items: center; gap: 12px; margin-left: auto; }
+button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; }
+button svg { flex: 0 0 auto; }
 button {
     border: 1px solid var(--border); border-radius: 5px; padding: 7px 12px;
     color: var(--text); background: var(--panel); font: inherit; cursor: pointer;
@@ -60,17 +64,27 @@ dialog form { text-align: right; }
 .hover-group { color: var(--muted); font-size: 12px; font-weight: 600; margin: 8px 0 5px; }
 .hover-row { display: grid; grid-template-columns: 10px minmax(100px, 1fr) auto; align-items: center; gap: 7px; margin: 4px 0; }
 .hover-row i { width: 10px; height: 3px; }
-.hover-row strong { padding-left: 12px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.hover-row strong { min-width: 100px; padding-left: 12px; font-variant-numeric: tabular-nums; white-space: nowrap; }
 #file-error { color: #ff819a; padding: 0 12px 10px; margin: 0; }
 body.embedded #open-recording { display: none; }
 #empty { color: var(--muted); padding: 32px 20px; text-align: center; }
 section { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; margin: 0 10px 12px; padding: 12px; }
 h2 { font-size: 15px; margin: 0 0 10px; }
+.plot-surface { position: relative; }
+canvas.overlay { position: absolute; inset: 0; pointer-events: none; }
 canvas { display: block; width: 100%; height: 220px; touch-action: none; cursor: crosshair; }
 .legend { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 10px; }
 .legend label { display: flex; align-items: center; gap: 6px; font-size: 12px; cursor: pointer; }
 .legend input { margin: 0; }
-.legend strong { color: var(--text); font-variant-numeric: tabular-nums; min-width: 60px; text-align: right; }
+.legend-option { position: relative; display: inline-flex; align-items: center; gap: 8px; min-height: 34px; white-space: nowrap; cursor: pointer; }
+.legend-option input { position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 36px; height: 22px; margin: 0; opacity: 0; z-index: 1; cursor: pointer; }
+.switch-track { display: inline-block; position: relative; width: 36px; height: 22px; border: 1px solid var(--muted); border-radius: 12px; background: var(--panel); pointer-events: none; }
+.switch-track::before { content: ""; position: absolute; width: 14px; height: 14px; top: 3px; left: 3px; border-radius: 50%; background: var(--muted); transition: transform 120ms ease; }
+.legend-option input:checked + .switch-track { border-color: var(--accent); background: var(--accent); }
+.legend-option input:checked + .switch-track::before { background: var(--background); transform: translateX(14px); }
+.legend-option input:focus-visible + .switch-track { outline: 2px solid var(--accent); outline-offset: 3px; }
+.legend strong { display: none; color: var(--text); font-variant-numeric: tabular-nums; min-width: 60px; text-align: right; }
+body.include-legend-values .legend strong { display: inline-block; }
 .legend span { overflow-wrap: anywhere; }
 .legend i { width: 14px; height: 3px; flex-shrink: 0; }
 body.embedded .legend input { display: none; }
@@ -81,22 +95,32 @@ footer { margin: 12px; color: var(--muted); font-size: 12px; }
 <header><h1>RTX Monitor - Performance Chart</h1><p id="session-info">No session</p><p id="status"></p></header>
 <div id="chart-controls">
 <nav aria-label="Chart navigation">
-    <button id="open-recording" type="button">Open recording</button>
+    <div class="nav-main">
+    <button id="open-recording" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 7h7l2 2h9l-3 11H3zM3 7V4h7l2 3"/></svg>Open recording</button>
     <input id="recording-file" type="file" accept=".rtxchart,.json,.html,text/html,application/json" hidden>
-    <button id="start" type="button" title="Go to the start of the recording">Start</button>
-    <button id="back" type="button" title="Move back by half the visible time range">Back</button>
-    <button id="forward" type="button" title="Move forward by half the visible time range">Forward</button>
-    <button id="end" type="button" title="Go to the end of the recording">End</button>
-    <button id="zoom-in" type="button">Zoom in</button>
-    <button id="zoom-out" type="button">Zoom out</button>
-    <button id="fit" type="button">Fit session</button>
-    <button id="follow" type="button" aria-pressed="false">Follow latest <span id="follow-indicator">Off</span></button>
-    <button id="info" type="button" aria-label="Chart controls" title="Chart controls">
+    <button id="start" type="button" title="Go to the start of the recording"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 4v16M18 5l-9 7 9 7"/></svg>Start</button>
+    <button id="back" type="button" title="Move back by half the visible time range"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m15 5-7 7 7 7"/></svg>Back</button>
+    <button id="forward" type="button" title="Move forward by half the visible time range"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m9 5 7 7-7 7"/></svg>Forward</button>
+    <button id="end" type="button" title="Go to the end of the recording"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M19 4v16M6 5l9 7-9 7"/></svg>End</button>
+    <button id="zoom-in" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="6"/><path d="m15 15 6 6M7 10h6m-3-3v6"/></svg>Zoom in</button>
+    <button id="zoom-out" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="6"/><path d="m15 15 6 6M7 10h6"/></svg>Zoom out</button>
+    <button id="fit" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 3H3v6m12-6h6v6M3 15v6h6m12-6v6h-6M3 3l6 6m12-6-6 6M3 21l6-6m12 6-6-6"/></svg>Fit session</button>
+    <button id="follow" type="button" aria-pressed="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M8 5v14l11-7zM3 5v14"/></svg>Follow latest <span id="follow-indicator">Off</span></button>
+
+    <span id="window-label"></span>
+    </div>
+    <div class="nav-options">
+        <label class="legend-option">
+            <input id="legend-values" type="checkbox" role="switch">
+            <span class="switch-track" aria-hidden="true"></span>
+            <span>Include values in legend</span>
+        </label>
+        <button id="info" type="button" aria-label="Chart controls" title="Chart controls">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
             <circle cx="12" cy="12" r="10"></circle><path d="M12 10v7m0-11v1"></path>
         </svg>
     </button>
-    <span id="window-label"></span>
+    </div>
 </nav>
 <div id="timeline-row">
     <span id="timeline-start">00:00</span>
@@ -109,14 +133,15 @@ footer { margin: 12px; color: var(--muted); font-size: 12px; }
 </div>
 <dialog id="controls-help" aria-labelledby="controls-title">
     <h2 id="controls-title">Chart controls</h2>
-    <p>In the app, select each metric and source with its checkbox, then use <strong>Start recording</strong>. Selection changes during recording apply from that moment. <strong>Stop recording</strong> keeps the session for review.</p>
+    <p>In the app, select each metric and source with its checkbox, then use <strong>Start recording</strong>. Selection changes during recording apply from that moment. <strong>Stop recording</strong> keeps the session for review. <strong>Clear recording</strong> discards the stopped session and keeps your metric selections for the next recording.</p>
     <p><strong>Start / End</strong> move to the beginning or end of the recording. <strong>Back / Forward</strong> move by half the visible time range.</p>
     <p>Drag the horizontal time scrollbar to browse the recording. With the scrollbar focused, use the arrow keys, Home, or End.</p>
     <p><strong>Zoom in / Zoom out</strong> change the visible time range. You can also scroll over a plot to zoom or drag across it to select a range. Shift-drag or Shift-scroll pans through time.</p>
+    <p><strong>Include values in legend</strong> adds values beside each trace name. Values follow the hover timestamp while the popup is visible and show the latest loaded readings otherwise.</p>
     <p><strong>Fit session</strong> shows the complete recording. <strong>Follow latest</strong> toggles automatic movement to the newest readings. Browsing earlier times turns it off.</p>
     <p>Hover over a plot to see the timestamp and nearest recorded values for all selected traces. Gaps display a dash. You can move into the popup to scroll a long list.</p>
     <p>In the app, <strong>Export recording</strong> saves a recording data file or interactive HTML. <strong>Import recording</strong> reopens either format. In the HTML viewer, use <strong>Open recording</strong> to load saved recordings.</p>
-    <form method="dialog"><button type="submit">Close</button></form>
+    <form method="dialog"><button type="submit"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m6 6 12 12M6 18 18 6"/></svg>Close</button></form>
 </dialog>
 <div id="hover" role="tooltip" aria-live="off" hidden>
     <div id="hover-time"></div><div id="hover-date"></div><div id="hover-values"></div>
@@ -133,6 +158,27 @@ footer { margin: 12px; color: var(--muted); font-size: 12px; }
     document.body.classList.toggle("embedded", embedded);
     const traces = new Map();
     const plots = new Map();
+    const plotElements = new WeakMap();
+    const visibility = new IntersectionObserver(entries => {
+        for (const entry of entries) {
+            const plot = plotElements.get(entry.target);
+            if (plot) plot.visible = entry.isIntersecting;
+        }
+        requestDraw();
+    }, { rootMargin: "100px 0px" });
+    const numbers = new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 });
+    const dates = new Intl.DateTimeFormat(undefined, {
+        year: "numeric", month: "numeric", day: "numeric", hour: "2-digit",
+        minute: "2-digit", second: "2-digit", fractionalSecondDigits: 3
+    });
+    let colorsCache = null;
+    let navigationKey = "";
+    let viewportKey = "";
+    let hoverTimer = null;
+    let hoverRequestId = 0;
+    let rawHover = null;
+    let lastHoverResponse = 0;
+    let includeLegendValues = false;
     let sessionId = "";
     let frame = null;
     let follow = embedded;
@@ -151,8 +197,10 @@ footer { margin: 12px; color: var(--muted); font-size: 12px; }
     let expectedScrollLeft = 0;
 
     const palette = () => {
+        if (colorsCache) return colorsCache;
+
         const style = getComputedStyle(document.body);
-        return Object.fromEntries(["text", "muted", "border", "accent"].map(name =>
+        return colorsCache = Object.fromEntries(["text", "muted", "border", "accent"].map(name =>
             [name, style.getPropertyValue("--" + name).trim()]));
     };
 
@@ -175,6 +223,8 @@ footer { margin: 12px; color: var(--muted); font-size: 12px; }
             sessionId = update.sessionId;
             traces.clear();
             for (const plot of plots.values()) {
+                visibility.unobserve(plot.section);
+                plot.resize.disconnect();
                 plot.section.remove();
             }
             plots.clear();
@@ -200,14 +250,18 @@ footer { margin: 12px; color: var(--muted); font-size: 12px; }
 
         for (const series of update.series) {
             let trace = traces.get(series.trace.key);
-            if (!trace || series.offset === 0) {
+            if (!trace || !update.displayOnly && series.offset === 0) {
                 trace = { ...series, samples: [] };
                 traces.set(series.trace.key, trace);
             }
 
             trace.selected = series.selected;
             trace.available = series.available;
-            if (trace.samples.length === series.offset) {
+            trace.count = series.count;
+            trace.revision = [series.count, series.samples.length, series.samples[0]?.seconds, series.samples.at(-1)?.seconds].join("/");
+            if (update.displayOnly) {
+                trace.samples = series.samples;
+            } else if (trace.samples.length === series.offset) {
                 for (const sample of series.samples) {
                     trace.samples.push(sample);
                 }
@@ -222,13 +276,14 @@ footer { margin: 12px; color: var(--muted); font-size: 12px; }
             + " readings - " + time(update.durationSeconds) + (update.recording ? " - Recording" : "");
 
         syncPlots();
+        requestRawHover();
         requestDraw();
     }
 
     function syncPlots() {
         const groups = new Map();
         for (const trace of traces.values()) {
-            if (trace.samples.length === 0) {
+            if ((trace.count ?? trace.samples.length) === 0) {
                 continue;
             }
 
@@ -241,6 +296,8 @@ footer { margin: 12px; color: var(--muted); font-size: 12px; }
 
         for (const [name, plot] of plots) {
             if (!groups.has(name)) {
+                visibility.unobserve(plot.section);
+                plot.resize.disconnect();
                 plot.section.remove();
                 plots.delete(name);
             }
@@ -323,11 +380,25 @@ footer { margin: 12px; color: var(--muted); font-size: 12px; }
         canvas.setAttribute("aria-label", name + " against elapsed session time");
         const legend = document.createElement("div");
         legend.className = "legend";
-        section.append(title, canvas, legend);
+        const surface = document.createElement("div");
+        surface.className = "plot-surface";
+        const overlay = document.createElement("canvas");
+        overlay.className = "overlay";
+        overlay.setAttribute("aria-hidden", "true");
+        surface.append(canvas, overlay);
+        section.append(title, surface, legend);
         document.getElementById("plots").append(section);
 
-        const plot = { section, canvas, legend, series: [], rows: new Map(), area: null };
-        new ResizeObserver(requestDraw).observe(canvas);
+        const plot = { section, canvas, overlay, legend, series: [], rows: new Map(), area: null,
+            visible: false, width: 200, cacheKey: "" };
+        plot.resize = new ResizeObserver(entries => {
+            plot.width = Math.max(200, entries[0].contentRect.width);
+            plot.cacheKey = "";
+            requestDraw();
+        });
+        plot.resize.observe(canvas);
+        plotElements.set(section, plot);
+        visibility.observe(section);
         canvas.addEventListener("wheel", event => zoom(event, plot), { passive: false });
         canvas.addEventListener("pointerdown", event => beginDrag(event, plot));
         canvas.addEventListener("pointermove", event => movePointer(event, plot));
@@ -376,11 +447,14 @@ footer { margin: 12px; color: var(--muted); font-size: 12px; }
         updateNavigation();
         const colors = palette();
         for (const plot of plots.values()) {
-            if (!plot.section.hidden) {
+            if (!plot.section.hidden && plot.visible) {
                 drawPlot(plot, colors);
+                drawOverlay(plot, colors);
+                updateLegend(plot);
             }
         }
 
+        requestViewport();
         updateHover();
     }
 
@@ -424,7 +498,12 @@ footer { margin: 12px; color: var(--muted); font-size: 12px; }
 
     function drawPlot(plot, colors) {
         const canvas = plot.canvas;
-        const width = Math.max(200, canvas.clientWidth);
+        const width = plot.width;
+        const selected = plot.series.filter(trace => trace.selected);
+        const cacheKey = [width, window.devicePixelRatio, viewStart, viewEnd,
+            JSON.stringify(colors), ...selected.map(trace => trace.trace.key + trace.revision)].join("|");
+        if (plot.cacheKey === cacheKey) return;
+        plot.cacheKey = cacheKey;
         const height = 220;
         const ratio = window.devicePixelRatio || 1;
         if (canvas.width !== Math.round(width * ratio) || canvas.height !== Math.round(height * ratio)) {
@@ -435,7 +514,6 @@ footer { margin: 12px; color: var(--muted); font-size: 12px; }
         const context = canvas.getContext("2d");
         context.setTransform(ratio, 0, 0, ratio, 0, 0);
         context.clearRect(0, 0, width, height);
-        const selected = plot.series.filter(trace => trace.selected);
         const [minimum, maximum] = bounds(selected);
         const area = { left: 68, top: 12, width: Math.max(20, width - 82), height: height - 45 };
         plot.area = area;
@@ -469,6 +547,33 @@ footer { margin: 12px; color: var(--muted); font-size: 12px; }
             drawTrace(context, trace, x, y);
         }
 
+        context.restore();
+    }
+
+    function drawOverlay(plot, colors) {
+        const canvas = plot.overlay;
+        const key = [plot.canvas.width, plot.canvas.height, window.devicePixelRatio,
+            viewStart, viewEnd, cursor, drag?.start, drag?.end, drag?.pan, JSON.stringify(colors)].join("/");
+        if (plot.overlayKey === key) return;
+        plot.overlayKey = key;
+
+        const ratio = window.devicePixelRatio || 1;
+        if (canvas.width !== plot.canvas.width || canvas.height !== plot.canvas.height) {
+            canvas.width = plot.canvas.width;
+            canvas.height = plot.canvas.height;
+        }
+
+        const context = canvas.getContext("2d");
+        context.setTransform(ratio, 0, 0, ratio, 0, 0);
+        context.clearRect(0, 0, plot.width, 220);
+        const area = plot.area;
+        if (!area) return;
+
+        const x = seconds => area.left + (seconds - viewStart) / (viewEnd - viewStart) * area.width;
+        context.save();
+        context.beginPath();
+        context.rect(area.left, area.top, area.width, area.height);
+        context.clip();
         if (cursor !== null) {
             context.strokeStyle = colors.muted;
             context.setLineDash([4, 4]);
@@ -476,7 +581,6 @@ footer { margin: 12px; color: var(--muted); font-size: 12px; }
             context.moveTo(x(cursor), area.top);
             context.lineTo(x(cursor), area.top + area.height);
             context.stroke();
-            context.setLineDash([]);
         }
 
         if (drag && drag.plot === plot && !drag.pan) {
@@ -484,11 +588,50 @@ footer { margin: 12px; color: var(--muted); font-size: 12px; }
             context.fillRect(Math.min(drag.start, drag.end), area.top, Math.abs(drag.end - drag.start), area.height);
         }
         context.restore();
+    }
+
+    function setText(element, text) {
+        if (element.textContent !== text) element.textContent = text;
+    }
+
+    function hoverValue(trace) {
+        if (embedded && frame?.displayOnly && cursor !== null) {
+            return rawHover?.sessionId === sessionId ? rawHover.values[trace.trace.key] ?? null : null;
+        }
+        return nearestSample(trace.samples, cursor ?? Infinity)?.value ?? null;
+    }
+
+    function updateLegend(plot) {
+        if (!includeLegendValues || embedded && frame?.displayOnly && cursor !== null && !rawHover) return;
 
         for (const trace of plot.series) {
-            const sample = nearestSample(trace.samples, cursor ?? Infinity);
-            plot.rows.get(trace.trace.key).value.textContent = sample?.value == null ? "-" : format(sample.value) + " " + trace.trace.unit;
+            if (!trace.selected) continue;
+            const value = hoverValue(trace);
+            setText(plot.rows.get(trace.trace.key).value, value === null ? "-" : format(value) + " " + trace.trace.unit);
         }
+    }
+
+    function requestViewport() {
+        if (!embedded || !frame?.displayOnly) return;
+        const shown = [...plots.values()].filter(plot => !plot.section.hidden && plot.visible);
+        const keys = shown.flatMap(plot => plot.series.filter(trace => trace.selected).map(trace => trace.trace.key));
+        const width = Math.round(Math.max(200, ...shown.map(plot => plot.width)));
+        const key = JSON.stringify([sessionId, follow, autoFit, follow || autoFit ? null : [viewStart, viewEnd], width, keys]);
+        if (key === viewportKey) return;
+        viewportKey = key;
+        window.chrome.webview.postMessage({ type: "viewport", start: viewStart, end: viewEnd,
+            follow, fit: autoFit, width, keys });
+    }
+
+    function requestRawHover() {
+        if (!embedded || !frame?.displayOnly || cursor === null || hoverTimer !== null) return;
+        hoverTimer = setTimeout(() => {
+            hoverTimer = null;
+            if (cursor !== null && hoverPosition) {
+                window.chrome.webview.postMessage({ type: "hover", sessionId,
+                    requestId: ++hoverRequestId, seconds: cursor });
+            }
+        }, 32);
     }
 
     function drawTrace(context, trace, x, y) {
@@ -500,26 +643,31 @@ footer { margin: 12px; color: var(--muted); font-size: 12px; }
         context.lineWidth = 1.7;
         context.beginPath();
         let connected = false;
-        let bucket = [];
+        let bucketFirst = null;
+        let bucketLast = null;
+        let bucketMin = null;
+        let bucketMax = null;
 
         function flush() {
-            if (bucket.length === 0) {
+            if (bucketFirst === null) {
                 return;
             }
 
-            const minimum = bucket.reduce((best, sample) => sample.value < best.value ? sample : best);
-            const maximum = bucket.reduce((best, sample) => sample.value > best.value ? sample : best);
-            const points = [...new Set([bucket[0], minimum, maximum, bucket[bucket.length - 1]])]
+            const points = [bucketFirst, bucketMin, bucketMax, bucketLast]
                 .sort((left, right) => left.seconds - right.seconds);
+            let previous = null;
             for (const sample of points) {
+                if (sample === previous) continue;
+                previous = sample;
                 if (connected) {
                     context.lineTo(x(sample.seconds), y(sample.value));
                 } else {
                     context.moveTo(x(sample.seconds), y(sample.value));
+                    context.lineTo(x(sample.seconds) + 0.3, y(sample.value));
                     connected = true;
                 }
             }
-            bucket = [];
+            bucketFirst = bucketLast = bucketMin = bucketMax = null;
         }
 
         let pixel = null;
@@ -542,7 +690,10 @@ footer { margin: 12px; color: var(--muted); font-size: 12px; }
             }
 
             pixel = nextPixel;
-            bucket.push(sample);
+            bucketFirst ??= sample;
+            bucketLast = sample;
+            if (bucketMin === null || sample.value < bucketMin.value) bucketMin = sample;
+            if (bucketMax === null || sample.value > bucketMax.value) bucketMax = sample;
         }
 
         flush();
@@ -580,7 +731,7 @@ footer { margin: 12px; color: var(--muted); font-size: 12px; }
     }
 
     function format(value) {
-        return value.toLocaleString(undefined, { maximumFractionDigits: 2 });
+        return numbers.format(value);
     }
 
     function pointerX(event, plot) {
@@ -629,6 +780,10 @@ footer { margin: 12px; color: var(--muted); font-size: 12px; }
     }
 
     function updateNavigation() {
+        const key = [viewStart, viewEnd, frame?.durationSeconds, follow, timeline.clientWidth].join("/");
+        if (navigationKey === key) return;
+        navigationKey = key;
+
         const span = viewEnd - viewStart;
         const duration = Math.max(span, frame?.durationSeconds ?? 0, 1);
         const maximumStart = Math.max(0, duration - span);
@@ -659,6 +814,7 @@ footer { margin: 12px; color: var(--muted); font-size: 12px; }
         cursor = null;
         hoverPosition = null;
         hover.hidden = true;
+        rawHover = null;
     }
 
     function updateHover() {
@@ -667,7 +823,10 @@ footer { margin: 12px; color: var(--muted); font-size: 12px; }
             return;
         }
 
+        if (embedded && frame.displayOnly && !rawHover) return;
+
         const selected = [...traces.values()].filter(trace => trace.selected);
+        const displayedTime = embedded && frame.displayOnly ? rawHover.seconds : cursor;
         const keys = selected.map(trace => trace.trace.key).join("\n");
         if (keys !== hoverKeys) {
             hoverKeys = keys;
@@ -700,19 +859,15 @@ footer { margin: 12px; color: var(--muted); font-size: 12px; }
             }
         }
 
-        document.getElementById("hover-time").textContent = "Time " + preciseTime(cursor);
-        const date = new Date(Date.parse(frame.startedAt) + cursor * 1000);
-        document.getElementById("hover-date").textContent = Number.isFinite(date.getTime())
-            ? date.toLocaleString(undefined, {
-                year: "numeric", month: "numeric", day: "numeric",
-                hour: "2-digit", minute: "2-digit", second: "2-digit", fractionalSecondDigits: 3
-            }) : "";
+        setText(document.getElementById("hover-time"), "Time " + preciseTime(displayedTime));
+        const date = new Date(Date.parse(frame.startedAt) + displayedTime * 1000);
+        setText(document.getElementById("hover-date"), Number.isFinite(date.getTime()) ? dates.format(date) : "");
         for (const trace of selected) {
-            const sample = nearestSample(trace.samples, cursor);
-            hoverRows.get(trace.trace.key).textContent = sample?.value == null ? "-" : format(sample.value) + " " + trace.trace.unit;
+            const value = hoverValue(trace);
+            setText(hoverRows.get(trace.trace.key), value === null ? "-" : format(value) + " " + trace.trace.unit);
         }
 
-        hover.hidden = selected.length === 0;
+        if (hover.hidden !== (selected.length === 0)) hover.hidden = selected.length === 0;
         const width = hover.offsetWidth;
         const height = hover.offsetHeight;
         const left = hoverPosition.x + width + 18 <= innerWidth ? hoverPosition.x + 18 : hoverPosition.x - width - 18;
@@ -740,6 +895,7 @@ footer { margin: 12px; color: var(--muted); font-size: 12px; }
         const pixel = pointerX(event, plot);
         cursor = secondsAt(pixel, plot);
         hoverPosition = { x: event.clientX, y: event.clientY };
+        requestRawHover();
         if (drag && drag.plot === plot) {
             hover.hidden = true;
             hoverPosition = null;
@@ -782,6 +938,12 @@ footer { margin: 12px; color: var(--muted); font-size: 12px; }
             setRange(frame.durationSeconds - (viewEnd - viewStart), viewEnd - viewStart);
         }
     });
+    document.getElementById("legend-values").addEventListener("change", event => {
+        includeLegendValues = event.target.checked;
+        document.body.classList.toggle("include-legend-values", includeLegendValues);
+        requestDraw();
+    });
+
     document.getElementById("zoom-in").addEventListener("click", () => zoomRange(0.5));
     document.getElementById("zoom-out").addEventListener("click", () => zoomRange(2));
     document.getElementById("fit").addEventListener("click", () => {
@@ -840,7 +1002,7 @@ footer { margin: 12px; color: var(--muted); font-size: 12px; }
         }
     });
     document.addEventListener("scroll", event => {
-        if (event.target !== hover && !hover.contains(event.target)) {
+        if (event.target !== timeline && event.target !== hover && !hover.contains(event.target)) {
             hideHover();
             requestDraw();
         }
@@ -929,7 +1091,15 @@ footer { margin: 12px; color: var(--muted); font-size: 12px; }
         window.chrome.webview.addEventListener("message", event => {
             if (event.data.type === "appearance") {
                 document.body.classList.toggle("light", Boolean(event.data.light));
+                colorsCache = null;
                 requestDraw();
+            } else if (event.data.type === "hover") {
+                if (cursor !== null && hoverPosition && event.data.sessionId === sessionId
+                    && event.data.requestId > lastHoverResponse && event.data.requestId <= hoverRequestId) {
+                    lastHoverResponse = event.data.requestId;
+                    rawHover = event.data;
+                    requestDraw();
+                }
             } else {
                 accept(event.data);
             }

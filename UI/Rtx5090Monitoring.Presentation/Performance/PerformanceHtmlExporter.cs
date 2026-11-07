@@ -17,7 +17,7 @@ public static class PerformanceHtmlExporter
 
     public static string Export(PerformanceChartFrame session)
     {
-        if (session.Recording || session.SampleCount == 0)
+        if (session.DisplayOnly || session.Recording || session.SampleCount == 0)
         {
             throw new ArgumentException("Export requires a completed recording with samples.", nameof(session));
         }

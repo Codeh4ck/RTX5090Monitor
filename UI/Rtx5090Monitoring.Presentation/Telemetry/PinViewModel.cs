@@ -6,6 +6,7 @@ namespace Rtx5090Monitoring.Presentation.Telemetry;
 
 public sealed class PinViewModel(int channel) : ObservableObject
 {
+    private bool _presentationDirty;
     private double? _currentPeak;
     private double? _powerPeak;
     private double? _voltagePeak;
@@ -56,7 +57,7 @@ public sealed class PinViewModel(int channel) : ObservableObject
         Raise(nameof(PsuCurrentText));
     }
 
-    public void Update(double? current, double? voltage, double? power, PinMetric metric, double? limit, bool showPeak, bool showHeadroom, double? cableRatingW = null, SettingsProfile? profile = null)
+    public void Update(double? current, double? voltage, double? power, PinMetric metric, double? limit, bool showPeak, bool showHeadroom, double? cableRatingW = null, SettingsProfile? profile = null, bool notifyChanges = true)
     {
         cableRatingW = cableRatingW is > 0 and < double.PositiveInfinity ? cableRatingW : null;
         var scaleChanged = _metric != metric || _cableRatingW != cableRatingW || _profile != profile;
@@ -79,7 +80,17 @@ public sealed class PinViewModel(int channel) : ObservableObject
         _currentPeak = MaximumValue(_currentPeak, current);
         _voltagePeak = MaximumValue(_voltagePeak, voltage);
         _powerPeak = MaximumValue(_powerPeak, power);
-        if (changed)
+        if (notifyChanges)
+        {
+            changed |= _presentationDirty;
+            _presentationDirty = false;
+        }
+        else
+        {
+            _presentationDirty |= changed;
+        }
+
+        if (changed && notifyChanges)
         {
             Raise(string.Empty);
         }

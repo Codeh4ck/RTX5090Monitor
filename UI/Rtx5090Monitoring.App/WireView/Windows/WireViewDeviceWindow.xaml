@@ -8,16 +8,31 @@
             <TextBlock Text="WireView device settings" Style="{StaticResource MonitorHeading}" />
             <TextBlock Text="Read only - firmware thresholds and fan settings. Device writes are not supported." Style="{StaticResource MonitorCaption}" />
         </StackPanel>
-        <controls:SectionPanel Grid.Row="1" Header="Device configuration">
-            <controls:SectionPanel.HeaderActions>
-                <Button x:Name="RefreshButton" Content="Refresh" Click="Refresh_Click" />
-            </controls:SectionPanel.HeaderActions>
-            <Grid RowDefinitions="Auto,*" RowSpacing="12">
-                <TextBlock x:Name="StatusText" Style="{StaticResource MonitorCaption}" />
+        <Border Grid.Row="1" Style="{StaticResource MonitorCard}">
+            <Grid RowDefinitions="Auto,*" RowSpacing="14">
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                    <StackPanel Spacing="8">
+                        <StackPanel Orientation="Horizontal" Spacing="9">
+                            <controls:WidgetIcon IconName="settings" Width="28" Height="28" />
+                            <TextBlock Text="Device configuration" Style="{StaticResource MonitorSectionHeading}" VerticalAlignment="Center" />
+                        </StackPanel>
+                        <TextBlock x:Name="StatusText" Style="{StaticResource MonitorCaption}" TextWrapping="Wrap" />
+                    </StackPanel>
+                    <Button x:Name="RefreshButton" Grid.Column="1" Click="Refresh_Click" VerticalAlignment="Center" AutomationProperties.Name="Refresh device settings">
+                        <StackPanel Orientation="Horizontal" Spacing="7">
+                            <Image Width="16" Height="16">
+                                <Image.Source>
+                                    <SvgImageSource UriSource="ms-appx:///Assets/Icons/refresh.svg" />
+                                </Image.Source>
+                            </Image>
+                            <TextBlock Text="Refresh" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+                </Grid>
                 <ScrollViewer x:Name="SettingsScroll" Grid.Row="1" Padding="0,0,20,0" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
                     <StackPanel x:Name="RowsHost" Spacing="8" />
                 </ScrollViewer>
             </Grid>
-        </controls:SectionPanel>
+        </Border>
     </Grid>
 </Window>

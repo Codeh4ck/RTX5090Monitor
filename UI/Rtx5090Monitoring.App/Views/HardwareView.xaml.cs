@@ -30,14 +30,18 @@ public sealed partial class HardwareView : UserControl
             GpuStatusHost.Children.Add(new GpuStatusView(runtime.Dashboard.GpuStatus, Model.IsNvidia));
             if (!Model.IsWireView)
             {
-                NativeStatusHeading.Visibility = Visibility.Collapsed;
-                MetricsHost.Visibility = Visibility.Collapsed;
+                NativeDetailsCard.Visibility = Visibility.Collapsed;
             }
+        }
+
+        if (!Model.HasGpuStatus)
+        {
+            DetailsCard.Visibility = Visibility.Collapsed;
         }
 
         if (Model.IsNvidia)
         {
-            DeviceHeader.Visibility = Visibility.Collapsed;
+            DeviceIdentity.Visibility = Visibility.Collapsed;
             HeadlineGrid.Visibility = Visibility.Collapsed;
             DetailsCard.Style = null;
             DetailsCard.Padding = new Thickness(0);
@@ -66,6 +70,15 @@ public sealed partial class HardwareView : UserControl
     {
         UpdateLayoutColumns();
         LayoutHeadlines();
+        LayoutHeaderActions();
+    }
+
+    private void LayoutHeaderActions()
+    {
+        var stacked = ActualWidth < (Model.IsWireView ? 1000 : 720);
+        Grid.SetRow(DeviceActions, stacked ? 1 : 0);
+        Grid.SetColumn(DeviceActions, stacked ? 0 : 1);
+        Grid.SetColumnSpan(DeviceActions, stacked ? 2 : 1);
     }
 
     private void LayoutHeadlines()
@@ -104,8 +117,8 @@ public sealed partial class HardwareView : UserControl
         TelemetryGrid.ColumnDefinitions[0].Width = new GridLength(wide ? 1.55 : 1, GridUnitType.Star);
         TelemetryGrid.ColumnDefinitions[1].Width = wide ? new GridLength(1, GridUnitType.Star) : new GridLength(0);
         TelemetryGrid.ColumnSpacing = wide ? 14 : 0;
-        Grid.SetRow(DetailsCard, wide || !Model.HasPins ? 0 : 1);
-        Grid.SetColumn(DetailsCard, wide ? 1 : 0);
+        Grid.SetRow(DetailsColumn, wide || !Model.HasPins ? 0 : 1);
+        Grid.SetColumn(DetailsColumn, wide ? 1 : 0);
     }
 
     private void SetMetric(PinMetric metric) => _runtime.SetPinMetric(metric);

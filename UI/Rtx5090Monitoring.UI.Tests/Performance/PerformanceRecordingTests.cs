@@ -11,6 +11,13 @@ internal static class PerformanceRecordingTests
 {
     public static void Run(TestRunner runner)
     {
+        runner.Run(TemperaturesIncludeReportedWireViewSensorsAndGpuFans);
+        runner.Run(ClearRemovesSessionDataAndRetainsLiveSelections);
+        runner.Run(GpuMetricsRetainSourcesUnitsAndReportedFans);
+        runner.Run(BulkSelectionIsScopedAndNotifiesOnce);
+        runner.Run(MsiSelectorsHideUnusedConnectorsAndKeepRecordedHistory);
+        runner.Run(DisplayFramesBoundMemoryAndKeepExactHoverAndExport);
+        runner.Run(HiddenPinUpdatesPreservePeaksAndRefreshOnReturn);
         runner.Run(RecordsMultipleSourcesWithoutFallbackOrDuplicateSamples);
         runner.Run(SelectionChangesRetainPreviousSamplesAndCreateGaps);
         runner.Run(DisconnectsStaleReadingsAndModeChangesBreakTheTrace);
@@ -21,6 +28,280 @@ internal static class PerformanceRecordingTests
         runner.Run(RejectsInvalidImportsWithoutChangingTheCurrentSession);
         runner.Run(ImportedSessionsPreserveGapsAndLiveSourceAvailability);
         runner.Run(DisabledPluginsDisappearAndReturnWithoutLosingRecordedSamples);
+    }
+
+    private static void TemperaturesIncludeReportedWireViewSensorsAndGpuFans()
+    {
+        var clock = new RecordingClock();
+        var recorder = Create(clock);
+        var frame = Frame(clock, 1);
+        frame = frame with
+        {
+            Sensors =
+            [
+                .. frame.Sensors,
+                new(new("wireview-pro2", "com3", SensorComponent.MonitorBoard, SensorMetric.Temperature, 1),
+                    SensorUnit.Celsius, 40, clock.GetUtcNow()),
+                new(new("wireview-pro2", "com3", SensorComponent.MonitorBoard, SensorMetric.Temperature, 2),
+                    SensorUnit.Celsius, 42, clock.GetUtcNow()),
+                new(new("wireview-pro2", "com3", SensorComponent.ExternalProbe, SensorMetric.Temperature, 1),
+                    SensorUnit.Celsius, 35, clock.GetUtcNow()),
+                new(new("wireview-pro2", "com3", SensorComponent.ExternalProbe, SensorMetric.Temperature, 2),
+                    SensorUnit.Celsius, 36, clock.GetUtcNow()),
+                new(new("generic-nvidia", "gpu0", SensorComponent.GpuFan, SensorMetric.FanSpeed, 1),
+                    SensorUnit.Rpm, 1500, clock.GetUtcNow())
+            ]
+        };
+        recorder.Accept(frame);
+        var temperatures = recorder.ReadFrame(null, new Dictionary<string, int>()).Series
+            .Where(series => series.Trace.Category == "Temperatures").ToArray();
+        TestAssert.Equal(6, temperatures.Length);
+        TestAssert.Equal(4, temperatures.Count(series => series.Trace.Identity.PluginId == "wireview-pro2"));
+        TestAssert.True(temperatures.Any(series => series.Trace.Label.EndsWith("Board temp in", StringComparison.Ordinal)), "WireView board sensors need readable labels.");
+        TestAssert.True(temperatures.Any(series => series.Trace.Label.EndsWith("External temp 2", StringComparison.Ordinal)), "External probe numbers must be retained.");
+        recorder.SelectMany(temperatures.Select(series => series.Trace.Key), true);
+        recorder.Start();
+        recorder.Accept(frame);
+        recorder.Stop();
+        var session = recorder.CompletedSession();
+        TestAssert.True(session.Series.All(series => series.Trace.Category == "Temperatures"), "Bulk temperature selection must retain its category.");
+        TestAssert.Equal(4, session.Series.Count(series => series.Trace.Group == "Device temperatures"));
+        AssertSameSamples(session, PerformanceRecordingFile.Deserialize(PerformanceHtmlExporter.Export(session)));
+    }
+
+    private static void ClearRemovesSessionDataAndRetainsLiveSelections()
+    {
+        var clock = new RecordingClock();
+        var recorder = Create(clock);
+        recorder.Accept(Frame(clock, 1));
+        var key = recorder.ReadFrame(null, new Dictionary<string, int>()).Series.First().Trace.Key;
+        recorder.Select(key, true);
+        recorder.Start();
+        recorder.Accept(Frame(clock, 1));
+        TestAssert.Throws<InvalidOperationException>(() => recorder.Clear());
+        TestAssert.True(recorder.ReadFrame(null, new Dictionary<string, int>()).Recording,
+            "Clear must require stopping first.");
+        recorder.Stop();
+        var session = recorder.CompletedSession();
+
+        recorder.Clear();
+        var cleared = recorder.ReadFrame(session.SessionId, new Dictionary<string, int>());
+        TestAssert.Equal(0L, cleared.SampleCount);
+        TestAssert.Equal(0d, cleared.DurationSeconds);
+        TestAssert.Equal<DateTimeOffset?>(null, cleared.StartedAt);
+        TestAssert.True(cleared.SessionId != session.SessionId && cleared.Series.All(series => series.Samples.Length == 0),
+            "Clear must reset the session and remove every recorded sample.");
+        TestAssert.True(cleared.Series.Single(series => series.Trace.Key == key).Selected,
+            "Live source selections should remain ready for the next recording.");
+        TestAssert.Throws<InvalidOperationException>(() => recorder.CompletedSession());
+
+        recorder.Start();
+        recorder.Accept(Frame(clock, 2));
+        recorder.Stop();
+        TestAssert.Equal(1L, recorder.CompletedSession().SampleCount);
+    }
+
+    private static void GpuMetricsRetainSourcesUnitsAndReportedFans()
+    {
+        var clock = new RecordingClock();
+        var recorder = Create(clock);
+        var frame = Frame(clock, 1);
+        var sensors = frame.Sensors.ToList();
+        foreach (var plugin in new[] { "asus-astral", "generic-nvidia" })
+        {
+            sensors.Add(new(new(plugin, "gpu0", SensorComponent.GpuCore, SensorMetric.Clock),
+                SensorUnit.Megahertz, 1560, clock.GetUtcNow()));
+            sensors.Add(new(new(plugin, "gpu0", SensorComponent.GpuMemory, SensorMetric.Clock),
+                SensorUnit.Megahertz, 10000, clock.GetUtcNow()));
+            sensors.Add(new(new(plugin, "gpu0", SensorComponent.GpuMemory, SensorMetric.MemoryUsed),
+                SensorUnit.Megabytes, 8192, clock.GetUtcNow()));
+            sensors.Add(new(new(plugin, "gpu0", SensorComponent.GpuMemory, SensorMetric.MemoryTotal),
+                SensorUnit.Megabytes, 32768, clock.GetUtcNow()));
+            sensors.Add(new(new(plugin, "gpu0", SensorComponent.GpuFan, SensorMetric.FanSpeed, 1),
+                SensorUnit.Rpm, 1600, clock.GetUtcNow()));
+        }
+        sensors.Add(new(new("generic-nvidia", "gpu0", SensorComponent.GpuFan, SensorMetric.FanSpeed, 2),
+            SensorUnit.Rpm, 1450, clock.GetUtcNow()));
+        frame = frame with { Sensors = [.. sensors] };
+        recorder.Accept(frame);
+        var options = recorder.ReadFrame(null, new Dictionary<string, int>()).Series;
+        var gpu = options.Where(series => series.Trace.Category is "GPU metrics" or "Temperatures").ToArray();
+        TestAssert.True(gpu.Where(series => series.Trace.Identity.Metric is SensorMetric.Temperature or SensorMetric.FanSpeed)
+            .All(series => series.Trace.Category == "Temperatures"), "GPU temperatures and fans must leave GPU metrics.");
+        TestAssert.Equal(2, gpu.Count(series => series.Trace.Group == "GPU core clock"));
+        TestAssert.Equal(2, gpu.Count(series => series.Trace.Group == "GPU memory clock"));
+        TestAssert.True(gpu.All(series => series.Trace.Identity.Metric != SensorMetric.MemoryTotal),
+            "VRAM usage should record used GB only.");
+        TestAssert.Equal(3, gpu.Count(series => series.Trace.Group == "GPU fan speed"));
+        TestAssert.True(gpu.Any(series => series.Trace.Label.EndsWith("Fan 2", StringComparison.Ordinal)),
+            "Each reported fan must be independently selectable.");
+
+        recorder.SelectMany(gpu.Select(series => series.Trace.Key), true);
+        recorder.Start();
+        recorder.Accept(frame);
+        recorder.Stop();
+        var session = recorder.CompletedSession();
+        TestAssert.True(session.Series.Where(series => series.Trace.Group == "VRAM usage")
+            .All(series => series.Trace.Unit == "GB" && series.Samples[0].Value == 8),
+            "VRAM samples must convert MB to GB once.");
+        TestAssert.True(session.Series.Where(series => series.Trace.Group == "GPU core clock")
+            .All(series => series.Trace.Unit == "MHz" && series.Samples[0].Value == 1560),
+            "Clock values must remain unchanged.");
+        TestAssert.Equal<double?>(850, session.Series.Single(series => series.Trace.Group == "GPU core voltage").Samples[0].Value);
+        AssertSameSamples(session, PerformanceRecordingFile.Deserialize(PerformanceRecordingFile.Serialize(session)));
+        AssertSameSamples(session, PerformanceRecordingFile.Deserialize(PerformanceHtmlExporter.Export(session)));
+    }
+
+    private static void BulkSelectionIsScopedAndNotifiesOnce()
+    {
+        var clock = new RecordingClock();
+        var recorder = Create(clock);
+        recorder.Accept(Frame(clock, 1));
+        var options = recorder.ReadFrame(null, new Dictionary<string, int>()).Series;
+        var pins = options.Where(series => series.Trace.Group == "Pin current").Select(series => series.Trace.Key).ToArray();
+        var notifications = 0;
+        recorder.Changed += () => notifications++;
+
+        recorder.SelectMany(pins, true);
+        TestAssert.Equal(1, notifications);
+        var selected = recorder.ReadFrame(null, new Dictionary<string, int>()).Series;
+        TestAssert.True(selected.All(series => series.Selected == pins.Contains(series.Trace.Key)),
+            "Category selection must not select unrelated metrics.");
+        recorder.SelectMany(pins, true);
+        TestAssert.Equal(1, notifications);
+
+        var asus = options.Where(series => series.Trace.Identity.PluginId == "asus-astral").Select(series => series.Trace.Key).ToArray();
+        recorder.SelectMany(asus, true);
+        TestAssert.True(recorder.ReadFrame(null, new Dictionary<string, int>()).Series
+            .All(series => series.Selected == (series.Trace.Identity.PluginId == "asus-astral")),
+            "Plugin selection must not affect another plugin.");
+
+        recorder.Start();
+        recorder.Accept(Frame(clock, 1));
+        recorder.SelectMany(asus, false);
+        clock.Advance(1);
+        recorder.SelectMany(asus, true);
+        recorder.Accept(Frame(clock, 2));
+        recorder.Stop();
+        TestAssert.True(recorder.CompletedSession().Series.All(series => series.Samples.Any(sample => sample.Value is null)),
+            "Bulk deselection must preserve recording gaps.");
+    }
+
+    private static void MsiSelectorsHideUnusedConnectorsAndKeepRecordedHistory()
+    {
+        var clock = new RecordingClock();
+        var recorder = Create(clock);
+        SensorSnapshot Snapshot(double first, double second)
+        {
+            var frame = Frame(clock, 1);
+            var msi = new List<SensorReading>();
+            foreach (var (connector, current) in new[] { ("1", first), ("2", second) })
+            {
+                for (var pin = 1; pin <= 6; pin++)
+                {
+                    msi.Add(new(new("msi-psu", "psu", SensorComponent.PsuPin, SensorMetric.Current, pin, connector),
+                        SensorUnit.Amperes, current, clock.GetUtcNow()));
+                }
+            }
+
+            return frame with
+            {
+                Sensors = [.. frame.Sensors, .. msi],
+                Plugins = [.. frame.Plugins, new("msi-psu", PluginState.Ready, clock.GetUtcNow(), null)]
+            };
+        }
+
+        recorder.Accept(Snapshot(0, 0.4));
+        var sources = recorder.ReadFrame(null, new Dictionary<string, int>()).Series;
+        TestAssert.Equal(6, sources.Count(series => series.Trace.Identity.PluginId == "msi-psu"));
+        TestAssert.True(sources.Where(series => series.Trace.Identity.PluginId == "msi-psu")
+            .All(series => series.Trace.Identity.ConnectorId == "2"), "Only the loaded connector should be offered.");
+
+        clock.Advance(1);
+        recorder.Accept(Snapshot(0, 0));
+        TestAssert.Equal(6, recorder.ReadFrame(null, new Dictionary<string, int>()).Series
+            .Count(series => series.Trace.Identity.PluginId == "msi-psu"));
+
+        recorder.Accept(Snapshot(0.5, 0));
+        var firstConnector = recorder.ReadFrame(null, new Dictionary<string, int>()).Series
+            .Where(series => series.Trace.Identity.PluginId == "msi-psu").ToArray();
+        TestAssert.True(firstConnector.All(series => series.Trace.Identity.ConnectorId == "1"),
+            "An unused connector must disappear when another connector is loaded.");
+        recorder.SelectMany(firstConnector.Select(series => series.Trace.Key), true);
+        recorder.Start();
+        recorder.Accept(Snapshot(0.5, 0));
+        clock.Advance(1);
+        recorder.Accept(Snapshot(0, 0.5));
+        TestAssert.True(recorder.ReadFrame(null, new Dictionary<string, int>()).Series
+            .Any(series => series.Trace.Identity.PluginId == "msi-psu" && series.Trace.Identity.ConnectorId == "1"),
+            "A previously recorded connector must remain reviewable.");
+        recorder.Stop();
+        TestAssert.True(recorder.CompletedSession().Series.All(series => series.Samples.Length == 2),
+            "Connector filtering must not discard recorded readings.");
+
+        TestAssert.Throws<InvalidOperationException>(() => recorder.Start());
+        var secondConnector = recorder.ReadFrame(null, new Dictionary<string, int>()).Series
+            .Where(series => series.Trace.Identity.PluginId == "msi-psu" && series.Trace.Identity.ConnectorId == "2");
+        recorder.SelectMany(secondConnector.Select(series => series.Trace.Key), true);
+        recorder.Start();
+        recorder.Accept(Snapshot(0, 0.5));
+        TestAssert.True(recorder.ReadFrame(null, new Dictionary<string, int>()).Series
+            .Where(series => series.Trace.Identity.PluginId == "msi-psu")
+            .All(series => series.Trace.Identity.ConnectorId == "2"),
+            "A new session must not silently select an unused connector from an earlier recording.");
+        recorder.Stop();
+    }
+
+    private static void DisplayFramesBoundMemoryAndKeepExactHoverAndExport()
+    {
+        var recorder = Create(new RecordingClock());
+        var original = Fixture();
+        var samples = Enumerable.Range(0, 20_000)
+            .Select(index => new PerformanceSample(index / 100d, index == 12345 ? 999 : index % 17)).ToArray();
+        samples[10_000] = new(100, null);
+        var series = original.Series[0] with { Selected = true, Count = samples.Length, Samples = samples };
+        recorder.Import(original with { Series = [series], DurationSeconds = 200, SampleCount = samples.Length - 1 });
+
+        var shown = recorder.ReadDisplayFrame(new(0, 200, 200, Follow: false, Keys: [series.Trace.Key]));
+        var points = shown.Series.Single().Samples;
+        TestAssert.True(shown.DisplayOnly, "A display frame is separate from export data.");
+        TestAssert.Throws<InvalidDataException>(() => PerformanceRecordingFile.Validate(shown));
+        TestAssert.Throws<ArgumentException>(() => PerformanceHtmlExporter.Export(shown));
+        TestAssert.True(points.Length < 2000, "Rendering memory must be bounded by screen width.");
+        TestAssert.True(points.Any(point => point.Value == 999), "Reduction must preserve spikes.");
+        TestAssert.True(points.Any(point => point.Value is null), "Reduction must preserve disconnections.");
+        TestAssert.True(points.Zip(points.Skip(1)).All(pair => pair.First.Seconds <= pair.Second.Seconds),
+            "Reduced samples must retain chronological order.");
+
+        var hover = recorder.ReadHover(shown.SessionId, 1, 123.45);
+        TestAssert.Equal<double?>(999, hover.Values[series.Trace.Key]);
+        TestAssert.Equal<double?>(null, recorder.ReadHover(shown.SessionId, 2, 100).Values[series.Trace.Key]);
+        TestAssert.Equal(0, recorder.ReadHover("old-session", 3, 123.45).Values.Count);
+        TestAssert.Equal(samples.Length, recorder.CompletedSession().Series.Single().Samples.Length);
+
+        var empty = recorder.ReadDisplayFrame(new(Keys: []));
+        TestAssert.True(empty.Series.All(item => item.Samples.Length == 0), "Offscreen charts need metadata only.");
+        var zoomed = recorder.ReadDisplayFrame(new(120, 125, 200, Follow: false, Keys: [series.Trace.Key]));
+        TestAssert.True(zoomed.Series.Single().Samples.Length < 600, "A zoomed view must not transfer the entire session.");
+
+        var same = recorder.ReadDisplayFrame(new(120, 125, 200, Follow: false, Keys: [series.Trace.Key]));
+        TestAssert.True(ReferenceEquals(zoomed.Series[0].Samples, same.Series[0].Samples),
+            "Unchanged view data must reuse the cached projection.");
+    }
+
+    private static void HiddenPinUpdatesPreservePeaksAndRefreshOnReturn()
+    {
+        var pin = new Rtx5090Monitoring.Presentation.Telemetry.PinViewModel(1);
+        var notifications = 0;
+        pin.PropertyChanged += (_, _) => notifications++;
+        pin.Update(8, 12, 96, Rtx5090Monitoring.Presentation.Telemetry.PinMetric.Current, 9.2, true, true,
+            notifyChanges: false);
+        TestAssert.Equal(0, notifications);
+        TestAssert.Equal<double?>(8, pin.Current);
+
+        pin.Update(1, 12, 12, Rtx5090Monitoring.Presentation.Telemetry.PinMetric.Current, 9.2, true, true);
+        TestAssert.True(notifications > 0, "Returning to a page must refresh bindings.");
+        TestAssert.True(pin.ShowPeak && pin.PeakTop < pin.BarTop, "Background updates must preserve peak history.");
     }
 
     private static void RecordsMultipleSourcesWithoutFallbackOrDuplicateSamples()
