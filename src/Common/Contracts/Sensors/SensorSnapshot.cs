@@ -11,4 +11,5 @@ public sealed record SensorSnapshot(int SchemaVersion, long Sequence, DateTimeOf
     public Warnings.PinWarningLimit[]? PinWarningLimits { get; init; }
     public Warnings.WarningSnapshot? Warnings { get; init; }
     public SensorAlert[] Alerts { get; init; } = [];
+    public SafeguardExecutionNotice[]? SafeguardExecutions { get; init; }
 }

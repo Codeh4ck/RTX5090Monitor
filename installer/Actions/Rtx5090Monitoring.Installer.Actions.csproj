@@ -11,6 +11,8 @@
         <PackageReference Include="WixToolset.Dtf.CustomAction" GeneratePathProperty="true" />
         <Content Include="CustomAction.config" />
         <Reference Include="System.ServiceProcess" />
+        <Reference Include="Microsoft.CSharp" />
+        <Compile Include="../../src/Common/Contracts/Security/ProtectedInstallationFile.cs" Link="Validation/ProtectedInstallationFile.cs" />
         <Reference Include="System.Runtime.Serialization" />
     </ItemGroup>
 </Project>

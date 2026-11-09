@@ -1,0 +1,106 @@
+using System;
+using System.Diagnostics;
+using System.IO;
+using Rtx5090Monitoring.Installer.Actions.Configuration;
+
+namespace Rtx5090Monitoring.Installer.Tests.Configuration;
+
+internal static class AfterburnerBackupCleanupTests
+{
+    private const string Archive = "20261109-044139-100-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+    private const string Key = "0123456789ABCDEF0123";
+
+    public static void Run()
+    {
+        var fixture = Path.Combine(Path.GetTempPath(), "rtx-afterburner-cleanup-" + Guid.NewGuid().ToString("N"));
+        var installation = Path.Combine(fixture, "Installation");
+        var desktop = Path.Combine(installation, "Desktop");
+        var store = Path.Combine(desktop, "AfterburnerBackups");
+        var programData = Path.Combine(fixture, "ProgramData");
+        var legacy = Path.Combine(programData, "Rtx5090Monitoring.AfterburnerBackups", Key);
+        var external = Path.Combine(fixture, "MSI Afterburner");
+        var link = Path.Combine(store, ".import-bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
+
+        try
+        {
+            WriteArchive(store);
+            WriteArchive(legacy);
+            File.WriteAllText(Path.Combine(store, ".operation.lock"), "");
+            File.WriteAllText(Path.Combine(store, "legacy-import-" + Key + ".txt"), "");
+            File.WriteAllText(Path.Combine(legacy, "pending.json"), Archive);
+            var results = Directory.CreateDirectory(Path.Combine(store, "OperationResults"));
+            File.WriteAllText(Path.Combine(results.FullName, "cccccccccccccccccccccccccccccccc.json"), "");
+            Check.That(AfterburnerBackupCleanup.ContainsOnlyBackupLeftovers(installation),
+                "A reinstall accepts the backup tree left by an older uninstaller.");
+
+            var otherFile = Path.Combine(desktop, "unrelated.txt");
+            File.WriteAllText(otherFile, "keep");
+            Check.That(!AfterburnerBackupCleanup.ContainsOnlyBackupLeftovers(installation),
+                "Reinstall still rejects unrelated files.");
+            File.Delete(otherFile);
+
+            Directory.CreateDirectory(external);
+            var liveConfig = Path.Combine(external, "MSIAfterburner.cfg");
+            File.WriteAllText(liveConfig, "live configuration");
+            CreateJunction(link, external);
+            Check.That(!AfterburnerBackupCleanup.ContainsOnlyBackupLeftovers(installation),
+                "Reinstall rejects a linked backup directory.");
+
+            var smtp = Path.Combine(programData, "Rtx5090Monitoring.Safeguard", "mail", "record.json");
+            Directory.CreateDirectory(Path.GetDirectoryName(smtp)!);
+            File.WriteAllText(smtp, "credential placeholder");
+
+            AfterburnerBackupCleanup.Remove(installation, programData, message => throw new InvalidOperationException(message));
+            Check.That(!Directory.Exists(Path.Combine(store, Archive)) && !File.Exists(Path.Combine(store, ".operation.lock"))
+                && !File.Exists(Path.Combine(store, "legacy-import-" + Key + ".txt")) && !Directory.Exists(Path.GetDirectoryName(legacy))
+                && !Directory.Exists(results.FullName),
+                "Uninstall removes recognized files from both backup locations.");
+            Check.That(File.Exists(liveConfig) && File.Exists(smtp) && Directory.Exists(link),
+                "Uninstall preserves the live Afterburner configuration, SMTP data and linked targets.");
+
+            Directory.Delete(link, recursive: false);
+            AfterburnerBackupCleanup.Remove(installation, programData, message => throw new InvalidOperationException(message));
+            Check.That(!Directory.Exists(store), "Uninstall removes the backup directory once it is empty.");
+        }
+        finally
+        {
+            if (Directory.Exists(link))
+            {
+                Directory.Delete(link, recursive: false);
+            }
+
+            var target = Path.GetFullPath(fixture);
+            var temporary = Path.GetFullPath(Path.GetTempPath()).TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
+            if (!target.StartsWith(temporary, StringComparison.OrdinalIgnoreCase)
+                || !Path.GetFileName(target).StartsWith("rtx-afterburner-cleanup-", StringComparison.Ordinal))
+            {
+                throw new InvalidOperationException("Invalid backup cleanup test path.");
+            }
+
+            Directory.Delete(target, recursive: true);
+        }
+    }
+
+    private static void WriteArchive(string store)
+    {
+        var directory = Path.Combine(store, Archive);
+        Directory.CreateDirectory(directory);
+        foreach (var name in new[] { "PSU.cfg", "MSIAfterburner.cfg", "manifest.json" })
+        {
+            File.WriteAllText(Path.Combine(directory, name), "");
+        }
+    }
+
+    private static void CreateJunction(string link, string target)
+    {
+        using var process = Process.Start(new ProcessStartInfo("cmd.exe", $"/d /c mklink /J \"{link}\" \"{target}\"")
+        {
+            UseShellExecute = false,
+            CreateNoWindow = true,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true
+        }) ?? throw new InvalidOperationException("Could not start junction fixture creation.");
+        process.WaitForExit();
+        Check.That(process.ExitCode == 0, "The junction fixture was created.");
+    }
+}

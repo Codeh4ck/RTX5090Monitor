@@ -365,6 +365,30 @@ try {
     assert.equal(lexicalProperty.value,'msiConnector2','iCUE sandbox-local settings win over DOM named properties');
 
     await verifyUpdates(page, base, properties, value => { updateManifest = value; }, value => { updateFailure = value; }, requests, output, latest.version);
+    await page.setViewportSize({ width: 840, height: 344 });
+    paused = false;
+    await page.reload();
+    await page.waitForFunction(() => document.querySelector('.widget').dataset.connection === 'live');
+    const execution = {
+        id: 'e22d33b8-0eb6-4749-bd00-3b35fccbd40e', script: 'Low power profile & shutdown',
+        connector: 2, startedAt: new Date().toISOString(), status: 'Running'
+    };
+    transform = frame => ({ ...frame, safeguardExecutions: [execution] });
+    for (const socket of sockets) send(socket);
+    const safeguard = page.locator('dialog[data-mode="safeguard"]');
+    await safeguard.waitFor();
+    await safeguard.getByText(/Connector 2.*Running/).waitFor();
+    execution.status = 'Shutdown requested';
+    for (const socket of sockets) send(socket);
+    await safeguard.getByText(/Connector 2.*Shutdown requested/).waitFor();
+    assert.equal(await safeguard.locator('.warning-card').count(), 1);
+    await safeguard.getByRole('button', { name: 'Close flyout' }).click();
+    await page.reload();
+    await page.waitForFunction(() => document.querySelector('.widget').dataset.connection === 'live');
+    await page.waitForTimeout(700);
+    assert.equal(await safeguard.count(), 0, 'A replayed Safeguard+ execution must not notify again after reload.');
+    transform = frame => frame;
+    for (const socket of sockets) send(socket);
 
     assert.equal(messages.length, 0, 'No commands sent through the telemetry socket');
     assert.ok(requests.every(request => request.method === 'GET' && (

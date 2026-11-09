@@ -34,7 +34,7 @@ internal static class GenericNvidiaSmokeTests
         await runtime.RefreshNvidiaDevicesAsync();
         await Task.Delay(100);
         var selector = VisualTreeQuery.Descendants<ComboBox>(configuration).Single(box => box.Header as string == "Selected GPU"
-            && box.ItemsSource is System.Collections.ObjectModel.ObservableCollection<Rtx5090Monitoring.Presentation.Configuration.GpuChoice> items
+            && box.ItemsSource is System.Collections.ObjectModel.ObservableCollection<Presentation.Configuration.GpuChoice> items
             && items.Any(item => item.Id == "demo-gpu0"));
         if (selector.SelectedItem is null)
         {

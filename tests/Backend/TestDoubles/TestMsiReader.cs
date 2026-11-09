@@ -14,7 +14,7 @@ internal sealed class TestMsiReader(MsiTestState state) : IMsiPsuReader
         state.LastOptions = options;
         var controlled = options.FanControl is MsiFanControl.Manual or MsiFanControl.Curve;
         var duty = options.FanControl == MsiFanControl.Curve
-            ? Rtx5090Monitoring.Plugins.Msi.Control.MsiFanCurveController.Interpolate(options.FanCurve.Points, 55)
+            ? Plugins.Msi.Control.MsiFanCurveController.Interpolate(options.FanCurve.Points, 55)
             : options.FanControl == MsiFanControl.Manual ? options.FanDutyPercent : 0;
 
         duty = MsiFanCurve.EffectiveDutyPercent(duty);

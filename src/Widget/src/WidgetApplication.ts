@@ -17,6 +17,8 @@ import { DoubleTap } from './input/DoubleTap.ts';
 import { FlyoutView } from './view/FlyoutView.ts';
 import { WarningPresenter } from './warnings/WarningPresenter.ts';
 import { WarningTracker } from './warnings/WarningTracker.ts';
+import { SafeguardNoticeTracker } from './warnings/SafeguardNoticeTracker.ts';
+import type { SafeguardExecutionNotice } from './contracts/SafeguardExecutionNotice.ts';
 import { previewWarnings } from './warnings/previewWarnings.ts';
 
 export class WidgetApplication {
@@ -33,6 +35,8 @@ export class WidgetApplication {
     private doubleTap: DoubleTap;
     private warnings = new WarningPresenter(this.store);
     private warningTracker = new WarningTracker();
+    private safeguardTracker: SafeguardNoticeTracker;
+    private safeguardShown = new Map<string, SafeguardExecutionNotice>();
     private previewRequested = false;
     private media: MediaViewer;
     private frame = 0;
@@ -69,6 +73,7 @@ export class WidgetApplication {
             // Some embedded web views do not permit persistent storage.
         }
 
+        this.safeguardTracker = new SafeguardNoticeTracker('rtx-monitor-safeguard/' + instance, storage);
         this.updates = new UpdateChecker(widgetVersion(), new UpdateStateStore(`rtx-monitor-updates/${instance}`, storage),
             () => this.updatesChanged());
         this.updates.configure(false, 'Daily');
@@ -127,6 +132,7 @@ export class WidgetApplication {
             // Persistent storage is optional in the embedded host.
         }
 
+        this.safeguardTracker = new SafeguardNoticeTracker('rtx-monitor-safeguard/' + instance, storage);
         this.updates = new UpdateChecker(widgetVersion(), new UpdateStateStore(`rtx-monitor-updates/${instance}`, storage),
             () => this.updatesChanged());
         this.updates.configure(false, 'Daily');
@@ -242,6 +248,41 @@ export class WidgetApplication {
         });
     }
 
+    private renderSafeguard(): boolean {
+        const mode = this.flyout.mode;
+        if (mode !== 'safeguard') {
+            this.safeguardShown.clear();
+
+            if (mode !== null && mode !== 'warnings') {
+                return false;
+            }
+        }
+
+        const feed = this.store.snapshot?.safeguardExecutions ?? [];
+        for (const execution of this.safeguardTracker.receive(feed)) {
+            this.safeguardShown.set(execution.id, execution);
+        }
+
+        if (!this.safeguardShown.size) {
+            return false;
+        }
+
+        for (const execution of feed) {
+            if (this.safeguardShown.has(execution.id)) {
+                this.safeguardShown.set(execution.id, execution);
+            }
+        }
+
+        this.flyout.safeguard([...this.safeguardShown.values()].reverse().map((execution) => ({
+            id: execution.id,
+            icon: 'overcurrent',
+            title: 'Safeguard+ script executed',
+            detail: [execution.script, 'Connector ' + execution.connector,
+                new Date(execution.startedAt).toLocaleString(), execution.status].join(' · ')
+        })));
+        return true;
+    }
+
     private render(): void {
         const now = Date.now();
         const notices = this.warnings.present(now);
@@ -256,6 +297,10 @@ export class WidgetApplication {
                   )
               }
             : undefined;
+
+        if (this.renderSafeguard()) {
+            return;
+        }
 
         const newWarning = this.warningTracker.update(deliverable, this.settings.enabled('showAlerts'));
 

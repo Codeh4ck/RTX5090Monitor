@@ -17,7 +17,7 @@ internal static class HealthEndpointTests
         using var document = System.Text.Json.JsonDocument.Parse(await host.Client.GetStringAsync("/version"));
         var version = document.RootElement.GetProperty("version").GetString();
         TestAssert.Equal(1, document.RootElement.GetProperty("schemaVersion").GetInt32());
-        TestAssert.True(Rtx5090Monitoring.Contracts.Updates.SemanticVersion.TryParse(version, out _), "The endpoint must report a stable binary version.");
+        TestAssert.True(Contracts.Updates.SemanticVersion.TryParse(version, out _), "The endpoint must report a stable binary version.");
     }
 
     private static async Task ReportsServiceLivenessAsync()

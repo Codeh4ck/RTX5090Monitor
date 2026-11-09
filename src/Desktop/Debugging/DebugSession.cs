@@ -18,7 +18,7 @@ namespace Rtx5090Monitoring.Debugging;
 
 public sealed class DebugSession : ObservableObject
 {
-    private readonly Core.ConnectorProfileResolver _connectorProfiles = Processing.SimulationConnectorProfiles.CreateResolver();
+    private readonly Core.ConnectorProfileResolver _connectorProfiles = SimulationConnectorProfiles.CreateResolver();
 
     private long _revision = 1;
     private long _sequence;

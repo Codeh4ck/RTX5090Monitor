@@ -31,7 +31,7 @@ internal sealed partial class AppRuntime
 
                 if (current is not null)
                 {
-                    current.FanModeIndex = (int)Rtx5090Monitoring.Plugins.Msi.Contracts.Configuration.MsiFanControl.Automatic;
+                    current.FanModeIndex = (int)Plugins.Msi.Contracts.Configuration.MsiFanControl.Automatic;
                 }
             });
         FanCurveWindow = window;

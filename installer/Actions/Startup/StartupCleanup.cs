@@ -20,7 +20,11 @@ public static class StartupCleanup
             || command.StartsWith('"' + executable + "\" ", StringComparison.OrdinalIgnoreCase));
     }
 
-    public static void Remove(string installDirectory, Action<string> log)
+    public static void Remove(string installDirectory, Action<string> log) => Update(installDirectory, log, migrate: false);
+
+    public static void Migrate(string installDirectory, Action<string> log) => Update(installDirectory, log, migrate: true);
+
+    private static void Update(string installDirectory, Action<string> log, bool migrate)
     {
         var loaded = new HashSet<string>(Registry.Users.GetSubKeyNames(), StringComparer.OrdinalIgnoreCase);
         using var profiles = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList");
@@ -34,10 +38,22 @@ public static class StartupCleanup
 
             try
             {
+                if (!migrate)
+                {
+                    ElevatedStartupTask.Remove(sid, Path.Combine(installDirectory, "Desktop", "Rtx5090Monitoring.App.exe"));
+                }
+
                 if (loaded.Contains(sid))
                 {
                     using var hive = Registry.Users.OpenSubKey(sid, true);
-                    RemoveFromHive(hive, installDirectory);
+                    if (migrate)
+                    {
+                        UpdateHive(hive, installDirectory, sid, true);
+                    }
+                    else
+                    {
+                        RemoveFromHive(hive, installDirectory);
+                    }
                 }
                 else
                 {
@@ -63,23 +79,37 @@ public static class StartupCleanup
                         }
 
                         using var hive = RegistryKey.FromHandle(handle);
+                        if (migrate)
+                    {
+                        UpdateHive(hive, installDirectory, sid, true);
+                    }
+                    else
+                    {
                         RemoveFromHive(hive, installDirectory);
+                    }
                     }
                 }
             }
-            catch (Exception error) when (error is IOException || error is UnauthorizedAccessException || error is System.Security.SecurityException)
+            catch (Exception error) when (error is IOException || error is UnauthorizedAccessException || error is System.Security.SecurityException || error is COMException)
             {
                 log($"Could not remove startup registration for {sid}: {error.Message}");
             }
         }
     }
 
-    private static void RemoveFromHive(RegistryKey? hive, string installDirectory)
+    private static void RemoveFromHive(RegistryKey? hive, string installDirectory) => UpdateHive(hive, installDirectory, "", false);
+
+    private static void UpdateHive(RegistryKey? hive, string installDirectory, string sid, bool migrate)
     {
         using var run = hive?.OpenSubKey(RunKey, true);
         if (!MatchesInstalledApp(run?.GetValue(ValueName) as string, installDirectory))
         {
             return;
+        }
+
+        if (migrate)
+        {
+            ElevatedStartupTask.Register(sid, Path.Combine(installDirectory, "Desktop", "Rtx5090Monitoring.App.exe"));
         }
 
         run!.DeleteValue(ValueName, false);
