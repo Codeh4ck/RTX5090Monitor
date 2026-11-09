@@ -197,7 +197,7 @@ try
 
     Write-ReleaseFileManifest $release
 
-    $zip = Join-Path $release "RtxMonitor-$Version-win-x64.zip"
+    $zip = Join-Path $release 'RTXLens-win-x64.zip'
     $entries = Get-ChildItem -LiteralPath $release -File | Where-Object Extension -ne '.zip'
 
     Compress-Archive -LiteralPath $entries.FullName -DestinationPath $zip -Force
