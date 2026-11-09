@@ -8,6 +8,7 @@ $workflow = Join-Path $repo 'scripts/afterburner/SafeguardWorkflow.ps1'
 $cases = @(
     @{ Id = 'low-power-shutdown'; File = 'LowPowerAndShutdown.ps1'; Notify = $false }
     @{ Id = 'low-power-shutdown-notify'; File = 'LowPowerShutdownAndNotify.ps1'; Notify = $true }
+    @{ Id = 'simulation'; File = 'SimulateSafeguard.ps1'; Notify = $true }
 )
 
 foreach ($case in $cases) {
@@ -33,6 +34,11 @@ foreach ($case in $cases) {
     $record = $records | ForEach-Object { Get-Content -Raw -LiteralPath $_.FullName | ConvertFrom-Json } | Where-Object bindingId -eq $id
     if ($record.status -ne 'Simulated' -or $record.steps.Count -ne (2 + [int]$case.Notify) -or !$record.finishedAt) {
         throw 'The low-power timeout must still produce a completed shutdown attempt in the journal.'
+    }
+
+    if ($case.Id -eq 'simulation' -and
+        (!$record.steps[0].result.StartsWith('Simulated.') -or !$record.steps[1].result.StartsWith('Simulated.'))) {
+        throw 'The validation action must only record simulated protection steps.'
     }
 
     $outbox = Join-Path $root ('outbox\' + ([guid]$record.id).ToString('N') + '.json')

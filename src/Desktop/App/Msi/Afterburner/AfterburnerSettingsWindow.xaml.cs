@@ -1,3 +1,4 @@
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -10,7 +11,7 @@ internal sealed partial class AfterburnerSettingsWindow : Window
 {
     private bool _closeApproved;
     private bool _confirmingClose;
-    private bool _initialHeightFitted;
+    private bool _heightFitQueued;
     internal AfterburnerSettingsView Integration { get; }
     internal FrameworkElement ThemeRoot => Root;
 
@@ -22,7 +23,8 @@ internal sealed partial class AfterburnerSettingsWindow : Window
         Integration.CloseRequested += Close;
         IntegrationHost.Content = Integration;
         ApplyAppearance(runtime.Preferences);
-        Integration.Loaded += (_, _) => DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low, FitInitialHeight);
+        Integration.Loaded += (_, _) => QueueHeightFit();
+        Integration.PreferredHeightChanged += QueueHeightFit;
         AppWindow.Closing += OnClosing;
         Closed += (_, _) =>
         {
@@ -33,9 +35,24 @@ internal sealed partial class AfterburnerSettingsWindow : Window
         };
     }
 
-    private void FitInitialHeight()
+    private void QueueHeightFit()
     {
-        if (_initialHeightFitted || !Root.IsLoaded || Root.XamlRoot is not { } xamlRoot)
+        if (_heightFitQueued)
+        {
+            return;
+        }
+
+        _heightFitQueued = DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
+        {
+            _heightFitQueued = false;
+            FitContentHeight();
+        });
+    }
+
+    private void FitContentHeight()
+    {
+        if (!Root.IsLoaded || Root.XamlRoot is not { } xamlRoot
+            || AppWindow.Presenter is not OverlappedPresenter { State: OverlappedPresenterState.Restored })
         {
             return;
         }
@@ -46,14 +63,20 @@ internal sealed partial class AfterburnerSettingsWindow : Window
             return;
         }
 
-        _initialHeightFitted = true;
         var scale = xamlRoot.RasterizationScale;
         var frameHeight = AppWindow.Size.Height - (int)Math.Round(Root.ActualHeight * scale);
         var contentHeight = Integration.PreferredContentHeight + Root.Padding.Top + Root.Padding.Bottom + 8;
         var area = DisplayArea.GetFromWindowId(AppWindow.Id, DisplayAreaFallback.Primary).WorkArea;
         var height = Math.Min(area.Height, (int)Math.Ceiling(contentHeight * scale) + frameHeight);
-        AppWindow.Resize(new global::Windows.Graphics.SizeInt32(AppWindow.Size.Width, height));
+        var position = AppWindow.Position;
+        var top = Math.Clamp(position.Y, area.Y, area.Y + area.Height - height);
+
+        if (AppWindow.Size.Height != height || position.Y != top)
+        {
+            AppWindow.MoveAndResize(new global::Windows.Graphics.RectInt32(position.X, top, AppWindow.Size.Width, height));
+        }
     }
+
     private async void OnClosing(AppWindow sender, AppWindowClosingEventArgs args)
     {
         if (_closeApproved)

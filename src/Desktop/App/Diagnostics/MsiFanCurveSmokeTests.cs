@@ -125,10 +125,10 @@ internal static class MsiFanCurveSmokeTests
 
         var graphPanel = VisualTreeQuery.Descendants<Border>(window.ThemeRoot).Single(border => border.Name == "GraphPanel");
         var notice = VisualTreeQuery.Descendants<TextBlock>(window.ThemeRoot).Single(text => text.Name == "AutomaticControlNotice");
-        var graphBottom = graphPanel.TransformToVisual(window.ThemeRoot).TransformPoint(new global::Windows.Foundation.Point(0, graphPanel.ActualHeight)).Y;
-        var noticeTop = notice.TransformToVisual(window.ThemeRoot).TransformPoint(new global::Windows.Foundation.Point()).Y;
+        var graphBottom = graphPanel.TransformToVisual(window.ThemeRoot).TransformPoint(new Windows.Foundation.Point(0, graphPanel.ActualHeight)).Y;
+        var noticeTop = notice.TransformToVisual(window.ThemeRoot).TransformPoint(new Windows.Foundation.Point()).Y;
         var actions = VisualTreeQuery.Descendants<Grid>(window.ThemeRoot).Single(grid => grid.Name == "Actions");
-        var actionsBottom = actions.TransformToVisual(window.ThemeRoot).TransformPoint(new global::Windows.Foundation.Point(0, actions.ActualHeight)).Y;
+        var actionsBottom = actions.TransformToVisual(window.ThemeRoot).TransformPoint(new Windows.Foundation.Point(0, actions.ActualHeight)).Y;
 
         if (noticeTop <= graphBottom || actionsBottom > window.ThemeRoot.ActualHeight)
         {
@@ -248,7 +248,7 @@ internal static class MsiFanCurveSmokeTests
     {
         var scroll = VisualTreeQuery.Descendants<ScrollViewer>(root).Single(view => view.Name == "EditorScroll");
         var layout = VisualTreeQuery.Descendants<Grid>(root).Single(grid => grid.Name == "EditorLayout");
-        var bottom = layout.TransformToVisual(root).TransformPoint(new global::Windows.Foundation.Point(0, layout.ActualHeight)).Y;
+        var bottom = layout.TransformToVisual(root).TransformPoint(new Windows.Foundation.Point(0, layout.ActualHeight)).Y;
         var bottomGap = root.ActualHeight - bottom;
 
         if (scroll.ScrollableHeight > 1 || bottomGap is < 19 or > 24)

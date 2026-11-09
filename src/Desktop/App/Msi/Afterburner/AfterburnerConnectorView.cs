@@ -15,6 +15,12 @@ internal sealed class AfterburnerConnectorView : UserControl
     private readonly ComboBox _scripts;
     private readonly Button _configure;
     private readonly TextBlock _scriptStatus;
+    private readonly InfoBar _simulationWarning = new()
+    {
+        Severity = InfoBarSeverity.Warning,
+        IsClosable = false,
+        Message = "Validation only. Simulation sends a real email without changing GPU power settings or shutting down the PC."
+    };
     private SafeguardBinding? _binding;
     private string? _installation;
     private bool _invalidNumericInput;
@@ -110,6 +116,7 @@ internal sealed class AfterburnerConnectorView : UserControl
         body.Children.Add(_lowPower);
         body.Children.Add(_script);
         body.Children.Add(scriptActions);
+        body.Children.Add(_simulationWarning);
         body.Children.Add(_scriptStatus);
         Content = body;
 
@@ -142,9 +149,11 @@ internal sealed class AfterburnerConnectorView : UserControl
         var enabled = _script.IsChecked == true;
         _scripts.IsEnabled = enabled;
         _configure.IsEnabled = enabled && selected is not null && _installation is not null;
+        _simulationWarning.IsOpen = enabled && selected?.IsSimulation == true;
         if (enabled && selected is not null && _binding is { } binding && binding.ScriptId == selected.Id)
         {
-            _scriptStatus.Text = $"Shutdown delay: {binding.DelayMs:N0} ms" + (selected.SendsMail ? " · SMTP configured" : "")
+            var delayLabel = selected.IsSimulation ? "Simulated shutdown delay" : "Shutdown delay";
+            _scriptStatus.Text = $"{delayLabel}: {binding.DelayMs:N0} ms" + (selected.SendsMail ? " · SMTP configured" : "")
                 + ". Run Afterburner as administrator.";
             _scriptStatus.Visibility = Visibility.Visible;
         }
@@ -164,7 +173,8 @@ internal sealed class AfterburnerConnectorView : UserControl
 
         try
         {
-            var previous = _binding?.ScriptId == selected.Id ? _binding : null;
+            var previous = _binding is { } existing && (existing.ScriptId == selected.Id || (selected.SendsMail && existing.MailId is not null))
+                ? existing : null;
             if (await new SafeguardScriptDialog(selected, previous).ShowAsync(XamlRoot, installation, Connector) is { } binding)
             {
                 _binding = binding;

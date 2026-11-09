@@ -27,6 +27,11 @@ public sealed record SafeguardBinding(Guid Id, string ScriptId, int Version, int
 }
 
 public sealed record SafeguardMailRequest(DateTimeOffset CreatedAt, SafeguardMailSettings Settings,
-    string? EncryptedInput, Guid? PreviousMailId, bool SendTest);
+    string? EncryptedInput, Guid? PreviousMailId, bool SendTest)
+{
+    public SafeguardMailPreview? Preview { get; init; }
+}
+
+public sealed record SafeguardMailPreview(string ScriptId, int Connector, int DelayMs);
 
 public sealed record SafeguardMailResult(bool Success, string Message, Guid? MailId = null);

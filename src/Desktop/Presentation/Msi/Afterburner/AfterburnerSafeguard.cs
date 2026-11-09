@@ -10,6 +10,7 @@ namespace Rtx5090Monitoring.Presentation.Msi.Afterburner;
 [SupportedOSPlatform("windows")]
 public static class AfterburnerSafeguard
 {
+    internal const string HiddenWindowOption = "-WindowStyle Hidden ";
     private const string ArgumentPrefix = "-NoLogo -NoProfile -NonInteractive -ExecutionPolicy RemoteSigned -File \"";
     private const string BindingMarker = "\" -BindingId ";
     private const string Workflow = "SafeguardWorkflow.ps1";
@@ -29,7 +30,7 @@ public static class AfterburnerSafeguard
     }
 
     public static string Arguments(SafeguardScriptDefinition script, Guid id) =>
-        ArgumentPrefix + Path.Combine(ScriptDirectory, script.FileName) + BindingMarker + id.ToString("D");
+        HiddenWindowOption + ArgumentPrefix + Path.Combine(ScriptDirectory, script.FileName) + BindingMarker + id.ToString("D");
 
     public static (Guid Id, string FileName)? Inspect(string application, string arguments)
     {
@@ -45,7 +46,11 @@ public static class AfterburnerSafeguard
         }
 
         var script = SafeguardScripts.All.FirstOrDefault(candidate =>
-            string.Equals(arguments, Arguments(candidate, id), StringComparison.OrdinalIgnoreCase));
+        {
+            var hiddenArguments = Arguments(candidate, id);
+            return string.Equals(arguments, hiddenArguments, StringComparison.OrdinalIgnoreCase)
+                || string.Equals(arguments, hiddenArguments[HiddenWindowOption.Length..], StringComparison.OrdinalIgnoreCase);
+        });
         return script is null ? null : (id, script.FileName);
     }
 

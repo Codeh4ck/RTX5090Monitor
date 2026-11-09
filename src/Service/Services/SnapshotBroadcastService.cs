@@ -35,6 +35,7 @@ internal sealed class SnapshotBroadcastService(IRuntimeConfiguration configurati
                 var snapshot = store.Snapshot(now, settings.Selections) with { ConfigurationRevision = current.Revision };
                 snapshot = runtime.ConnectorProfiles.Resolve(snapshot, current.Configuration);
                 snapshot = snapshot with { SettingsProfile = profiles.Resolve(snapshot, current.Configuration) };
+                safeguard.Observe(snapshot);
                 warningProfiles.Evaluate(snapshot, activeProfiles =>
                 {
                     var evaluated = _profileWarnings.Evaluate(snapshot, current.Configuration, activeProfiles, profiles.Automatic);

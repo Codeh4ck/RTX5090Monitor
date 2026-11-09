@@ -144,7 +144,7 @@ internal static class HardwarePanelTests
         frame = frame with
         {
             Sensors = [.. frame.Sensors.Select(reading => reading with { Identity = reading.Identity with { PluginId = "generic-nvidia" } })],
-            Plugins = [new Rtx5090Monitoring.Contracts.Health.PluginHealth("generic-nvidia", PluginState.Ready, frame.Timestamp, "RTX 5090")]
+            Plugins = [new Contracts.Health.PluginHealth("generic-nvidia", PluginState.Ready, frame.Timestamp, "RTX 5090")]
         };
         var model = new GpuStatusViewModel();
         model.Apply(frame, null, new AppPreferences(), frame.Timestamp);

@@ -23,7 +23,7 @@ public sealed partial class MainWindow : Window
     private bool _rememberWindowSize;
     private Task _closingCharts = Task.CompletedTask;
     private readonly Microsoft.UI.Dispatching.DispatcherQueueTimer _sizeSaveTimer;
-    public Rtx5090Monitoring.Presentation.Updates.UpdateViewModel Updates => _runtime.Updates;
+    public Presentation.Updates.UpdateViewModel Updates => _runtime.Updates;
     public DashboardViewModel Model { get; private set; }
     internal FrameworkElement ThemeRoot => Root;
     internal object? CurrentView => PageHost.Content;

@@ -294,12 +294,12 @@ internal static class PerformanceRecordingTests
         var pin = new Rtx5090Monitoring.Presentation.Telemetry.PinViewModel(1);
         var notifications = 0;
         pin.PropertyChanged += (_, _) => notifications++;
-        pin.Update(8, 12, 96, Rtx5090Monitoring.Presentation.Telemetry.PinMetric.Current, 9.2, true, true,
+        pin.Update(8, 12, 96, Presentation.Telemetry.PinMetric.Current, 9.2, true, true,
             notifyChanges: false);
         TestAssert.Equal(0, notifications);
         TestAssert.Equal<double?>(8, pin.Current);
 
-        pin.Update(1, 12, 12, Rtx5090Monitoring.Presentation.Telemetry.PinMetric.Current, 9.2, true, true);
+        pin.Update(1, 12, 12, Presentation.Telemetry.PinMetric.Current, 9.2, true, true);
         TestAssert.True(notifications > 0, "Returning to a page must refresh bindings.");
         TestAssert.True(pin.ShowPeak && pin.PeakTop < pin.BarTop, "Background updates must preserve peak history.");
     }

@@ -47,7 +47,8 @@ internal sealed class SafeguardScriptDialog(SafeguardScriptDefinition script, Sa
                 try
                 {
                     _message.Text = "Sending test email through the Windows service...";
-                    var result = await SubmitMailAsync(store!, previousMail, true);
+                    var preview = new SafeguardMailPreview(script.Id, connector, ReadInteger("DelayMs"));
+                    var result = await SubmitMailAsync(store!, previousMail, preview);
                     _message.Text = result.Message;
                 }
                 catch (Exception error) when (IsConfigurationError(error))
@@ -78,7 +79,7 @@ internal sealed class SafeguardScriptDialog(SafeguardScriptDefinition script, Sa
                 await AfterburnerSafeguard.ProbeAsync(script);
                 if (script.SendsMail)
                 {
-                    var result = await SubmitMailAsync(store!, previousMail, false);
+                    var result = await SubmitMailAsync(store!, previousMail);
                     if (!result.Success || result.MailId is null)
                     {
                         throw new InvalidOperationException(result.Message);
@@ -152,7 +153,8 @@ internal sealed class SafeguardScriptDialog(SafeguardScriptDefinition script, Sa
         return checked((int)input.Value);
     }
 
-    private async Task<SafeguardMailResult> SubmitMailAsync(SafeguardStorage store, SafeguardMailCredential? previousMail, bool test)
+    private async Task<SafeguardMailResult> SubmitMailAsync(SafeguardStorage store, SafeguardMailCredential? previousMail,
+        SafeguardMailPreview? preview = null)
     {
         string Read(string key) => ((TextBox)_inputs[key]).Text.Trim();
         string Choice(string key) => (string)((ComboBox)_inputs[key]).SelectedItem;
@@ -181,7 +183,7 @@ internal sealed class SafeguardScriptDialog(SafeguardScriptDefinition script, Sa
 
         var id = Guid.NewGuid();
         store.Write("requests", id, new SafeguardMailRequest(DateTimeOffset.UtcNow, settings, encrypted,
-            reusePassword ? previous?.MailId : null, test));
+            reusePassword ? previous?.MailId : null, preview is not null) { Preview = preview });
 
         try
         {

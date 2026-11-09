@@ -69,7 +69,7 @@ internal static class AfterburnerSmokeTests
             throw new InvalidOperationException("Backups require a two-column list, a single compact action row, and help through an info button.");
         }
         var header = (Grid)integration.FindName("HeaderLayout");
-        var leftEdge = panels.TransformToVisual(integration).TransformPoint(new global::Windows.Foundation.Point(0, 0)).X;
+        var leftEdge = panels.TransformToVisual(integration).TransformPoint(new Windows.Foundation.Point(0, 0)).X;
         var rightGap = integration.ActualWidth - leftEdge - panels.ActualWidth;
         if (Math.Abs(leftEdge - rightGap) > 1 || Math.Abs(header.ActualWidth - panels.ActualWidth) > 1)
         {
@@ -78,15 +78,15 @@ internal static class AfterburnerSmokeTests
 
         var runningWarning = (FrameworkElement)integration.FindName("ProcessWarning");
         var headerInfo = (FrameworkElement)integration.FindName("HeaderInfoButton");
-        var warningEnd = runningWarning.TransformToVisual(integration).TransformPoint(new global::Windows.Foundation.Point(runningWarning.ActualWidth, 0)).X;
-        var infoStart = headerInfo.TransformToVisual(integration).TransformPoint(new global::Windows.Foundation.Point(0, 0)).X;
+        var warningEnd = runningWarning.TransformToVisual(integration).TransformPoint(new Windows.Foundation.Point(runningWarning.ActualWidth, 0)).X;
+        var infoStart = headerInfo.TransformToVisual(integration).TransformPoint(new Windows.Foundation.Point(0, 0)).X;
         if (Math.Abs(infoStart - warningEnd - 12) > 1 || backupList.SelectionMode != ListViewSelectionMode.Multiple
             || backupList.IsMultiSelectCheckBoxEnabled)
         {
             throw new InvalidOperationException("The warning must sit beside its info button, and backups must retain multiselect without a check column.");
         }
 
-        var launcherIcon = VisualTreeQuery.Descendants<Rtx5090Monitoring.App.Controls.WidgetIcon>(launcher).Single();
+        var launcherIcon = VisualTreeQuery.Descendants<Controls.WidgetIcon>(launcher).Single();
         if (launcherIcon.IconName != "settings" || launcherIcon.Width < 22)
         {
             throw new InvalidOperationException("The launcher needs a readable dark SVG on its light icon surface.");
@@ -235,9 +235,9 @@ internal static class AfterburnerSmokeTests
 
         var installationPicker = (FrameworkElement)integration.FindName("InstallationPicker");
         var badgeBottom = badges.TransformToVisual(configurationBody)
-            .TransformPoint(new global::Windows.Foundation.Point(0, badges.ActualHeight)).Y;
+            .TransformPoint(new Windows.Foundation.Point(0, badges.ActualHeight)).Y;
         var pickerTop = installationPicker.TransformToVisual(configurationBody)
-            .TransformPoint(new global::Windows.Foundation.Point(0, 0)).Y;
+            .TransformPoint(new Windows.Foundation.Point(0, 0)).Y;
         if (badgeBottom > pickerTop || integration.FindName("StatusPanel") is not null
             || integration.FindName("ConnectorStatusPanel") is not null
             || integration.FindName("MonitoringStatus") is not null || integration.FindName("ProcessStatus") is not null)
@@ -308,7 +308,7 @@ internal static class AfterburnerSmokeTests
         var showMessage = typeof(AfterburnerSettingsView).GetMethod("ShowMessage", BindingFlags.Instance | BindingFlags.NonPublic)!;
         showMessage.Invoke(integration, ["Preview: operation feedback is shown below the action buttons.", false]);
         await Task.Delay(350);
-        Microsoft.UI.Xaml.DependencyObject? ancestor = integration;
+        DependencyObject? ancestor = integration;
         while (ancestor is not null && ancestor is not ScrollViewer)
         {
             ancestor = VisualTreeHelper.GetParent(ancestor);
@@ -316,7 +316,7 @@ internal static class AfterburnerSmokeTests
 
         if (ancestor is ScrollViewer scroll)
         {
-            var top = message.TransformToVisual(scroll).TransformPoint(new global::Windows.Foundation.Point(0, 0)).Y;
+            var top = message.TransformToVisual(scroll).TransformPoint(new Windows.Foundation.Point(0, 0)).Y;
             if (top < -1 || top + message.ActualHeight > scroll.ActualHeight + 1)
             {
                 throw new InvalidOperationException($"Operation feedback must be visible. Top={top}, message={message.ActualHeight}, viewport={scroll.ViewportHeight}, actual={scroll.ActualHeight}, offset={scroll.VerticalOffset}, extent={scroll.ScrollableHeight}.");
@@ -324,7 +324,7 @@ internal static class AfterburnerSmokeTests
         }
 
         var messageTop = message.TransformToVisual(integrationWindow.ThemeRoot)
-            .TransformPoint(new global::Windows.Foundation.Point(0, 0)).Y;
+            .TransformPoint(new Windows.Foundation.Point(0, 0)).Y;
         if (messageTop < -1 || messageTop + message.ActualHeight > integrationWindow.ThemeRoot.ActualHeight + 1)
         {
             throw new InvalidOperationException("The pinned operation feedback must stay visible below the action buttons.");
@@ -346,7 +346,7 @@ internal static class AfterburnerSmokeTests
         }
 
         // WM_CLOSE exercises the same close path as the title-bar X, within this isolated diagnostic process only.
-        Rtx5090Monitoring.App.Platform.Interop.NativeMethods.PostMessageW(
+        Platform.Interop.NativeMethods.PostMessageW(
             WinRT.Interop.WindowNative.GetWindowHandle(integrationWindow), 0x0010, 0, 0);
         var closeDialog = await FindPendingDialogAsync(integrationWindow);
         await SmokeTestRunner.CaptureElementAsync(closeDialog, Path.Combine(output, "afterburner-pending-changes.png"));
@@ -386,7 +386,7 @@ internal static class AfterburnerSmokeTests
 
         foreach (var icon in new[] { "settings", "application", "terminal" })
         {
-            if (Rtx5090Monitoring.App.Controls.WidgetIcon.LoadFailures.TryGetValue(icon, out var error))
+            if (Controls.WidgetIcon.LoadFailures.TryGetValue(icon, out var error))
             {
                 throw new InvalidOperationException("Configuration icon failed to load: " + icon + ": " + error);
             }
@@ -395,7 +395,7 @@ internal static class AfterburnerSmokeTests
         var numericInput = VisualTreeQuery.Descendants<TextBox>(sharedCurrent).First();
         numericInput.Focus(FocusState.Programmatic);
         numericInput.Text = sharedCurrent.NumberFormatter.FormatDouble(savedCurrent + 0.1);
-        Rtx5090Monitoring.App.Platform.Interop.NativeMethods.PostMessageW(
+        Platform.Interop.NativeMethods.PostMessageW(
             WinRT.Interop.WindowNative.GetWindowHandle(integrationWindow), 0x0010, 0, 0);
         var finalCloseDialog = await FindPendingDialogAsync(integrationWindow);
         InvokeDialogButton(finalCloseDialog, "PrimaryButton");

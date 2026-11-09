@@ -9,7 +9,7 @@ public sealed partial class SettingsView : UserControl
 {
     private readonly AppRuntime _runtime;
     public AppSettingsViewModel Model { get; }
-    public Rtx5090Monitoring.Presentation.Updates.UpdateViewModel Updates => _runtime.Updates;
+    public Presentation.Updates.UpdateViewModel Updates => _runtime.Updates;
 
     internal SettingsView(AppRuntime runtime)
     {
@@ -56,7 +56,7 @@ public sealed partial class SettingsView : UserControl
 
     private async void SkipUpdate_Click(object sender, RoutedEventArgs args) => await DismissUpdateAsync(sender, true);
 
-    private Rtx5090Monitoring.Presentation.Updates.UpdateNotice? FindUpdate(object sender) =>
+    private Presentation.Updates.UpdateNotice? FindUpdate(object sender) =>
         Updates.Available.FirstOrDefault(notice => notice.Component == ((sender as FrameworkElement)?.Tag as string));
 
     private async Task DismissUpdateAsync(object sender, bool skip)

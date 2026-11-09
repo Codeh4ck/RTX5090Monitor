@@ -31,6 +31,7 @@ public sealed partial class AfterburnerSettingsView : UserControl
     private DateTimeOffset _startPendingUntil;
 
     internal event Action? CloseRequested;
+    internal event Action? PreferredHeightChanged;
     internal bool IsBusy => _busy;
     internal double PreferredContentHeight => HeaderLayout.ActualHeight + ((Grid)Content).RowSpacing + Panels.ActualHeight + Panels.Margin.Top + Panels.Margin.Bottom;
     internal bool HasPendingChanges => _savedFields is { } saved
@@ -421,6 +422,11 @@ public sealed partial class AfterburnerSettingsView : UserControl
 
     private void PageLayout_Changed(object sender, SizeChangedEventArgs args)
     {
+        if (!ReferenceEquals(sender, PageScroll) && args.NewSize.Height != args.PreviousSize.Height)
+        {
+            PreferredHeightChanged?.Invoke();
+        }
+
         if (_gutterUpdateQueued)
         {
             return;

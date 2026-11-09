@@ -102,9 +102,9 @@ internal static class GenericNvidiaTests
     {
         var source = Source();
         using var reader = new NvidiaTelemetryReader(source, new TestTimeProvider());
-        using var asus = new Rtx5090Monitoring.Plugins.Asus.Device.AsusGpuReader(reader);
-        var factory = new Rtx5090Monitoring.Plugins.Asus.Factories.AsusPluginFactory(new TestTimeProvider(),
-            new Rtx5090Monitoring.Plugins.Asus.Streaming.AsusStream(), reader);
+        using var asus = new Plugins.Asus.Device.AsusGpuReader(reader);
+        var factory = new Plugins.Asus.Factories.AsusPluginFactory(new TestTimeProvider(),
+            new Plugins.Asus.Streaming.AsusStream(), reader);
         TestAssert.True(asus.Read(null, CancellationToken.None) is null, "An RTX 5090 name alone must not qualify as Astral.");
         TestAssert.Equal<bool?>(false, factory.HardwarePresent(factory.CreateDefaultSettings()));
         source.Sensors = [.. source.Sensors, new("12VHPWR Pin 1", SensorType.Current, 1, 0)];

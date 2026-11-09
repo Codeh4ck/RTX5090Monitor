@@ -64,6 +64,20 @@ internal static class AfterburnerConfigurationTests
         var connector = AfterburnerConfiguration.InspectConnector(plan.Files[1].After, 2);
         TestAssert.Equal<Guid?>(id, connector.ScriptBindingId);
         TestAssert.Equal("LowPowerAndShutdown.ps1", connector.BuiltInScriptFileName!);
+
+        const string hiddenOption = "-WindowStyle Hidden ";
+        TestAssert.True(connector.Arguments.StartsWith(hiddenOption, StringComparison.Ordinal), "Bundled alarms must hide the PowerShell window.");
+        var legacyProfile = Encoding.UTF8.GetBytes(Encoding.UTF8.GetString(plan.Files[1].After)
+            .Replace(hiddenOption, "", StringComparison.Ordinal));
+        var legacyConnector = AfterburnerConfiguration.InspectConnector(legacyProfile, 2);
+        TestAssert.Equal<Guid?>(id, legacyConnector.ScriptBindingId);
+
+        var migrated = AfterburnerConfiguration.Plan(install, plan.Files[0].After, legacyProfile, settings);
+        TestAssert.True(migrated.HasChanges, "Reapplying an existing alarm must update the launch command.");
+        TestAssert.True(migrated.Files[1].After.SequenceEqual(plan.Files[1].After), "Migration must only restore the hidden window option.");
+        TestAssert.False(AfterburnerConfiguration.Plan(install, migrated.Files[0].After, migrated.Files[1].After, settings).HasChanges,
+            "Reapplying a hidden alarm must leave the files unchanged.");
+
         TestAssert.False(Encoding.UTF8.GetString(plan.Files[1].After).Contains("-Delay"), "Parameters belong in the protected binding.");
         TestAssert.Throws<ArgumentException>(() => (script with { DelayMs = -1 }).Validate());
         TestAssert.Throws<ArgumentException>(() => (script with { ScriptId = "user-script" }).Validate());

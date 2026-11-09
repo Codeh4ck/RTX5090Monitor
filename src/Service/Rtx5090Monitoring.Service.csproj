@@ -8,6 +8,7 @@
         <ProjectReference Include="../Plugins/Msi/Plugin/Rtx5090Monitoring.Plugins.Msi.csproj" />
         <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" />
         <PackageReference Include="MailKit" />
+        <Compile Include="../Common/SafeguardReporting/*.cs" Link="SafeguardReporting/%(Filename)%(Extension)" />
         <PackageReference Include="System.Security.Cryptography.ProtectedData" />
         <Content Include="../../scripts/afterburner/*.ps1" Link="SafeguardScripts/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
         <ProjectReference Include="../Core/Rtx5090Monitoring.Core.csproj" />

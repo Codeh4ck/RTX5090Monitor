@@ -13,6 +13,7 @@ public sealed record SafeguardScriptDefinition(string Id, string Name, string Fi
 {
     public int Version => 1;
     public bool SendsMail => Parameters.ContainsKey("Host");
+    public bool IsSimulation => Id == SafeguardScripts.Simulation;
     public override string ToString() => Name;
 }
 
@@ -20,6 +21,7 @@ public static class SafeguardScripts
 {
     public const string LowPower = "low-power-shutdown";
     public const string Notify = "low-power-shutdown-notify";
+    public const string Simulation = "simulation";
     public const int DefaultRetentionDays = 14;
     public const int DefaultDelayMs = 5000;
     public const int MaximumDelayMs = 3_600_000;
@@ -27,19 +29,22 @@ public static class SafeguardScripts
     private static readonly SafeguardParameterDefinition Delay =
         new("DelayMs", "Shutdown delay (ms)", SafeguardParameterType.Integer, DefaultDelayMs, 0, MaximumDelayMs);
 
+    private static readonly IReadOnlyDictionary<string, SafeguardParameterDefinition> NotificationParameters = Parameters(
+        Delay,
+        new("Host", "SMTP server", SafeguardParameterType.Host),
+        new("Port", "SMTP port", SafeguardParameterType.Integer, 587, 1, 65535),
+        new("Security", "Connection security", SafeguardParameterType.Choice, "STARTTLS", Choices: ["STARTTLS", "Implicit TLS"]),
+        new("Authentication", "Authentication", SafeguardParameterType.Choice, "Username/password", Choices: ["Username/password", "Unauthenticated relay"]),
+        new("Username", "Username", SafeguardParameterType.Text),
+        new("Password", "Password or app password", SafeguardParameterType.Secret),
+        new("Sender", "Sender", SafeguardParameterType.Mailbox),
+        new("Recipients", "Recipients (comma separated)", SafeguardParameterType.Mailboxes, Minimum: 1, Maximum: 10));
+
     public static IReadOnlyList<SafeguardScriptDefinition> All { get; } = Array.AsReadOnly(new[]
     {
         new SafeguardScriptDefinition(LowPower, "Low power profile & shutdown", "LowPowerAndShutdown.ps1", Parameters(Delay)),
-        new SafeguardScriptDefinition(Notify, "Low power profile, shutdown & notify", "LowPowerShutdownAndNotify.ps1", Parameters(
-            Delay,
-            new("Host", "SMTP server", SafeguardParameterType.Host),
-            new("Port", "SMTP port", SafeguardParameterType.Integer, 587, 1, 65535),
-            new("Security", "Connection security", SafeguardParameterType.Choice, "STARTTLS", Choices: ["STARTTLS", "Implicit TLS"]),
-            new("Authentication", "Authentication", SafeguardParameterType.Choice, "Username/password", Choices: ["Username/password", "Unauthenticated relay"]),
-            new("Username", "Username", SafeguardParameterType.Text),
-            new("Password", "Password or app password", SafeguardParameterType.Secret),
-            new("Sender", "Sender", SafeguardParameterType.Mailbox),
-            new("Recipients", "Recipients (comma separated)", SafeguardParameterType.Mailboxes, Minimum: 1, Maximum: 10)))
+        new SafeguardScriptDefinition(Notify, "Low power profile, shutdown & notify", "LowPowerShutdownAndNotify.ps1", NotificationParameters),
+        new SafeguardScriptDefinition(Simulation, "Simulation", "SimulateSafeguard.ps1", NotificationParameters)
     });
 
     public static SafeguardScriptDefinition Get(string id) => All.FirstOrDefault(script => script.Id == id)

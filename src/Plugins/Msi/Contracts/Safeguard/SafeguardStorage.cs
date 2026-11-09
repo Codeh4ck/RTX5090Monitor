@@ -125,17 +125,23 @@ public sealed class SafeguardStorage
 
         foreach (var id in selection)
         {
-            Delete("history", id);
-            if (!File.Exists(Location("outbox", id)))
-            {
-                Delete("delivery", id);
-            }
+            DeleteExecutionHistory(id);
+        }
+    }
+
+    public void DeleteExecutionHistory(Guid id)
+    {
+        Delete("history", id);
+        if (!File.Exists(Location("outbox", id)))
+        {
+            Delete("telemetry", id);
+            Delete("delivery", id);
         }
     }
 
     private string Area(string area)
     {
-        if (area is not ("bindings" or "mail" or "requests" or "results" or "history" or "outbox" or "delivery" or "seen"))
+        if (area is not ("bindings" or "mail" or "requests" or "results" or "history" or "outbox" or "delivery" or "seen" or "telemetry"))
         {
             throw new ArgumentOutOfRangeException(nameof(area));
         }

@@ -84,7 +84,9 @@ public static class AfterburnerConfiguration
             }
 
             var actionChanged = alarm.UseLowPowerAction != saved.LowPowerAction
-                || (alarm.Script is { } binding && binding.Id != saved.ScriptBindingId);
+                || (alarm.Script is { } binding && (binding.Id != saved.ScriptBindingId
+                    || (OperatingSystem.IsWindows()
+                        && !saved.Arguments.StartsWith(AfterburnerSafeguard.HiddenWindowOption, StringComparison.OrdinalIgnoreCase))));
             if (alarm.Enabled == saved.AlarmConfigured && !actionChanged)
             {
                 continue;
@@ -122,7 +124,7 @@ public static class AfterburnerConfiguration
                     profile.Set(section, "AlarmFlags", "3");
                     profile.Set(section, "AlarmApp", AfterburnerSafeguard.PowerShell);
                     profile.Set(section, "AlarmAppCmdLine", AfterburnerSafeguard.Arguments(
-                        Rtx5090Monitoring.Plugins.Msi.Contracts.Safeguard.SafeguardScripts.Get(script.ScriptId), script.Id));
+                        Plugins.Msi.Contracts.Safeguard.SafeguardScripts.Get(script.ScriptId), script.Id));
                 }
                 else if (alarm.UseLowPowerAction)
                 {

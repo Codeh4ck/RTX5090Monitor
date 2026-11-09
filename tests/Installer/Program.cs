@@ -21,6 +21,7 @@ internal static class Program
                 TcpListenerTests.Run();
                 StartupCleanupTests.Run();
                 ConfigurationBackupTests.Run();
+                AfterburnerBackupCleanupTests.Run();
             }
 
             Console.WriteLine("PASS: Installer checks completed without changing services, startup registry or installed applications.");
