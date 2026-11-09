@@ -1,3 +1,10 @@
+1.0.6 - Afterburner Safeguard+ integration
+- Configure MSI Afterburner PSU monitoring, software current limits and per-connector alarms from RTX Monitor.
+- Save, restore and delete Afterburner configuration backups.
+- Add low-power and forced shutdown actions with a configurable delay and optional SMTP email notification.
+- Add Safeguard+ History with configurable retention and execution notifications in the desktop app and iCUE widget.
+- Run the desktop app with administrator privileges and use an elevated scheduled task for start with Windows.
+
 1.0.5 - MSI fan curves and desktop improvements
 - Add backend-managed MSI PSU fan curves with a separate graphical editor and live temperature, RPM and duty indicators
 - Support up to six curve points, rising or falling duty, and custom maximum duty. Fan response delay defaults to two seconds in both directions
