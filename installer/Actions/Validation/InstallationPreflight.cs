@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using Microsoft.Win32;
+using Rtx5090Monitoring.Installer.Actions.Configuration;
 using Rtx5090Monitoring.Installer.Actions.Services;
 
 namespace Rtx5090Monitoring.Installer.Actions.Validation;
@@ -35,7 +36,8 @@ public static class InstallationPreflight
                                                Path.GetFullPath(installDirectory).TrimEnd(Path.DirectorySeparatorChar),
                                                StringComparison.OrdinalIgnoreCase));
 
-        if (!managed && Directory.Exists(installDirectory) && Directory.GetFileSystemEntries(installDirectory).Length > 0)
+        if (!managed && Directory.Exists(installDirectory) && Directory.GetFileSystemEntries(installDirectory).Length > 0
+            && !AfterburnerBackupCleanup.ContainsOnlyBackupLeftovers(installDirectory))
         {
             throw new IOException("The destination contains files not managed by this installer. Choose an empty dedicated folder or remove the previous unmanaged installation first.");
         }

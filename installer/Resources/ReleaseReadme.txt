@@ -23,7 +23,8 @@ For version 1.0.0, update the service, desktop app and widget together to enable
 MODIFY / REPAIR / UNINSTALL
 Use Windows Settings > Apps > RTX Monitor, or run the same setup EXE again.
 Modify lets you add/remove the desktop component without removing the service.
-Uninstall removes the installed service, app, shortcuts and startup entries pointing to this installation.
+Uninstall removes the installed service, app, shortcuts, startup entries and RTX Monitor's Afterburner backups.
+Setup can reuse an installation folder left behind by an older uninstaller if it contains only those backups.
 Uninstall-RTXMonitor.ps1 is an optional launcher for the registered cached uninstaller.
 Exit the desktop app using its tray menu first; unsaved configuration drafts are not forcibly discarded.
 

@@ -1,4 +1,5 @@
 using System;
+using Microsoft.Win32;
 using Rtx5090Monitoring.Installer.Actions.Configuration;
 using Rtx5090Monitoring.Installer.Actions.Startup;
 using Rtx5090Monitoring.Installer.Actions.Services;
@@ -66,6 +67,20 @@ public static class CustomActions
     [CustomAction]
     public static ActionResult MigrateStartupRegistration(Session session) => Run(session, () =>
         StartupCleanup.Migrate(session.CustomActionData["InstallDirectory"], message => session.Log(message)));
+
+    [CustomAction]
+    public static ActionResult PrepareAfterburnerBackupCleanup(Session session) => Run(session, () =>
+    {
+        using var hive = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
+        using var registration = hive.OpenSubKey(@"SOFTWARE\Rtx5090Monitoring");
+        var installation = registration?.GetValue("InstallDirectory") as string;
+        session["RemoveAfterburnerBackups"] = new CustomActionData { { "InstallDirectory", installation ?? "" } }.ToString();
+    });
+
+    [CustomAction]
+    public static ActionResult RemoveAfterburnerBackups(Session session) => Run(session, () =>
+        AfterburnerBackupCleanup.Remove(session.CustomActionData["InstallDirectory"],
+            Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), message => session.Log(message)));
 
     private static ActionResult Run(Session session, Action action)
     {

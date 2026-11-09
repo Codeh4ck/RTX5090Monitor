@@ -72,6 +72,8 @@
         <CustomAction Id="RemoveStartupRegistration" BinaryRef="InstallerActions" DllEntry="RemoveStartupRegistration" Execute="commit" Impersonate="no" Return="ignore" />
         <CustomAction Id="PrepareStartupMigration" BinaryRef="InstallerActions" DllEntry="PrepareStartupMigration" Execute="immediate" Return="check" />
         <CustomAction Id="MigrateStartupRegistration" BinaryRef="InstallerActions" DllEntry="MigrateStartupRegistration" Execute="commit" Impersonate="no" Return="ignore" />
+        <CustomAction Id="PrepareAfterburnerBackupCleanup" BinaryRef="InstallerActions" DllEntry="PrepareAfterburnerBackupCleanup" Execute="immediate" Return="check" />
+        <CustomAction Id="RemoveAfterburnerBackups" BinaryRef="InstallerActions" DllEntry="RemoveAfterburnerBackups" Execute="commit" Impersonate="no" Return="ignore" />
         <InstallExecuteSequence>
             <Custom Action="Preflight" Before="InstallInitialize" Condition="NOT UPGRADINGPRODUCTCODE" />
             <Custom Action="PortAvailable" After="StopServices" Condition="NOT (REMOVE~=&quot;ALL&quot;)" />
@@ -85,6 +87,8 @@
             <Custom Action="PrepareStartupCleanup" Before="RemoveStartupRegistration" Condition="(&amp;Desktop=2) AND NOT UPGRADINGPRODUCTCODE" />
             <Custom Action="MigrateStartupRegistration" Before="InstallFinalize" Condition="WIX_UPGRADE_DETECTED AND (&amp;Desktop=3)" />
             <Custom Action="PrepareStartupMigration" Before="MigrateStartupRegistration" Condition="WIX_UPGRADE_DETECTED AND (&amp;Desktop=3)" />
+            <Custom Action="RemoveAfterburnerBackups" Before="InstallFinalize" Condition="Installed AND REMOVE~=&quot;ALL&quot; AND NOT UPGRADINGPRODUCTCODE" />
+            <Custom Action="PrepareAfterburnerBackupCleanup" Before="RemoveAfterburnerBackups" Condition="Installed AND REMOVE~=&quot;ALL&quot; AND NOT UPGRADINGPRODUCTCODE" />
         </InstallExecuteSequence>
 
         <ui:WixUI Id="WixUI_FeatureTree" />
