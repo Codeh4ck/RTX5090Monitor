@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
+using Microsoft.Win32.SafeHandles;
 using Rtx5090Monitoring.Presentation.Msi.Afterburner;
 
 namespace Rtx5090Monitoring.App.Msi.Afterburner;
@@ -93,6 +94,52 @@ internal static class AfterburnerProcessControl
             }
         }
     }
+
+    internal static bool HasElevatedInstance(string installation)
+    {
+        var expected = Path.Combine(installation, "MSIAfterburner.exe");
+        var processes = Process.GetProcessesByName("MSIAfterburner");
+        using var current = Process.GetCurrentProcess();
+        try
+        {
+            foreach (var process in processes)
+            {
+                if (process.SessionId != current.SessionId
+                    || !string.Equals(process.MainModule?.FileName, expected, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                if (!OpenProcessToken(process.Handle, 8, out var token))
+                {
+                    return false;
+                }
+
+                using (token)
+                {
+                    return GetTokenInformation(token, 20, out var elevated, sizeof(int), out _) && elevated != 0;
+                }
+            }
+
+            return false;
+        }
+        finally
+        {
+            foreach (var process in processes)
+            {
+                process.Dispose();
+            }
+        }
+    }
+
+    [DllImport("advapi32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool OpenProcessToken(nint process, uint access, out SafeAccessTokenHandle token);
+
+    [DllImport("advapi32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool GetTokenInformation(SafeAccessTokenHandle token, int informationClass,
+        out int information, int size, out int returnedSize);
 
     private delegate bool WindowCallback(nint window, nint parameter);
 

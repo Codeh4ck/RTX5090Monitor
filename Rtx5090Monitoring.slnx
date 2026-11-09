@@ -11,6 +11,11 @@
         <Project Path="tests/Installer/Rtx5090Monitoring.Installer.Tests.csproj" />
     </Folder>
     <Folder Name="/Plugins/" />
+    <Folder Name="/Plugins/MSI/Safeguard+ Scripts/">
+        <File Path="scripts/afterburner/LowPowerAndShutdown.ps1" />
+        <File Path="scripts/afterburner/LowPowerShutdownAndNotify.ps1" />
+        <File Path="scripts/afterburner/SafeguardWorkflow.ps1" />
+    </Folder>
     <Folder Name="/Plugins/Asus/">
         <Project Path="src/Plugins/Asus/Analysis/Rtx5090Monitoring.Plugins.Asus.Analysis.csproj" />
         <Project Path="src/Plugins/Asus/Contracts/Rtx5090Monitoring.Plugins.Asus.Contracts.csproj" />

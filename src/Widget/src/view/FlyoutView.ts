@@ -13,7 +13,7 @@ export class FlyoutView {
     private body: HTMLElement | null = null;
     private controller: AbortController | null = null;
     private signature = '';
-    mode: 'configuration' | 'warnings' | 'preview' | 'updates' | null = null;
+    mode: 'configuration' | 'warnings' | 'preview' | 'updates' | 'safeguard' | null = null;
 
     constructor(root: HTMLElement, changed: () => void, showUpdates: () => void = () => {}) {
         this.root = root;
@@ -203,14 +203,22 @@ export class FlyoutView {
     }
 
     warnings(warnings: WarningNotice[], preview = false): void {
-        const signature = JSON.stringify([warnings, preview]);
+        this.showNotices(warnings, preview ? 'preview' : 'warnings', preview ? 'Warning preview' : 'Monitoring warnings');
+    }
+
+    safeguard(notices: WarningNotice[]): void {
+        this.showNotices(notices, 'safeguard', 'Safeguard+');
+    }
+
+    private showNotices(warnings: WarningNotice[], mode: 'warnings' | 'preview' | 'safeguard', title: string): void {
+        const preview = mode === 'preview';
+        const signature = JSON.stringify([warnings, mode]);
 
         if (this.signature === signature && this.open) {
             return;
         }
 
-        const mode = preview ? 'preview' : 'warnings';
-        const body = this.mode === mode && this.body ? this.body : this.show(mode, preview ? 'Warning preview' : 'Monitoring warnings');
+        const body = this.mode === mode && this.body ? this.body : this.show(mode, title);
         const scroll = body.scrollTop;
         body.replaceChildren();
 

@@ -1,4 +1,5 @@
 import type { WarningSnapshot } from './WarningSnapshot.ts';
+import type { SafeguardExecutionNotice } from './SafeguardExecutionNotice.ts';
 import type { PluginHealth } from './PluginHealth.ts';
 import type { ResolvedSelection } from './ResolvedSelection.ts';
 import type { SensorAlert } from './SensorAlert.ts';
@@ -19,4 +20,5 @@ export interface SensorSnapshot {
     settingsProfile?: ActiveSettingsProfile | null;
     pinWarningLimits?: PinWarningLimit[] | null;
     warnings?: WarningSnapshot | null;
+    safeguardExecutions?: SafeguardExecutionNotice[] | null;
 }

@@ -57,6 +57,16 @@ public static class CustomActions
     public static ActionResult RemoveStartupRegistration(Session session) => Run(session, () =>
         StartupCleanup.Remove(session.CustomActionData["InstallDirectory"], message => session.Log(message)));
 
+    [CustomAction]
+    public static ActionResult PrepareStartupMigration(Session session) => Run(session, () =>
+    {
+        session["MigrateStartupRegistration"] = new CustomActionData { { "InstallDirectory", session["INSTALLFOLDER"] } }.ToString();
+    });
+
+    [CustomAction]
+    public static ActionResult MigrateStartupRegistration(Session session) => Run(session, () =>
+        StartupCleanup.Migrate(session.CustomActionData["InstallDirectory"], message => session.Log(message)));
+
     private static ActionResult Run(Session session, Action action)
     {
         try

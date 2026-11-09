@@ -24,6 +24,12 @@ public sealed partial class MsiHardwareView : UserControl
             ConnectorGrid.Children.Add(new MsiConnectorCard(connector));
         }
 
+        Loaded += (_, _) =>
+        {
+            _runtime.SafeguardHistoryChanged += UpdateSafeguardHistory;
+            UpdateSafeguardHistory();
+        };
+        Unloaded += (_, _) => _runtime.SafeguardHistoryChanged -= UpdateSafeguardHistory;
         SizeChanged += (_, _) => LayoutPanels();
         LayoutPanels();
     }
@@ -71,6 +77,11 @@ public sealed partial class MsiHardwareView : UserControl
             Grid.SetColumn(card, index % columns);
         }
     }
+
+    private void UpdateSafeguardHistory() => SafeguardHistoryButton.Visibility = _runtime.HasSafeguardHistory
+        ? Visibility.Visible : Visibility.Collapsed;
+
+    private void SafeguardHistory_Click(object sender, RoutedEventArgs args) => _runtime.OpenSafeguardHistory();
 
     private void ResetPeak_Click(object sender, RoutedEventArgs args) => Model.Msi.ResetPeaks();
     private async void Restart_Click(object sender, RoutedEventArgs args) => await _runtime.RestartPluginAsync(Model.Id);

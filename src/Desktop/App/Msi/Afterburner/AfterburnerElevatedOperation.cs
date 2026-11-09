@@ -148,6 +148,18 @@ internal static class AfterburnerElevatedOperation
                 {
                     // All checks, including process detection, are repeated in the elevated process before writing.
                     AfterburnerDiscovery.RequireStopped();
+                    if (operation.Action == "apply" && operation.Settings is { } settings)
+                    {
+                        foreach (var alarm in settings.GetConnectorAlarms())
+                        {
+                            if (alarm.Script is { } script)
+                            {
+                                await AfterburnerSafeguard.InstallBindingAsync(installation.Directory, alarm.Connector, script);
+                            }
+                        }
+                    }
+
+                    AfterburnerDiscovery.RequireStopped();
                     var backup = store.Apply(plan, operation.Action == "restore");
                     File.WriteAllText(Path.Combine(store.BackupDirectory, "restart-required.txt"), DateTimeOffset.UtcNow.ToString("O"));
                     result = new(true, (operation.Action == "restore" ? "Configuration restored" : "Configuration saved")

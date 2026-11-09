@@ -160,8 +160,8 @@ public sealed partial class AfterburnerSettingsView : UserControl
         SoftwareAlarmsEnabled.IsChecked = inspection.Settings.SoftwareAlarm;
         MaxCurrent.Value = inspection.Settings.MaxCurrent;
         CurrentDifference.Value = inspection.Settings.CurrentDifference;
-        _connector1.SetInspection(AfterburnerConfiguration.InspectConnector(baseline.Files[1].Before, 1));
-        _connector2.SetInspection(AfterburnerConfiguration.InspectConnector(baseline.Files[1].Before, 2));
+        _connector1.SetInspection(AfterburnerConfiguration.InspectConnector(baseline.Files[1].Before, 1), installation.Directory);
+        _connector2.SetInspection(AfterburnerConfiguration.InspectConnector(baseline.Files[1].Before, 2), installation.Directory);
         _savedFields = CurrentFields();
         _invalidNumericInput = false;
 
@@ -490,7 +490,7 @@ public sealed partial class AfterburnerSettingsView : UserControl
         }
 
         AfterburnerDiscovery.RequireStopped();
-        _ = Process.Start(new ProcessStartInfo(Path.Combine(installation.Directory, "MSIAfterburner.exe")) { UseShellExecute = true })
+        _ = Process.Start(new ProcessStartInfo(Path.Combine(installation.Directory, "MSIAfterburner.exe")) { UseShellExecute = true, Verb = "runas" })
             ?? throw new InvalidOperationException("Afterburner could not be started.");
         _startPendingUntil = DateTimeOffset.UtcNow.AddSeconds(5);
         RefreshProcessState();
@@ -571,7 +571,12 @@ public sealed partial class AfterburnerSettingsView : UserControl
             var running = AfterburnerDiscovery.IsRunning();
             var starting = !running && DateTimeOffset.UtcNow < _startPendingUntil;
             _processStateKnown = true;
-            ProcessWarningText.Text = "Afterburner is running. Close Afterburner to modify Safeguard+ settings!";
+            var scriptArmed = new[] { _connector1.Saved, _connector2.Saved }
+                .Any(connector => connector is { AlarmConfigured: true, ScriptBindingId: not null });
+            ProcessWarningText.Text = running && scriptArmed && _installation is { } installation
+                && !AfterburnerProcessControl.HasElevatedInstance(installation.Directory)
+                ? "Safeguard+ scripts require the selected Afterburner installation to run as administrator."
+                : "Afterburner is running. Close Afterburner to modify Safeguard+ settings!";
             ProcessWarning.Visibility = running || starting ? Visibility.Visible : Visibility.Collapsed;
         }
         catch (Exception error) when (error is System.ComponentModel.Win32Exception or InvalidOperationException)

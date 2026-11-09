@@ -1,6 +1,7 @@
 using System.Text;
 using System.Text.Json;
 using Rtx5090Monitoring.Presentation.Msi.Afterburner;
+using Rtx5090Monitoring.Plugins.Msi.Contracts.Safeguard;
 using Rtx5090Monitoring.Tests.Infrastructure;
 
 namespace Rtx5090Monitoring.UI.Tests.Configuration;
@@ -10,6 +11,10 @@ internal static class AfterburnerConfigurationTests
     public static void Run(TestRunner runner)
     {
         runner.Run(CurrentLimitsEnforceOneDecimalPlace);
+        if (OperatingSystem.IsWindows())
+        {
+            runner.Run(BundledScriptBindingsRoundTripWithoutChangingTheOtherConnector);
+        }
         runner.Run(ConnectorConfigurationsAndActionsAreIndependent);
         runner.Run(IndependentConnectorDraftsSurviveTheElevatedRequest);
         runner.Run(ConnectorTimeoutsChangeOnlyTheirOwnNativeKeys);
@@ -42,6 +47,32 @@ internal static class AfterburnerConfigurationTests
     private static readonly byte[] Profile = Encoding.UTF8.GetBytes("; profile comment\r\n[Settings]\r\nCurrentGpu=0\r\nSources=+GPU usage,-PSU 12VHPWR1 alarm,+PSU 12VHPWR2 alarm,+Core clock\r\n[Monitoring]\r\nPSU.dll=1\r\nOther.dll=1\r\n[Source PSU 12VHPWR1 alarm]\r\nAlarmThresholdMin=\r\nAlarmThresholdMax=\r\nAlarmFlags=3\r\nAlarmTimeout=2000\r\nAlarmApp=%AB%\r\nAlarmAppCmdLine=-lowpowerprofile -message GPUSafeguard\r\nFormula=\r\n[Source PSU 12VHPWR2 alarm]\r\nAlarmThresholdMin=\r\nAlarmThresholdMax=1\r\nAlarmFlags=3\r\nAlarmTimeout=3000\r\nAlarmApp=%AB%\r\nAlarmAppCmdLine=-lowpowerprofile -message GPUSafeguard\r\nFormula=\r\n[Source GPU usage]\r\nAlarmFlags=0\r\nGroup=untouched\r\n");
 
     private static AfterburnerSettings Settings => new(true, true, true, 6, 1.2, 2, true);
+
+    [System.Runtime.Versioning.SupportedOSPlatform("windows")]
+    private static void BundledScriptBindingsRoundTripWithoutChangingTheOtherConnector()
+    {
+        var install = Path.GetFullPath("fixture-afterburner");
+        var hash = new string('A', 64);
+        var id = Guid.NewGuid();
+        var script = new SafeguardBinding(id, SafeguardScripts.LowPower, 1, 2, 5000,
+            Path.Combine(install, "MSIAfterburner.exe"), hash, hash, hash, null);
+        var settings = Settings with { ConnectorAlarms = [new(2, true, false) { Script = script }] };
+        var plan = AfterburnerConfiguration.Plan(install, Plugin, Profile, settings);
+        var before = AfterburnerConfiguration.InspectConnector(Profile, 1);
+        var after = AfterburnerConfiguration.InspectConnector(plan.Files[1].After, 1);
+        TestAssert.Equal(before, after);
+        var connector = AfterburnerConfiguration.InspectConnector(plan.Files[1].After, 2);
+        TestAssert.Equal<Guid?>(id, connector.ScriptBindingId);
+        TestAssert.Equal("LowPowerAndShutdown.ps1", connector.BuiltInScriptFileName!);
+        TestAssert.False(Encoding.UTF8.GetString(plan.Files[1].After).Contains("-Delay"), "Parameters belong in the protected binding.");
+        TestAssert.Throws<ArgumentException>(() => (script with { DelayMs = -1 }).Validate());
+        TestAssert.Throws<ArgumentException>(() => (script with { ScriptId = "user-script" }).Validate());
+
+        var operation = new AfterburnerOperation(install, "apply", settings, plan.Id, null);
+        var bytes = JsonSerializer.SerializeToUtf8Bytes(operation, AfterburnerJsonContext.Default.AfterburnerOperation);
+        var restored = JsonSerializer.Deserialize(bytes, AfterburnerJsonContext.Default.AfterburnerOperation)!;
+        TestAssert.Equal(script, restored.Settings!.ConnectorAlarms.Single().Script!);
+    }
 
     private static void DeletesOnlyTheSelectedBackupWithoutChangingConfiguration()
     {

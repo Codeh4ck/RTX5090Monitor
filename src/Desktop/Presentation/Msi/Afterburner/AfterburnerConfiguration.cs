@@ -83,7 +83,9 @@ public static class AfterburnerConfiguration
                 profile.Set(section, "AlarmTimeout", timeout.ToString(CultureInfo.InvariantCulture));
             }
 
-            if (alarm.Enabled == saved.AlarmConfigured && alarm.UseLowPowerAction == saved.LowPowerAction)
+            var actionChanged = alarm.UseLowPowerAction != saved.LowPowerAction
+                || (alarm.Script is { } binding && binding.Id != saved.ScriptBindingId);
+            if (alarm.Enabled == saved.AlarmConfigured && !actionChanged)
             {
                 continue;
             }
@@ -107,9 +109,22 @@ public static class AfterburnerConfiguration
                 profile.Set(section, "AlarmThresholdMax", alarm.Enabled ? "1" : "");
             }
 
-            if (alarm.UseLowPowerAction != saved.LowPowerAction)
+            if (actionChanged)
             {
-                if (alarm.UseLowPowerAction)
+                if (alarm.Script is { } script)
+                {
+                    script.Validate();
+                    if (!OperatingSystem.IsWindows() || script.Connector != alarm.Connector || alarm.UseLowPowerAction)
+                    {
+                        throw new InvalidDataException("The selected script does not match this connector.");
+                    }
+
+                    profile.Set(section, "AlarmFlags", "3");
+                    profile.Set(section, "AlarmApp", AfterburnerSafeguard.PowerShell);
+                    profile.Set(section, "AlarmAppCmdLine", AfterburnerSafeguard.Arguments(
+                        Rtx5090Monitoring.Plugins.Msi.Contracts.Safeguard.SafeguardScripts.Get(script.ScriptId), script.Id));
+                }
+                else if (alarm.UseLowPowerAction)
                 {
                     profile.Set(section, "AlarmFlags", "3");
                     profile.Set(section, "AlarmApp", "%AB%");
@@ -144,10 +159,17 @@ public static class AfterburnerConfiguration
         var enabled = (profile.Get("Settings", "Sources") ?? "").Split(',')
             .Any(item => item.Trim().Equals("+" + source, StringComparison.OrdinalIgnoreCase));
 
+        var application = profile.Get(section, "AlarmApp") ?? "";
+        var arguments = profile.Get(section, "AlarmAppCmdLine") ?? "";
+        var script = OperatingSystem.IsWindows() ? AfterburnerSafeguard.Inspect(application, arguments) : null;
         return new(connector, enabled, IsConfigured(profile, connector), IsLowPowerAction(profile, section),
             profile.Get(section, "AlarmThresholdMin") ?? "", profile.Get(section, "AlarmThresholdMax") ?? "",
             profile.Get(section, "AlarmFlags") ?? "0", profile.Get(section, "AlarmTimeout") ?? "Default",
-            profile.Get(section, "AlarmApp") ?? "", profile.Get(section, "AlarmAppCmdLine") ?? "", profile.Get(section, "Formula") ?? "");
+            application, arguments, profile.Get(section, "Formula") ?? "")
+        {
+            BuiltInScriptFileName = script?.FileName,
+            ScriptBindingId = script?.Id
+        };
     }
 
     public static string AlarmSection(int connector) => "Source PSU 12VHPWR" + connector + " alarm";

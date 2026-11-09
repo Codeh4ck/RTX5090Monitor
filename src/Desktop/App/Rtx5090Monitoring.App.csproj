@@ -19,6 +19,8 @@
         <Content Update="Assets/monitor.ico" CopyToOutputDirectory="PreserveNewest" />
         <Content Update="Assets/Icons/*.svg" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
         <PackageReference Include="Microsoft.WindowsAppSDK.WinUI" />
+        <PackageReference Include="System.Security.Cryptography.ProtectedData" />
+        <Compile Include="../../../installer/Actions/Startup/ElevatedStartupTask.cs" Link="Platform/Startup/ElevatedStartupTask.cs" />
         <PackageReference Include="Microsoft.WindowsAppSDK.Foundation" />
         <PackageReference Include="Microsoft.WindowsAppSDK.InteractiveExperiences" />
         <PackageReference Include="Microsoft.WindowsAppSDK.Runtime" />

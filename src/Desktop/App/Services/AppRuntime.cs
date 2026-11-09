@@ -83,6 +83,7 @@ internal sealed partial class AppRuntime
         Settings.Message = _store.LastError ?? string.Empty;
         Settings.Changed += PreferencesChanged;
         InitializeUpdates(directory);
+        InitializeSafeguard();
         _liveConfiguration = new ConfigurationEditorViewModel(() => _api);
         _timer = dispatcher.CreateTimer();
         _timer.Interval = TimeSpan.FromMilliseconds(250);
@@ -112,7 +113,7 @@ internal sealed partial class AppRuntime
             {
                 StartupRegistration.SetEnabled(true);
             }
-            catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or System.Security.SecurityException)
+            catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or System.Security.SecurityException or System.Runtime.InteropServices.COMException)
             {
                 Settings.Message = $"Windows startup registration could not be updated: {exception.Message}";
             }
@@ -173,6 +174,7 @@ internal sealed partial class AppRuntime
             WireViewSettingsWindow?.ApplyAppearance(preferences);
             FanCurveWindow?.ApplyAppearance(preferences);
             AfterburnerWindow?.ApplyAppearance(preferences);
+            SafeguardHistory?.ApplyAppearance(preferences);
 #if TELEMETRY_DEBUG
             DebugConsole?.ApplyAppearance(preferences);
 #endif
@@ -188,7 +190,7 @@ internal sealed partial class AppRuntime
                 await ConnectAsync();
             }
         }
-        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or System.Security.SecurityException or OperationCanceledException)
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or System.Security.SecurityException or System.Runtime.InteropServices.COMException or OperationCanceledException)
         {
             Settings.Message = exception.Message;
         }
@@ -298,6 +300,11 @@ internal sealed partial class AppRuntime
             });
             session.SnapshotReceived += snapshot =>
             {
+                if (snapshot.SafeguardExecutions is { } executions)
+                {
+                    Dispatch(session, () => ReceiveSafeguard(executions));
+                }
+
                 var notifications =
 #if TELEMETRY_DEBUG
                     Debug.Enabled ? [] :
@@ -529,6 +536,7 @@ internal sealed partial class AppRuntime
         WireViewSettingsWindow?.Close();
         FanCurveWindow?.Close();
         AfterburnerWindow?.CloseAfterConfirmation();
+        SafeguardHistory?.Close();
 #if TELEMETRY_DEBUG
         StopDebugging();
 #endif

@@ -11,7 +11,8 @@ namespace Rtx5090Monitoring.Service.Services;
 
 internal sealed class SnapshotBroadcastService(IRuntimeConfiguration configuration, TimeProvider clock,
     SensorStateStore store, SensorStreamHub hub, Rtx5090Monitoring.Core.Plugins.PluginRuntimeManager runtime,
-    SettingsProfileResolver profiles, DeviceWarningProfileStore warningProfiles, WarningShutdownCoordinator shutdown) : BackgroundService
+    SettingsProfileResolver profiles, DeviceWarningProfileStore warningProfiles, WarningShutdownCoordinator shutdown,
+    SafeguardJournalService safeguard) : BackgroundService
 {
     private readonly DeviceWarningEvaluator _profileWarnings = new();
     private readonly AsyncSignal _wake = new();
@@ -46,6 +47,7 @@ internal sealed class SnapshotBroadcastService(IRuntimeConfiguration configurati
                     || publishedWarnings != _warnings.Revision || publishedConfiguration != current.Revision
                     || publishedProfile != snapshot.SettingsProfile)
                 {
+                    snapshot = snapshot with { SafeguardExecutions = safeguard.Notices };
                     hub.Publish(JsonSerializer.SerializeToUtf8Bytes(snapshot, AppJsonContext.Default.SensorSnapshot));
                     lastPublication = now;
                     publishedWarnings = _warnings.Revision;

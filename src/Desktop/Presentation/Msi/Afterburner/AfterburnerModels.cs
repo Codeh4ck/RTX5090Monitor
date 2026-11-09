@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
+using Rtx5090Monitoring.Plugins.Msi.Contracts.Safeguard;
 
 namespace Rtx5090Monitoring.Presentation.Msi.Afterburner;
 
@@ -56,13 +57,14 @@ public sealed record AfterburnerConnectorSettings(int Connector, bool Enabled, b
 {
     // Null preserves the native timeout, including an absent key using Afterburner's own default.
     public int? AlarmTimeoutMs { get; init; }
+    public SafeguardBinding? Script { get; init; }
 }
 
 public sealed record AfterburnerConnectorInspection(int Connector, bool SourceEnabled, bool AlarmConfigured,
     bool LowPowerAction, string Minimum, string Maximum, string Flags, string Timeout, string Application, string Arguments, string Formula)
 {
-    // Populated only by a future catalog of scripts shipped with RTX Monitor, never inferred from arbitrary commands.
     public string? BuiltInScriptFileName { get; init; }
+    public Guid? ScriptBindingId { get; init; }
 
     public int? AlarmTimeoutMs => Timeout == "Default" ? null
         : int.TryParse(Timeout, NumberStyles.None, CultureInfo.InvariantCulture, out var milliseconds) && milliseconds >= 0
