@@ -26,6 +26,12 @@ public sealed partial class App : Application
     protected override async void OnLaunched(LaunchActivatedEventArgs args)
     {
         var arguments = Environment.GetCommandLineArgs();
+        if (arguments is [_, "--afterburner-config", var operationId, var requestPath, var requestHash])
+        {
+            await Msi.Afterburner.AfterburnerElevatedOperation.RunHelperAsync(operationId, requestPath, requestHash);
+            Exit();
+            return;
+        }
 #if TELEMETRY_DEBUG
         var demo = arguments.Contains("--demo");
         var diagnostic = demo && arguments.Contains("--smoke-test");
@@ -117,6 +123,7 @@ public sealed partial class App : Application
                 await File.WriteAllTextAsync(Path.Combine(output, "smoke-error.txt"), exception.ToString());
                 Environment.ExitCode = 1;
             }
+
             await ExitCoreAsync();
             return;
         }
@@ -172,6 +179,11 @@ public sealed partial class App : Application
                 {
                     return;
                 }
+            }
+
+            if (_runtime.AfterburnerWindow is { } integration && !await integration.ConfirmDiscardAsync())
+            {
+                return;
             }
 
             await ExitCoreAsync();

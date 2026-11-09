@@ -172,6 +172,7 @@ internal sealed partial class AppRuntime
             _window?.ApplyAppearance(preferences);
             WireViewSettingsWindow?.ApplyAppearance(preferences);
             FanCurveWindow?.ApplyAppearance(preferences);
+            AfterburnerWindow?.ApplyAppearance(preferences);
 #if TELEMETRY_DEBUG
             DebugConsole?.ApplyAppearance(preferences);
 #endif
@@ -527,6 +528,7 @@ internal sealed partial class AppRuntime
         _updateHttp.Dispose();
         WireViewSettingsWindow?.Close();
         FanCurveWindow?.Close();
+        AfterburnerWindow?.CloseAfterConfirmation();
 #if TELEMETRY_DEBUG
         StopDebugging();
 #endif
