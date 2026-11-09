@@ -95,15 +95,21 @@ internal sealed class AfterburnerConnectorView : UserControl
             HorizontalAlignment = HorizontalAlignment.Stretch
         };
 
-        _configure = new Button { Content = "Configure...", IsEnabled = false };
+        _configure = new Button { Content = "Configure...", IsEnabled = false, VerticalAlignment = VerticalAlignment.Center };
+        var scriptActions = new Grid { ColumnSpacing = 8 };
+        scriptActions.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        scriptActions.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        Grid.SetColumn(_configure, 1);
+        scriptActions.Children.Add(_scripts);
+        scriptActions.Children.Add(_configure);
+
         _scriptStatus = new TextBlock { TextWrapping = TextWrapping.Wrap, Visibility = Visibility.Collapsed };
         var body = new StackPanel { Spacing = 10 };
         body.Children.Add(_enabled);
         body.Children.Add(_timeout);
         body.Children.Add(_lowPower);
         body.Children.Add(_script);
-        body.Children.Add(_scripts);
-        body.Children.Add(_configure);
+        body.Children.Add(scriptActions);
         body.Children.Add(_scriptStatus);
         Content = body;
 
@@ -136,11 +142,17 @@ internal sealed class AfterburnerConnectorView : UserControl
         var enabled = _script.IsChecked == true;
         _scripts.IsEnabled = enabled;
         _configure.IsEnabled = enabled && selected is not null && _installation is not null;
-        _scriptStatus.Visibility = enabled && selected is not null ? Visibility.Visible : Visibility.Collapsed;
-        _scriptStatus.Text = selected is not null && _binding?.ScriptId == selected.Id
-            ? $"Shutdown delay: {_binding.DelayMs:N0} ms" + (selected.SendsMail ? " · SMTP configured" : "")
-                + ". Run Afterburner as administrator."
-            : "Configure script parameters before applying.";
+        if (enabled && selected is not null && _binding is { } binding && binding.ScriptId == selected.Id)
+        {
+            _scriptStatus.Text = $"Shutdown delay: {binding.DelayMs:N0} ms" + (selected.SendsMail ? " · SMTP configured" : "")
+                + ". Run Afterburner as administrator.";
+            _scriptStatus.Visibility = Visibility.Visible;
+        }
+        else
+        {
+            _scriptStatus.Text = string.Empty;
+            _scriptStatus.Visibility = Visibility.Collapsed;
+        }
     }
 
     private async void Configure_Click(object sender, RoutedEventArgs args)
@@ -162,6 +174,7 @@ internal sealed class AfterburnerConnectorView : UserControl
         catch (Exception error) when (SafeguardScriptDialog.IsConfigurationError(error))
         {
             _scriptStatus.Text = error.Message;
+            _scriptStatus.Visibility = Visibility.Visible;
         }
     }
 

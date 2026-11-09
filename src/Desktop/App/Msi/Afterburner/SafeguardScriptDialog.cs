@@ -17,7 +17,8 @@ internal sealed class SafeguardScriptDialog(SafeguardScriptDefinition script, Sa
         var store = script.SendsMail ? new SafeguardStorage() : null;
         var previousMail = script.SendsMail && previous?.MailId is { } id
             ? store!.Read<SafeguardMailCredential>("mail", id) : null;
-        var body = new StackPanel { Spacing = 10 };
+        // The ScrollViewer's scrollbar overlays the viewport. Keep it clear of the inputs.
+        var body = new StackPanel { Spacing = 10, Margin = new Thickness(0, 0, 20, 0) };
         foreach (var field in script.Parameters.Values)
         {
             var control = CreateInput(field, previousMail);
