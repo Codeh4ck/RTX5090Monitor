@@ -201,5 +201,19 @@ export function parseSnapshot(value: unknown): SensorSnapshot {
         }
     }
 
+    if (value.safeguardExecutions != null && (
+        !Array.isArray(value.safeguardExecutions) ||
+        value.safeguardExecutions.some((execution) =>
+            !isRecord(execution) ||
+            typeof execution.id !== 'string' || !/^[0-9a-f-]{36}$/i.test(execution.id) ||
+            typeof execution.script !== 'string' || execution.script.length > 120 ||
+            (execution.connector !== 1 && execution.connector !== 2) ||
+            typeof execution.startedAt !== 'string' || !Number.isFinite(Date.parse(execution.startedAt)) ||
+            typeof execution.status !== 'string' || execution.status.length > 80
+        )
+    )) {
+        throw new Error('Invalid Safeguard+ execution feed.');
+    }
+
     return value as unknown as SensorSnapshot;
 }

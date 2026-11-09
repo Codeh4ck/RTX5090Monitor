@@ -62,7 +62,7 @@ internal sealed class MsiPsuTransport : IDisposable
                     return reply;
                 }
             }
-            throw new TimeoutException("No matching MSI PSU reply within 500 ms.");
+            throw new TimeoutException($"No matching MSI PSU reply within 500 ms (command 0x{packet[1]:X2}, register 0x{packet[2]:X2}).");
         }
         finally { _mutex.Release(); }
     }

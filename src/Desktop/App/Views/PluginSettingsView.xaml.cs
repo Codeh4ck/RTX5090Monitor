@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Rtx5090Monitoring.App.Services;
@@ -9,6 +10,7 @@ namespace Rtx5090Monitoring.App.Views;
 public sealed partial class PluginSettingsView : UserControl
 {
     private readonly AppRuntime _runtime;
+    private bool _afterburnerDetected;
     public PluginSettingsEditorViewModel Model { get; }
     public AppSettingsViewModel Preferences { get; }
 
@@ -18,6 +20,55 @@ public sealed partial class PluginSettingsView : UserControl
         _runtime = runtime;
         Preferences = runtime.Settings;
         InitializeComponent();
+
+        Loaded += OnLoaded;
+        Unloaded += (_, _) => Model.PropertyChanged -= OnPluginChanged;
+    }
+
+    private async void OnLoaded(object sender, RoutedEventArgs args)
+    {
+        if (!Model.IsMsi)
+        {
+            return;
+        }
+
+        Model.PropertyChanged -= OnPluginChanged;
+        Model.PropertyChanged += OnPluginChanged;
+        await RefreshAfterburnerAvailabilityAsync();
+    }
+
+    internal async Task RefreshAfterburnerAvailabilityAsync()
+    {
+        _afterburnerDetected = await _runtime.IsAfterburnerInstalledAsync();
+        UpdateAfterburnerButton();
+    }
+
+    private void OnPluginChanged(object? sender, PropertyChangedEventArgs args)
+    {
+        if (args.PropertyName == nameof(Model.Enabled))
+        {
+            UpdateAfterburnerButton();
+        }
+    }
+
+    private void UpdateAfterburnerButton()
+    {
+        if (AfterburnerIntegrationButton is { } button)
+        {
+            button.IsEnabled = Model.IsMsi && Model.Enabled && _afterburnerDetected;
+            ToolTipService.SetToolTip(button, !Model.Enabled ? "Enable the MSI plugin first."
+                : !_afterburnerDetected ? "Afterburner was not detected. Install or start it, then reopen MSI configuration."
+                : "Configure Afterburner Safeguard+ in a separate window.");
+        }
+    }
+
+    private async void Afterburner_Click(object sender, RoutedEventArgs args)
+    {
+        await RefreshAfterburnerAvailabilityAsync();
+        if (Model.Enabled && _afterburnerDetected)
+        {
+            await _runtime.OpenAfterburnerSettingsAsync();
+        }
     }
 
     private async void FanCurve_Click(object sender, RoutedEventArgs args) => await _runtime.OpenMsiFanCurveAsync();

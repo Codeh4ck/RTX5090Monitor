@@ -44,6 +44,8 @@ internal static class MsiFanCurveSmokeTests
             throw new InvalidOperationException("The separate editor must reuse its graph window without a duplicate mode selector.");
         }
 
+        AssertCompactHeight(window.ThemeRoot);
+
         window.Model.CurvePoints[0].TemperatureC = 35;
         window.Model.CurvePoints[0].DutyPercent = 50;
         window.Model.CurvePoints[1].TemperatureC = 40;
@@ -119,6 +121,20 @@ internal static class MsiFanCurveSmokeTests
             throw new InvalidOperationException("The editor must stop and disable Add point at six points.");
         }
 
+        AssertCompactHeight(window.ThemeRoot);
+
+        var graphPanel = VisualTreeQuery.Descendants<Border>(window.ThemeRoot).Single(border => border.Name == "GraphPanel");
+        var notice = VisualTreeQuery.Descendants<TextBlock>(window.ThemeRoot).Single(text => text.Name == "AutomaticControlNotice");
+        var graphBottom = graphPanel.TransformToVisual(window.ThemeRoot).TransformPoint(new Windows.Foundation.Point(0, graphPanel.ActualHeight)).Y;
+        var noticeTop = notice.TransformToVisual(window.ThemeRoot).TransformPoint(new Windows.Foundation.Point()).Y;
+        var actions = VisualTreeQuery.Descendants<Grid>(window.ThemeRoot).Single(grid => grid.Name == "Actions");
+        var actionsBottom = actions.TransformToVisual(window.ThemeRoot).TransformPoint(new Windows.Foundation.Point(0, actions.ActualHeight)).Y;
+
+        if (noticeTop <= graphBottom || actionsBottom > window.ThemeRoot.ActualHeight)
+        {
+            throw new InvalidOperationException("The automatic-control notice must follow the graph, and all six points and actions must fit in the default window.");
+        }
+
         foreach (var theme in new[] { AppTheme.Dark, AppTheme.Light })
         {
             runtime.Settings.Theme = theme;
@@ -126,9 +142,17 @@ internal static class MsiFanCurveSmokeTests
             await SmokeTestRunner.CaptureElementAsync(window.ThemeRoot, Path.Combine(output, "msi-fan-curve-" + theme + ".png"));
         }
 
+        window.Model.RemoveCurvePoint(window.Model.CurvePoints[^1]);
+        await Task.Delay(150);
+        AssertCompactHeight(window.ThemeRoot);
+        await SmokeTestRunner.CaptureElementAsync(window.ThemeRoot, Path.Combine(output, "msi-fan-curve-five-points.png"));
+
         window.Model.SetCurve(new MsiFanCurve { Points = [new(30, 40), new(60, 70)] });
         runtime.Settings.Theme = AppTheme.Dark;
         await Task.Delay(150);
+        AssertCompactHeight(window.ThemeRoot);
+        await SmokeTestRunner.CaptureElementAsync(window.ThemeRoot, Path.Combine(output, "msi-fan-curve-two-points.png"));
+
         var graph = VisualTreeQuery.Descendants<MsiFanCurveGraph>(window.ThemeRoot).Single();
         graph.BeginDrag(window.Model.CurvePoints[^1]);
         var readout = VisualTreeQuery.Descendants<Border>(graph).Single(border => border.Name == "DragPointReadout");
@@ -218,6 +242,19 @@ internal static class MsiFanCurveSmokeTests
 
         await File.WriteAllTextAsync(Path.Combine(output, "msi-fan-curve-pass.txt"),
             "PASS: Main mode gating, no duplicate selector, falling duty, whole-number input, six-point cap, restore-to-main draft, version synchronization, HTTP 503 telemetry recovery, configuration conflicts and dark/light rendering.");
+    }
+
+    private static void AssertCompactHeight(FrameworkElement root)
+    {
+        var scroll = VisualTreeQuery.Descendants<ScrollViewer>(root).Single(view => view.Name == "EditorScroll");
+        var layout = VisualTreeQuery.Descendants<Grid>(root).Single(grid => grid.Name == "EditorLayout");
+        var bottom = layout.TransformToVisual(root).TransformPoint(new Windows.Foundation.Point(0, layout.ActualHeight)).Y;
+        var bottomGap = root.ActualHeight - bottom;
+
+        if (scroll.ScrollableHeight > 1 || bottomGap is < 19 or > 24)
+        {
+            throw new InvalidOperationException($"The curve window must fit its actual content without excess height: scrollable={scroll.ScrollableHeight}, bottom gap={bottomGap}.");
+        }
     }
 
     private static void Invoke(FrameworkElement root, string caption)

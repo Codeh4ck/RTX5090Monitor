@@ -37,6 +37,12 @@ internal static class SmokeTestRunner
         {
             throw new InvalidOperationException("No demo telemetry received.");
         }
+        if (Environment.GetCommandLineArgs().Contains("--afterburner-only"))
+        {
+            await AfterburnerSmokeTests.RunAsync(window, runtime, output);
+            return;
+        }
+
         if (Environment.GetCommandLineArgs().Contains("--exit-confirmation-only"))
         {
             await ExitConfirmationSmokeTests.RunAsync(window, runtime, output);

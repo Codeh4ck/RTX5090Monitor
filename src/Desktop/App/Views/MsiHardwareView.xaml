@@ -31,6 +31,7 @@
                             <TextBlock Text="Reset peaks" VerticalAlignment="Center" />
                         </StackPanel>
                     </Button>
+                    <Button x:Name="SafeguardHistoryButton" Content="Safeguard+ History" Click="SafeguardHistory_Click" Visibility="Collapsed" />
                     <controls:StatusBadge Text="{x:Bind Model.State, Mode=OneWay}" Tone="{x:Bind Model.Tone, Mode=OneWay}"
                     ToolTipService.ToolTip="{x:Bind Model.Message, Mode=OneWay}" VerticalAlignment="Center" />
                 </StackPanel>

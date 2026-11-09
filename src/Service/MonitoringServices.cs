@@ -33,6 +33,8 @@ public static class MonitoringServices
         services.AddSingleton<DeviceWarningProfileStore>();
         services.AddSingleton<IWarningShutdown, WindowsWarningShutdown>();
         services.AddSingleton<WarningShutdownCoordinator>();
+        services.AddSingleton<SafeguardJournalService>();
+        services.AddHostedService(provider => provider.GetRequiredService<SafeguardJournalService>());
         services.AddHostedService<SnapshotBroadcastService>();
         services.AddHostedService<HardwareDiscoveryService>();
         services.AddSingleton<IServiceRestart, ServiceRestart>();

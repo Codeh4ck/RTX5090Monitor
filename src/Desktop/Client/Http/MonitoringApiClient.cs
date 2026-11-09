@@ -34,7 +34,7 @@ public sealed class MonitoringApiClient(HttpClient http) : IMonitoringApi
         var value = await response.Content.ReadFromJsonAsync(ClientJsonContext.Default.ServiceVersionResponse, token);
 
         return value is { SchemaVersion: 1 }
-            && Rtx5090Monitoring.Contracts.Updates.SemanticVersion.TryParse(value.Version, out _) ? value : null;
+            && Contracts.Updates.SemanticVersion.TryParse(value.Version, out _) ? value : null;
     }
 
     public Task<HealthResponse> GetHealthAsync(CancellationToken token) => GetAsync("health", ClientJsonContext.Default.HealthResponse, token);

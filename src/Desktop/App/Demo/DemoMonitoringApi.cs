@@ -19,8 +19,8 @@ namespace Rtx5090Monitoring.App.Demo;
 
 internal sealed class DemoMonitoringApi : IMonitoringApi
 {
-    public Task<Rtx5090Monitoring.Contracts.Updates.ServiceVersionResponse?> GetVersionAsync(CancellationToken token) =>
-        Task.FromResult<Rtx5090Monitoring.Contracts.Updates.ServiceVersionResponse?>(new(1, "1.0.0"));
+    public Task<Contracts.Updates.ServiceVersionResponse?> GetVersionAsync(CancellationToken token) =>
+        Task.FromResult<Contracts.Updates.ServiceVersionResponse?>(new(1, "1.0.0"));
 
     private readonly Lock _gate = new();
     private readonly DateTimeOffset _started = DateTimeOffset.UtcNow;
@@ -35,7 +35,7 @@ internal sealed class DemoMonitoringApi : IMonitoringApi
             ["generic-nvidia"] = new() { Options = JsonSerializer.SerializeToElement(new Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.Configuration.GenericNvidiaOptions(), ClientJsonContext.Default.GenericNvidiaOptions) }
         }
     }, Version: "demo:1");
-    private readonly Rtx5090Monitoring.Core.ConnectorProfileResolver _profiles = Rtx5090Monitoring.Debugging.Processing.SimulationConnectorProfiles.CreateResolver();
+    private readonly Core.ConnectorProfileResolver _profiles = Rtx5090Monitoring.Debugging.Processing.SimulationConnectorProfiles.CreateResolver();
     private long _sequence;
     private readonly Warnings.WarningEngine _warnings = new(Rtx5090Monitoring.Debugging.Catalog.DebugWarningCatalog.Registry);
     private readonly HashSet<string> _unavailable = [];

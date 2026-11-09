@@ -35,7 +35,7 @@ internal static class SettingsProfileTests
     private static async Task LoadsAndAppliesSettingsProfilesThroughTheDesktopClientAsync()
     {
         await using var host = await MonitoringTestHost.StartWithInstalledPluginsDisabledAsync();
-        var api = new Rtx5090Monitoring.Client.Http.MonitoringApiClient(host.Client);
+        var api = new Client.Http.MonitoringApiClient(host.Client);
         var catalog = await api.GetSettingsProfilesAsync(CancellationToken.None);
         TestAssert.Equal("auto", catalog.SelectedId);
         var preset = catalog.Profiles.Single(profile => profile.Id == "rtx-5080");
@@ -66,7 +66,7 @@ internal static class SettingsProfileTests
 
         var configuration = WarningTestData.Configuration();
         var previous = configuration.Plugins["asus-astral"];
-        configuration.Plugins["asus-astral"] = Rtx5090Monitoring.Plugins.Asus.Configuration.AsusSettings.WithOptions(previous,
+        configuration.Plugins["asus-astral"] = Plugins.Asus.Configuration.AsusSettings.WithOptions(previous,
             new Rtx5090Monitoring.Plugins.Asus.Contracts.Configuration.AsusOptions { WireOvercurrentAmperageThreshold = 8 });
         TestAssert.Equal(8d, Resolve("NVIDIA GeForce RTX 5080", snapshot, configuration).Profile.OvercurrentAmperes);
     }

@@ -8,7 +8,15 @@
     <StackPanel Spacing="14">
         <controls:SectionPanel Header="{x:Bind Model.Name}">
             <controls:SectionPanel.HeaderActions>
-                <CheckBox Content="Enabled" IsChecked="{x:Bind Model.Enabled, Mode=TwoWay}" VerticalAlignment="Center" />
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <Button x:Name="AfterburnerIntegrationButton" x:Load="{x:Bind Model.IsMsi}" IsEnabled="False" Click="Afterburner_Click">
+                        <StackPanel Orientation="Horizontal" Spacing="7">
+                            <controls:WidgetIcon x:Name="AfterburnerIntegrationIcon" IconName="settings" Width="24" Height="24" />
+                            <TextBlock Text="Afterburner Safeguard+" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+                    <CheckBox Content="Enabled" IsChecked="{x:Bind Model.Enabled, Mode=TwoWay}" VerticalAlignment="Center" />
+                </StackPanel>
             </controls:SectionPanel.HeaderActions>
             <StackPanel Spacing="14">
                 <TextBlock Text="Updates affect the service and every connected consumer." Style="{StaticResource MonitorCaption}" />

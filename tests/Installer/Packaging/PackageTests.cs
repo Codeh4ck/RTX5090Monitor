@@ -63,6 +63,14 @@ internal static class PackageTests
         var actions = Read(database, "SELECT `Action`, `Type` FROM `CustomAction`").ToDictionary(row => row[0]);
         Check.That((int.Parse(actions["RestoreConfiguration"][1]) & 0x500) == 0x500, "Configuration restore is a rollback action.");
         Check.That((int.Parse(actions["RemoveStartupRegistration"][1]) & 0x600) == 0x600, "Startup cleanup occurs only when uninstall/feature removal commits.");
+        var backupCleanup = sequence["RemoveAfterburnerBackups"];
+        Check.That(backupCleanup[2] == "Installed AND REMOVE~=\"ALL\" AND NOT UPGRADINGPRODUCTCODE"
+            && sequence["PrepareAfterburnerBackupCleanup"][2] == backupCleanup[2]
+            && (int.Parse(actions["RemoveAfterburnerBackups"][1]) & 0xE00) == 0xE00,
+            "Afterburner backup cleanup commits only on a full uninstall outside upgrades.");
+        Check.That(int.Parse(sequence["PrepareAfterburnerBackupCleanup"][1]) < int.Parse(backupCleanup[1])
+            && int.Parse(backupCleanup[1]) < int.Parse(sequence["InstallFinalize"][1]),
+            "Setup captures the registered installation path before the backup cleanup commits.");
         Check.That(Read(database, "SELECT `FileKey`, `FileName` FROM `RemoveFile`").All(row => string.IsNullOrEmpty(row[1])), "Uninstall contains no configuration or wildcard file wipe action.");
         Check.That(Read(database, "SELECT `UpgradeCode` FROM `Upgrade`").Count > 0, "Stable upgrade identity and downgrade checks are authored.");
         using (var binary = database.OpenView("SELECT `Data` FROM `Binary` WHERE `Name`='InstallerActions'"))

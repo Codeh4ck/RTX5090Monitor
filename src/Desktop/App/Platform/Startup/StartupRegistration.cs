@@ -1,4 +1,6 @@
+using System.Security.Principal;
 using Microsoft.Win32;
+using Rtx5090Monitoring.Installer.Actions.Startup;
 
 namespace Rtx5090Monitoring.App.Platform.Startup;
 
@@ -9,23 +11,24 @@ internal static class StartupRegistration
 
     public static void SetEnabled(bool enabled)
     {
-        using var key = Registry.CurrentUser.CreateSubKey(Key, true);
-        if (!enabled)
-        {
-            key.DeleteValue(Name, false);
-            return;
-        }
-
+        using var identity = WindowsIdentity.GetCurrent();
+        var sid = identity.User?.Value ?? throw new IOException("The Windows account could not be identified.");
         var executable = Path.Combine(AppContext.BaseDirectory, "Rtx5090Monitoring.App.exe");
-        if (!File.Exists(executable))
+        if (enabled)
         {
-            throw new IOException("The desktop executable was not found. Publish the portable app before enabling Windows startup.");
+            ElevatedStartupTask.Register(sid, executable);
+        }
+        else
+        {
+            ElevatedStartupTask.Remove(sid, executable);
         }
 
-        var command = $"\"{executable}\" --startup";
-        if (!string.Equals(key.GetValue(Name) as string, command, StringComparison.Ordinal))
+        using var key = Registry.CurrentUser.OpenSubKey(Key, writable: true);
+        if (key?.GetValue(Name) is string command
+            && (string.Equals(command, $"\"{executable}\"", StringComparison.OrdinalIgnoreCase)
+                || command.StartsWith($"\"{executable}\" ", StringComparison.OrdinalIgnoreCase)))
         {
-            key.SetValue(Name, command, RegistryValueKind.String);
+            key.DeleteValue(Name, throwOnMissingValue: false);
         }
     }
 }

@@ -36,12 +36,12 @@ internal static class MsiFanCurveTests
     private static void ValidatesCurveAndLegacyConfiguration()
     {
         var old = JsonSerializer.Deserialize("""{"fanControl":"Unmanaged","fanDutyPercent":50}""",
-            Rtx5090Monitoring.Plugins.Msi.Serialization.MsiJsonContext.Default.MsiOptions)!;
+            Plugins.Msi.Serialization.MsiJsonContext.Default.MsiOptions)!;
         old.Validate();
         TestAssert.Equal(2, old.FanCurve.ResponseDelaySeconds);
         TestAssert.Equal(MsiFanControl.Unmanaged, old.FanControl);
         var defaults = JsonSerializer.Deserialize("{}",
-            Rtx5090Monitoring.Plugins.Msi.Serialization.MsiJsonContext.Default.MsiOptions)!;
+            Plugins.Msi.Serialization.MsiJsonContext.Default.MsiOptions)!;
         defaults.Validate();
         TestAssert.Equal(50, defaults.FanDutyPercent);
 
@@ -192,9 +192,9 @@ internal static class MsiFanCurveTests
     {
         var options = JsonSerializer.Deserialize(
             """{"fanCurve":{"points":[{"temperatureC":20,"dutyPercent":0},{"temperatureC":60,"dutyPercent":50}],"decreaseDelaySeconds":7}}""",
-            Rtx5090Monitoring.Plugins.Msi.Serialization.MsiJsonContext.Default.MsiOptions)!;
+            Plugins.Msi.Serialization.MsiJsonContext.Default.MsiOptions)!;
         TestAssert.Equal(7, options.FanCurve.ResponseDelaySeconds);
-        var json = JsonSerializer.Serialize(options, Rtx5090Monitoring.Plugins.Msi.Serialization.MsiJsonContext.Default.MsiOptions);
+        var json = JsonSerializer.Serialize(options, Plugins.Msi.Serialization.MsiJsonContext.Default.MsiOptions);
         TestAssert.True(json.Contains("\"responseDelaySeconds\":7") && !json.Contains("decreaseDelaySeconds"),
             "Old delay settings must migrate without being lost or written twice.");
     }

@@ -120,7 +120,7 @@ public sealed class UpdateViewModel : ObservableObject
         {
             Status = "Update check cancelled.";
         }
-        catch (Exception error) when (error is HttpRequestException or Rtx5090Monitoring.Client.Http.MonitoringApiException or IOException or System.Text.Json.JsonException or OperationCanceledException)
+        catch (Exception error) when (error is HttpRequestException or Client.Http.MonitoringApiException or IOException or System.Text.Json.JsonException or OperationCanceledException)
         {
             Status = "Could not check for updates. Try again later.";
         }
@@ -141,7 +141,7 @@ public sealed class UpdateViewModel : ObservableObject
         {
             return;
         }
-        catch (Exception error) when (error is HttpRequestException or Rtx5090Monitoring.Client.Http.MonitoringApiException or IOException or System.Text.Json.JsonException or OperationCanceledException)
+        catch (Exception error) when (error is HttpRequestException or Client.Http.MonitoringApiException or IOException or System.Text.Json.JsonException or OperationCanceledException)
         {
             _installedService = null;
         }

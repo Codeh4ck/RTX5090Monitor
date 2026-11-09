@@ -35,6 +35,7 @@ await MsiPluginTests.RunAsync(runner);
 MsiFanCurveTests.Run(runner);
 await MsiEndpointTests.RunAsync(runner);
 
+SafeguardEmailTests.Run(runner);
 await SettingsProfileTests.RunEndpointsAsync(runner);
 await WarningConfigurationTests.RunAsync(runner);
 await HealthEndpointTests.RunAsync(runner);
