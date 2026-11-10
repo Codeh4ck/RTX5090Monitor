@@ -7,6 +7,8 @@ namespace RTXLens.Installer.Actions.Configuration;
 
 internal sealed class LegacyInstallationMigration(string previous, string destination, string transactionId)
 {
+    internal static string DefaultInstallFolder => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Rtx5090Monitoring");
+
     private static readonly string ProgramData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
     private readonly string _journal = Guid.TryParseExact(transactionId, "N", out _)
         ? Path.Combine(ProgramData, "RTXLens.Upgrade." + transactionId)
@@ -96,10 +98,43 @@ internal sealed class LegacyInstallationMigration(string previous, string destin
             Directory.Move(target, source);
         }
 
-        Clean();
+        CleanJournal();
     }
 
-    public void Clean()
+    public void Commit(Action<string> log)
+    {
+        CleanJournal();
+        if (SamePath(previous, DefaultInstallFolder) && !SamePath(previous, destination))
+        {
+            AssertNoLinks(previous);
+            if (Directory.Exists(previous))
+            {
+                PruneEmptyDirectories(previous);
+                if (Directory.Exists(previous))
+                {
+                    log("Retained the old RTX Monitor directory because it still contains files or linked directories.");
+                }
+            }
+        }
+    }
+
+    private static void PruneEmptyDirectories(string path)
+    {
+        foreach (var directory in new DirectoryInfo(path).EnumerateDirectories())
+        {
+            if ((directory.Attributes & FileAttributes.ReparsePoint) == 0)
+            {
+                PruneEmptyDirectories(directory.FullName);
+            }
+        }
+
+        if (Directory.GetFileSystemEntries(path).Length == 0)
+        {
+            Directory.Delete(path, recursive: false);
+        }
+    }
+
+    private void CleanJournal()
     {
         AssertNoLinks(_journal);
         if (!Directory.Exists(_journal))

@@ -15,8 +15,7 @@ public static class CustomActions
     public static ActionResult SelectLegacyInstallFolder(Session session) => Run(session, () =>
     {
         var legacy = session["LEGACYINSTALLFOLDER"];
-        var defaultPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Rtx5090Monitoring");
-        if (!LegacyInstallationMigration.SamePath(legacy, defaultPath))
+        if (!LegacyInstallationMigration.SamePath(legacy, LegacyInstallationMigration.DefaultInstallFolder))
         {
             session["INSTALLFOLDER"] = legacy;
         }
@@ -47,7 +46,7 @@ public static class CustomActions
     public static ActionResult RestoreLegacyMigration(Session session) => Run(session, () => LegacyMigration(session).Restore());
 
     [CustomAction]
-    public static ActionResult CleanLegacyMigration(Session session) => Run(session, () => LegacyMigration(session).Clean());
+    public static ActionResult CleanLegacyMigration(Session session) => Run(session, () => LegacyMigration(session).Commit(message => session.Log(message)));
 
     private static LegacyInstallationMigration LegacyMigration(Session session)
     {
@@ -72,7 +71,17 @@ public static class CustomActions
             InstallationPreflight.CheckDesktopClosed(previous, legacy: true);
             InstallationPreflight.CheckLegacyServiceOwnership(previous);
         }
-        InstallationPreflight.CheckServiceOwnership(session["INSTALLFOLDER"], !string.IsNullOrEmpty(session["Installed"]), string.IsNullOrEmpty(session["WIX_UPGRADE_DETECTED"]) ? null : previous);
+        var installed = !string.IsNullOrEmpty(session["Installed"]);
+        var upgrading = !string.IsNullOrEmpty(session["WIX_UPGRADE_DETECTED"]);
+        var destination = session["INSTALLFOLDER"];
+        InstallationPreflight.CheckServiceOwnership(destination, installed, upgrading ? previous : null);
+
+        if (upgrading && !installed && !string.IsNullOrEmpty(previous))
+        {
+            var programData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+            new LegacySafeguardMigration(previous, destination, programData)
+                .CloseAfterburnerBeforeMigration(message => session.Log(message));
+        }
     });
 
     [CustomAction]

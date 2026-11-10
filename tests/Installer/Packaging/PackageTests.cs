@@ -54,7 +54,7 @@ internal static class PackageTests
         var control = Read(database, "SELECT `Name`, `Event` FROM `ServiceControl`").Single();
         Check.That((int.Parse(control[1]) & 0x80) != 0 && (int.Parse(control[1]) & 0x20) != 0, "Uninstall stops and deletes the registered service.");
         var sequence = Read(database, "SELECT `Action`, `Sequence`, `Condition` FROM `InstallExecuteSequence`").ToDictionary(row => row[0]);
-        Check.That(int.Parse(sequence["Preflight"][1]) < int.Parse(sequence["InstallInitialize"][1]), "Ownership and open-app checks run before removing an old installation.");
+        Check.That(int.Parse(sequence["Preflight"][1]) < int.Parse(sequence["InstallValidate"][1]), "Ownership checks and Afterburner shutdown run before Windows Installer validates the installation.");
         Check.That(int.Parse(sequence["StopServices"][1]) < int.Parse(sequence["PortAvailable"][1]), "Port check runs after stopping this product's own service.");
         Check.That(int.Parse(sequence["RestoreConfiguration"][1]) < int.Parse(sequence["BackupConfiguration"][1])
             && int.Parse(sequence["BackupConfiguration"][1]) < int.Parse(sequence["InstallFiles"][1]), "Configuration rollback is scheduled before payload changes.");
@@ -71,6 +71,10 @@ internal static class PackageTests
             && Order("CaptureLegacyMigration") < Order("ApplyLegacyMigration")
             && Order("ApplyLegacyMigration") < Order("StartServices"),
             "Setup migrates preserved data before starting the new service and rolls it back before restoring the old product.");
+        Check.That(Order("VerifyServiceHealth") < Order("CleanLegacyMigration")
+            && (int.Parse(actions["CleanLegacyMigration"][1]) & 0xE00) == 0xE00,
+            "Legacy directory cleanup commits only after the replacement service is healthy.");
+
         var backupCleanup = sequence["RemoveAfterburnerBackups"];
         Check.That(backupCleanup[2] == "Installed AND REMOVE~=\"ALL\" AND NOT UPGRADINGPRODUCTCODE"
             && sequence["PrepareAfterburnerBackupCleanup"][2] == backupCleanup[2]

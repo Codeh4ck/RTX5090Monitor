@@ -95,7 +95,7 @@
             <Custom Action="ApplyLegacyMigration" After="CaptureLegacyMigration" Condition="LEGACYINSTALLFOLDER AND WIX_UPGRADE_DETECTED AND NOT Installed" />
             <Custom Action="CleanLegacyMigration" After="VerifyServiceHealth" Condition="LEGACYINSTALLFOLDER AND WIX_UPGRADE_DETECTED AND NOT Installed" />
             <Custom Action="PrepareServiceHealth" Before="VerifyServiceHealth" Condition="NOT (REMOVE~=&quot;ALL&quot;)" />
-            <Custom Action="Preflight" Before="InstallInitialize" Condition="NOT UPGRADINGPRODUCTCODE" />
+            <Custom Action="Preflight" Before="InstallValidate" Condition="NOT UPGRADINGPRODUCTCODE" />
             <Custom Action="PortAvailable" After="StopServices" Condition="NOT (REMOVE~=&quot;ALL&quot;)" />
             <Custom Action="PrepareConfigurationBackup" After="PortAvailable" Condition="NOT (REMOVE~=&quot;ALL&quot;) AND NOT (LEGACYINSTALLFOLDER AND WIX_UPGRADE_DETECTED AND NOT Installed)" />
             <Custom Action="RestoreConfiguration" After="PrepareConfigurationBackup" Condition="NOT (REMOVE~=&quot;ALL&quot;) AND NOT (LEGACYINSTALLFOLDER AND WIX_UPGRADE_DETECTED AND NOT Installed)" />

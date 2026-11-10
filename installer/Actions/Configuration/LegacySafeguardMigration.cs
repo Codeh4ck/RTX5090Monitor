@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Security.AccessControl;
@@ -10,6 +9,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Web.Script.Serialization;
 using RTXLens.Contracts.Security;
+using RTXLens.Installer.Actions.Validation;
 using RTXLens.Presentation.Msi.Afterburner;
 
 namespace RTXLens.Installer.Actions.Configuration;
@@ -40,20 +40,55 @@ internal sealed class LegacySafeguardMigration(string previous, string destinati
     private const string Workflow = "SafeguardWorkflow.ps1";
     private string NewBindings => Path.Combine(programData, "RTXLens.Safeguard", "bindings");
 
+    public void CloseAfterburnerBeforeMigration(Action<string> log)
+    {
+        if (!AfterburnerShutdown.IsRunning())
+        {
+            return;
+        }
+
+
+        var (candidates, profiles) = DiscoverBindings();
+        foreach (var profile in profiles)
+        {
+            _ = RewriteProfile(ReadBytes(profile), candidates, strict: true, out var changed);
+            if (changed)
+            {
+                AfterburnerShutdown.Close(AfterburnerExecutable(profile), log);
+            }
+        }
+    }
+
     public void Capture(string journal)
     {
+        var (candidates, profiles) = DiscoverBindings();
+        foreach (var profile in profiles)
+        {
+            _ = RewriteProfile(ReadBytes(profile), candidates, strict: true, out var changed);
+            if (changed)
+            {
+                AfterburnerShutdown.RequireStopped(AfterburnerExecutable(profile));
+            }
+        }
+
+        File.WriteAllText(Path.Combine(journal, "bindings.json"), Json.Serialize(candidates));
+        File.WriteAllText(Path.Combine(journal, "profiles.json"), Json.Serialize(profiles.ToArray()));
+    }
+
+    private (Dictionary<string, string> Candidates, HashSet<string> Profiles) DiscoverBindings()
+    {
+        var candidates = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        var profiles = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var store = Path.Combine(programData, "Rtx5090Monitoring.Safeguard");
         var bindings = Path.Combine(store, "bindings");
         LegacyInstallationMigration.AssertNoLinks(bindings);
         if (!Directory.Exists(bindings))
         {
-            return;
+            return (candidates, profiles);
         }
 
         RequireProtectedRecord(store);
         RequireProtectedRecord(bindings);
-        var candidates = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        var profiles = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         foreach (var path in Directory.EnumerateFiles(bindings, "*.json"))
         {
@@ -89,17 +124,7 @@ internal sealed class LegacySafeguardMigration(string previous, string destinati
             }
         }
 
-        foreach (var profile in profiles)
-        {
-            _ = RewriteProfile(ReadBytes(profile), candidates, strict: true, out var changed);
-            if (changed)
-            {
-                RequireAfterburnerClosed();
-            }
-        }
-
-        File.WriteAllText(Path.Combine(journal, "bindings.json"), Json.Serialize(candidates));
-        File.WriteAllText(Path.Combine(journal, "profiles.json"), Json.Serialize(profiles.ToArray()));
+        return (candidates, profiles);
     }
 
     public void Apply(string journal)
@@ -116,8 +141,6 @@ internal sealed class LegacySafeguardMigration(string previous, string destinati
         {
             return;
         }
-
-        RequireAfterburnerClosed();
 
         var hashes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         foreach (var script in candidates.Values.Append(Workflow).Distinct())
@@ -145,7 +168,7 @@ internal sealed class LegacySafeguardMigration(string previous, string destinati
             var after = RewriteProfile(before, candidates, strict: true, out var changed);
             if (changed)
             {
-                RequireAfterburnerClosed();
+                AfterburnerShutdown.RequireStopped(AfterburnerExecutable(profile));
                 Replace(journal, profile, before, after);
             }
         }
@@ -308,19 +331,8 @@ internal sealed class LegacySafeguardMigration(string previous, string destinati
         }
     }
 
-    private static void RequireAfterburnerClosed()
-    {
-        var processes = Process.GetProcessesByName("MSIAfterburner");
-        foreach (var process in processes)
-        {
-            process.Dispose();
-        }
-
-        if (processes.Length != 0)
-        {
-            throw new IOException("Exit MSI Afterburner before upgrading so Setup can migrate the Safeguard+ alarm actions.");
-        }
-    }
+    private static string AfterburnerExecutable(string profile) =>
+        Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(profile)!)!, "MSIAfterburner.exe");
 
     private static void RequireProtectedRecord(string path)
     {
