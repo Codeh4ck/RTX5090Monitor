@@ -70,7 +70,7 @@ internal sealed partial class TrayService : IDisposable
 
     public void SetStatus(string status)
     {
-        _data.Tip = ("RTX Lens · " + status)[..Math.Min(127, 14 + status.Length)];
+        _data.Tip = ("RTX Lens · " + status);
         NativeMethods.Shell_NotifyIconW(NativeConstants.NotifyModify, ref _data);
     }
 
