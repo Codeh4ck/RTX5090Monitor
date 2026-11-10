@@ -3,7 +3,7 @@ using RTXLens.App.Platform.Startup;
 using RTXLens.App.Platform.Tray;
 using RTXLens.App.Platform.Windowing;
 using RTXLens.App.Services;
-using Windows.Graphics;
+using RTXLens.Presentation.Settings;
 
 namespace RTXLens.App;
 
@@ -50,8 +50,6 @@ public sealed partial class App : Application
 
         _runtime = new AppRuntime(demo, Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread(), diagnostic);
         _window = new MainWindow(_runtime);
-        _window.AppWindow.Resize(new SizeInt32((int)Math.Min(_runtime.Preferences.WindowWidth, WindowSizeLimits.MaximumWidth),
-            (int)Math.Min(_runtime.Preferences.WindowHeight, WindowSizeLimits.MaximumHeight)));
         _window.AppWindow.SetIcon(Path.Combine(AppContext.BaseDirectory, "Assets", "monitor.ico"));
         _window.AppWindow.Closing += (_, closing) =>
         {
@@ -68,6 +66,7 @@ public sealed partial class App : Application
 
             if (_runtime.Preferences.CloseToTray && _tray?.IsAvailable == true)
             {
+                _runtime.SaveWindowPlacement(_window);
                 Hide();
             }
             else
@@ -92,6 +91,8 @@ public sealed partial class App : Application
                     _runtime.SetRendering(true);
                 }
             });
+        _runtime.TrackWindow(_window, "main", diagnostic ? WindowSizeLimits.MaximumWidth : AppPreferences.DefaultWindowWidth,
+            diagnostic ? WindowSizeLimits.MaximumHeight : AppPreferences.DefaultWindowHeight, center: false);
         _window.Activate();
         if (_window.ThemeRoot.XamlRoot is null)
         {
@@ -104,12 +105,6 @@ public sealed partial class App : Application
             _window.ThemeRoot.Loaded += OnLoaded;
             await loaded.Task;
         }
-        var scale = (_window.ThemeRoot.XamlRoot ?? throw new InvalidOperationException("Window content has not loaded.")).RasterizationScale;
-        var area = Microsoft.UI.Windowing.DisplayArea.GetFromWindowId(_window.AppWindow.Id, Microsoft.UI.Windowing.DisplayAreaFallback.Primary).WorkArea;
-        var width = diagnostic ? WindowSizeLimits.MaximumWidth : Math.Min(_runtime.Preferences.WindowWidth, WindowSizeLimits.MaximumWidth);
-        var height = diagnostic ? WindowSizeLimits.MaximumHeight : Math.Min(_runtime.Preferences.WindowHeight, WindowSizeLimits.MaximumHeight);
-        _window.AppWindow.Resize(new SizeInt32(Math.Min(area.Width, (int)(width * scale)), Math.Min(area.Height, (int)(height * scale))));
-        _window.EnableWindowSizePersistence();
         await _runtime.StartAsync(_window, _tray);
 #if TELEMETRY_DEBUG
         if (arguments.Contains("--smoke-test") && _runtime.IsDemo)
@@ -204,7 +199,6 @@ public sealed partial class App : Application
         _exiting = true;
         if (_runtime is not null && _window is not null)
         {
-            _window.SaveNormalWindowSize();
             await _window.CloseViewsAsync();
             try { await _runtime.StopAsync(); }
             catch (Exception exception) when (exception is IOException or UnauthorizedAccessException) { System.Diagnostics.Debug.WriteLine(exception); }

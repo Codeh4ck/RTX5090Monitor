@@ -52,6 +52,14 @@ public sealed partial class SettingsView : UserControl
         }
     }
 
+    private async void ViewReleaseNotes_Click(object sender, RoutedEventArgs args)
+    {
+        if (FindUpdate(sender) is { } notice)
+        {
+            await _runtime.OpenReleaseNotesAsync(notice);
+        }
+    }
+
     private async void RemindUpdate_Click(object sender, RoutedEventArgs args) => await DismissUpdateAsync(sender, false);
 
     private async void SkipUpdate_Click(object sender, RoutedEventArgs args) => await DismissUpdateAsync(sender, true);
@@ -77,7 +85,22 @@ public sealed partial class SettingsView : UserControl
         }
     }
 
-    private void ApplyWindowSize_Click(object sender, RoutedEventArgs args) => _runtime.ApplyWindowSize();
 
     private void Reconnect_Click(object sender, RoutedEventArgs args) => _runtime.Reconnect();
+
+    private void RememberWindowSize_Toggled(object sender, RoutedEventArgs args)
+    {
+        if (IsLoaded && ((ToggleSwitch)sender).IsOn != Model.RememberWindowSize)
+        {
+            Model.RememberWindowSize = ((ToggleSwitch)sender).IsOn;
+        }
+    }
+
+    private void RememberWindowPosition_Toggled(object sender, RoutedEventArgs args)
+    {
+        if (IsLoaded && ((ToggleSwitch)sender).IsOn != Model.RememberWindowPosition)
+        {
+            Model.RememberWindowPosition = ((ToggleSwitch)sender).IsOn;
+        }
+    }
 }

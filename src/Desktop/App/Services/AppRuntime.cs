@@ -137,8 +137,6 @@ internal sealed partial class AppRuntime
         StartUpdates();
     }
 
-    internal void ApplyWindowSize() => _window?.ApplyWindowSize();
-
     public void Reconnect() => _session?.Reconnect();
     public void SetPinMetric(PinMetric metric) => Settings.PinMetric = metric;
     internal void SetDemoDeviceAvailable(string pluginId, bool available)
@@ -541,6 +539,9 @@ internal sealed partial class AppRuntime
 
     public async Task StopAsync()
     {
+        Settings.Changed -= PreferencesChanged;
+        SaveWindowPlacements();
+        _releaseNotesWindow?.Close();
         Performance.Stop();
         _timer.Stop();
         _updateTimer?.Stop();
@@ -553,7 +554,6 @@ internal sealed partial class AppRuntime
 #if TELEMETRY_DEBUG
         StopDebugging();
 #endif
-        Settings.Changed -= PreferencesChanged;
         _stop.Cancel();
         if (_connectionTask is not null)
         {

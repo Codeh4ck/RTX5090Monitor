@@ -1,6 +1,7 @@
 using System.Net;
 using System.Text.Json.Nodes;
 using RTXLens.Client.Http;
+using RTXLens.Client.Updates;
 using RTXLens.Contracts.Updates;
 using RTXLens.Presentation.Settings;
 using RTXLens.Presentation.Updates;
@@ -15,6 +16,7 @@ internal static class UpdateTests
     {
         runner.Run(ComparesSemanticVersionsNumerically);
         runner.Run(UsesCalendarMonthsAndRealWeeklyIntervals);
+        await runner.RunAsync(ReadsPublishedReleaseNotesAsync);
         await runner.RunAsync(ChecksOnStartupAndPersistsTheScheduledTimestampAsync);
         await runner.RunAsync(DisabledChecksStillAllowManualChecksAsync);
         await runner.RunAsync(DismissalsArePerComponentAndVersionAsync);
@@ -44,6 +46,29 @@ internal static class UpdateTests
         TestAssert.Equal(start.AddDays(1), UpdateViewModel.NextCheck(start, UpdateFrequency.Daily));
         TestAssert.Equal(start.AddDays(7), UpdateViewModel.NextCheck(start, UpdateFrequency.Weekly));
         TestAssert.Equal(new DateTimeOffset(2026, 2, 28, 12, 0, 0, TimeSpan.Zero), UpdateViewModel.NextCheck(start, UpdateFrequency.Monthly));
+    }
+
+    private static async Task ReadsPublishedReleaseNotesAsync()
+    {
+        const string json = """
+            {
+              "schemaVersion": 1,
+              "releaseTag": "v1.0.6",
+              "publishedAt": "2026-11-09T05:36:39Z",
+              "releaseUrl": "https://github.com/Codeh4ck/RTX5090Monitor/releases/tag/v1.0.6",
+              "changelog": "- Add **Safeguard+ History**.\n- Improve updates."
+            }
+            """;
+
+        using var http = new HttpClient(new JsonResponseHandler(json));
+        var notes = await new ReleaseNotesClient(http).GetAsync(default);
+
+        TestAssert.Equal("v1.0.6", notes.ReleaseTag);
+        TestAssert.Equal("- Add **Safeguard+ History**.\n- Improve updates.", notes.Changelog);
+        TestAssert.Equal("https://github.com/Codeh4ck/RTX5090Monitor/releases/download/v1.0.6/RTXLens-win-x64.zip",
+            ReleaseNotes.DownloadFor(notes.ReleaseUrl).AbsoluteUri);
+        TestAssert.False((notes with { ReleaseTag = "v1.0.7" }).IsValid(),
+            "The release URL and changelog tag must match.");
     }
 
     private static async Task ChecksOnStartupAndPersistsTheScheduledTimestampAsync()

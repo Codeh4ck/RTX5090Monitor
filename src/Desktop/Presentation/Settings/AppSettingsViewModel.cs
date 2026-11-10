@@ -112,14 +112,17 @@ public sealed class AppSettingsViewModel(AppPreferences preferences) : Observabl
         }
     }
 
-    public double WindowWidth { get => Value.WindowWidth; set => Update(Value with { WindowWidth = value }); }
-    public double WindowHeight { get => Value.WindowHeight; set => Update(Value with { WindowHeight = value }); }
+    public bool RememberWindowSize { get => Value.RememberWindowSize; set => Update(Value with { RememberWindowSize = value }); }
+    public bool RememberWindowPosition { get => Value.RememberWindowPosition; set => Update(Value with { RememberWindowPosition = value }); }
 
-    public void SaveWindowSize(double width, double height)
+    public void SaveWindowPlacement(string key, WindowPlacement placement)
     {
-        Update(Value with { WindowWidth = width, WindowHeight = height });
-        Raise(nameof(WindowWidth));
-        Raise(nameof(WindowHeight));
+        if (Value.WindowPlacements?.GetValueOrDefault(key) == placement)
+        {
+            return;
+        }
+
+        Update(Value with { WindowPlacements = new(Value.WindowPlacements ?? []) { [key] = placement } }, nameof(Value));
     }
 
     private void Update(AppPreferences candidate, [System.Runtime.CompilerServices.CallerMemberName] string? property = null)

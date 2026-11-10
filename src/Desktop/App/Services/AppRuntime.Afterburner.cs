@@ -38,10 +38,7 @@ internal sealed partial class AppRuntime
             var window = new AfterburnerSettingsWindow(this);
             AfterburnerWindow = window;
             window.Closed += (_, _) => AfterburnerWindow = null;
-            var area = DisplayArea.GetFromWindowId(window.AppWindow.Id, DisplayAreaFallback.Primary).WorkArea;
-            var scale = _window?.ThemeRoot.XamlRoot?.RasterizationScale ?? 1;
-            window.AppWindow.Resize(new Windows.Graphics.SizeInt32(Math.Min(area.Width, (int)(1280 * scale)),
-                Math.Min(area.Height, (int)(1000 * scale))));
+            TrackWindow(window, "afterburner-settings", 1280, 1000);
         }
 
         AfterburnerWindow.Activate();

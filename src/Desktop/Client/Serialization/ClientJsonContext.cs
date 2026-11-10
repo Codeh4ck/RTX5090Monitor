@@ -21,6 +21,7 @@ namespace RTXLens.Client.Serialization;
 [JsonSerializable(typeof(HealthResponse))]
 [JsonSerializable(typeof(RTXLens.Contracts.Updates.ServiceVersionResponse))]
 [JsonSerializable(typeof(RTXLens.Contracts.Updates.ReleaseManifest))]
+[JsonSerializable(typeof(RTXLens.Contracts.Updates.ReleaseNotes))]
 [JsonSerializable(typeof(PluginCatalog))]
 [JsonSerializable(typeof(ConfigurationSnapshot))]
 [JsonSerializable(typeof(ServiceConfiguration))]

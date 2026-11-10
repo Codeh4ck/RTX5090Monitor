@@ -4,7 +4,9 @@ namespace RTXLens.Presentation.Settings;
 
 public sealed record AppPreferences
 {
-    public const int DefaultWindowHeight = 1050;
+    public const int DefaultWindowWidth = 1565;
+    public const int DefaultWindowHeight = 1103;
+
     public AppTheme Theme { get; init; } = AppTheme.System;
     public string AccentColor { get; init; } = "#27D8BD";
     public double TextScale { get; init; } = 1;
@@ -29,7 +31,11 @@ public sealed record AppPreferences
     public PinMetric PinMetric { get; init; }
     public bool ShowSeparateGpuStatusTab { get; init; }
     public string StartupTabId { get; init; } = string.Empty;
-    public double WindowWidth { get; init; } = 1100;
+    public bool RememberWindowSize { get; init; } = true;
+    public bool RememberWindowPosition { get; init; } = true;
+    public Dictionary<string, WindowPlacement>? WindowPlacements { get; init; }
+
+    public double WindowWidth { get; init; } = DefaultWindowWidth;
     public double WindowHeight { get; init; } = DefaultWindowHeight;
     public int WindowLayoutVersion { get; init; } = 1;
     public string ServiceAddress { get; init; } = "http://localhost:59273/";
@@ -40,6 +46,7 @@ public sealed record AppPreferences
             || WireViewPsuConnector is < 1 or > 2 || AsusPsuConnector is < 1 or > 2
             || !double.IsFinite(CoreTemperatureWarningC) || CoreTemperatureWarningC is < 30 or > 120
             || !double.IsFinite(MemoryTemperatureWarningC) || MemoryTemperatureWarningC is < 30 or > 120
+            || WindowPlacements?.Any(entry => entry.Value is null || !entry.Value.IsValid) == true
             || !double.IsFinite(WindowWidth) || !double.IsFinite(WindowHeight) || WindowWidth is < 720 or > 7680 || WindowHeight is < 550 or > 4320
             || string.IsNullOrEmpty(AccentColor) || AccentColor.Length != 7 || AccentColor[0] != '#' || !AccentColor.AsSpan(1).ToString().All(Uri.IsHexDigit)
             || !Uri.TryCreate(ServiceAddress, UriKind.Absolute, out var address) || address.Scheme is not ("http" or "https")

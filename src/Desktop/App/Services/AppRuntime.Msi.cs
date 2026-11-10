@@ -36,10 +36,7 @@ internal sealed partial class AppRuntime
             });
         FanCurveWindow = window;
         window.Closed += (_, _) => FanCurveWindow = null;
-        var area = DisplayArea.GetFromWindowId(window.AppWindow.Id, DisplayAreaFallback.Primary).WorkArea;
-        var scale = _window?.ThemeRoot.XamlRoot?.RasterizationScale ?? 1;
-        window.AppWindow.Resize(new Windows.Graphics.SizeInt32(
-            Math.Min(area.Width, (int)(1000 * scale)), Math.Min(area.Height, (int)(720 * scale))));
+        TrackWindow(window, "msi-fan-curve", 1000, 720);
         window.Activate();
         await window.InitializeAsync();
     }

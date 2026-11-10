@@ -31,10 +31,8 @@
                         <ComboBoxItem Content="Performance Chart" />
                     </ComboBox>
                     <TextBlock Text="Opens the selected tab at startup when it is reporting. Otherwise, opens the first available tab." Style="{StaticResource MonitorCaption}" TextWrapping="Wrap" />
-                    <NumberBox Header="Window width" Value="{x:Bind Model.WindowWidth, Mode=TwoWay}" Minimum="720" Maximum="7680" SmallChange="10" SpinButtonPlacementMode="Compact" Width="240" HorizontalAlignment="Left" />
-                    <NumberBox Header="Window height" Value="{x:Bind Model.WindowHeight, Mode=TwoWay}" Minimum="550" Maximum="4320" SmallChange="10" SpinButtonPlacementMode="Compact" Width="240" HorizontalAlignment="Left" />
-                    <Button Content="Apply window size" Click="ApplyWindowSize_Click" />
-                    <TextBlock Text="You can also resize or maximize the window. Its normal size is remembered automatically." Style="{StaticResource MonitorCaption}" TextWrapping="Wrap" />
+                    <ToggleSwitch Header="Remember window size" IsOn="{x:Bind Model.RememberWindowSize, Mode=OneWay}" Toggled="RememberWindowSize_Toggled" />
+                    <ToggleSwitch Header="Remember window position" IsOn="{x:Bind Model.RememberWindowPosition, Mode=OneWay}" Toggled="RememberWindowPosition_Toggled" />
                     <ToggleSwitch Header="Minimize to system tray" IsOn="{x:Bind Model.MinimizeToTray, Mode=TwoWay}"/>
                     <ToggleSwitch Header="Close to system tray" IsOn="{x:Bind Model.CloseToTray, Mode=TwoWay}"/>
                     <ToggleSwitch Header="Confirm before exiting" IsOn="{x:Bind Model.ConfirmBeforeExit, Mode=TwoWay}"/>
@@ -71,6 +69,7 @@
                                         <TextBlock Text="{x:Bind Description}" TextWrapping="Wrap" FontWeight="SemiBold" />
                                         <StackPanel Orientation="Horizontal" Spacing="8">
                                             <Button Content="View release" Tag="{x:Bind Component}" Click="ViewRelease_Click" />
+                                            <Button Content="View release notes" Tag="{x:Bind Component}" Click="ViewReleaseNotes_Click" />
                                             <Button Content="Remind me later" Tag="{x:Bind Component}" Click="RemindUpdate_Click" />
                                             <Button Content="Skip this version" Tag="{x:Bind Component}" Click="SkipUpdate_Click" />
                                         </StackPanel>

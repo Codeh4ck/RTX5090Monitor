@@ -200,7 +200,7 @@ public sealed class UpdateViewModel : ObservableObject
                 return;
             }
 
-            notices.Add(new UpdateNotice(component, name, installed!, latest, manifest!.ReleaseUrl));
+            notices.Add(new UpdateNotice(component, name, installed!, latest, manifest!.ReleaseUrl, manifest.ReleaseTag));
         }
     }
 

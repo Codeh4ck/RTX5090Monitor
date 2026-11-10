@@ -11,10 +11,13 @@ public sealed partial class GpuStatusView : UserControl
     public GpuStatusViewModel Model { get; }
     public bool ShowSummary { get; }
 
-    internal GpuStatusView(GpuStatusViewModel model, bool showSummary)
+    private readonly IReadOnlyList<MetricViewModel> _additionalMetrics;
+
+    internal GpuStatusView(GpuStatusViewModel model, bool showSummary, IReadOnlyList<MetricViewModel> additionalMetrics)
     {
         Model = model;
         ShowSummary = showSummary;
+        _additionalMetrics = additionalMetrics;
         InitializeComponent();
 
         if (showSummary)
@@ -39,7 +42,9 @@ public sealed partial class GpuStatusView : UserControl
     private void RebuildMetrics(object? sender, NotifyCollectionChangedEventArgs? args)
     {
         MetricsHost.Children.Clear();
-        foreach (var metric in ShowSummary ? Model.DetailedMetrics : Model.Metrics)
+        var metrics = ShowSummary ? Model.DetailedMetrics : Model.Metrics;
+
+        foreach (var metric in metrics.Concat(_additionalMetrics))
         {
             MetricsHost.Children.Add(new MetricTile(metric, valueMaxWidth: 260, usePanelBorder: true));
         }

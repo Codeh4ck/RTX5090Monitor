@@ -37,6 +37,13 @@ internal static class SmokeTestRunner
         {
             throw new InvalidOperationException("No demo telemetry received.");
         }
+        if (Environment.GetCommandLineArgs().Contains("--release-notes-and-wireview-only"))
+        {
+            await WaitUntilAsync(() => runtime.Dashboard.ReportingPanels.Any(panel => panel.IsWireView));
+            await ReleaseNotesAndWireViewSmokeTests.RunAsync(window, runtime, output);
+            return;
+        }
+
         if (Environment.GetCommandLineArgs().Contains("--afterburner-only"))
         {
             await AfterburnerSmokeTests.RunAsync(window, runtime, output);

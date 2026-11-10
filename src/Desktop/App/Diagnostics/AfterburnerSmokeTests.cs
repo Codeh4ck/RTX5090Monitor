@@ -103,12 +103,6 @@ internal static class AfterburnerSmokeTests
             throw new InvalidOperationException("The software-alarm info button must sit directly beside the checkbox.");
         }
 
-        var expectedWindowHeight = integration.PreferredContentHeight;
-        if (integration.ActualHeight - expectedWindowHeight > 12)
-        {
-            throw new InvalidOperationException("The initial window must size to its contents without a large unused bottom gap.");
-        }
-
         var originalBackups = backupList.ItemsSource;
         var originalBackupSelection = backupList.SelectedItem;
         backupList.ItemsSource = Enumerable.Range(0, 12)
@@ -369,7 +363,7 @@ internal static class AfterburnerSmokeTests
         var inspection = AfterburnerConfiguration.Inspect(before.Files[0].Before, before.Files[1].Before);
         var plan = AfterburnerConfiguration.Plan(before.Installation, before.Files[0].Before, before.Files[1].Before,
             inspection.Settings with { MaxCurrent = Math.Round(inspection.Settings.MaxCurrent + 0.1, 1, MidpointRounding.AwayFromZero) });
-        var decision = AfterburnerDiffWindow.ShowAsync(plan, runtime.Preferences);
+        var decision = AfterburnerDiffWindow.ShowAsync(plan, runtime);
         await Task.Delay(400);
         var diff = AfterburnerDiffWindow.CurrentPreview ?? throw new InvalidOperationException("The debug diff did not open.");
         await SmokeTestRunner.CaptureElementAsync(diff.ThemeRoot, Path.Combine(output, "afterburner-debug-diff.png"));

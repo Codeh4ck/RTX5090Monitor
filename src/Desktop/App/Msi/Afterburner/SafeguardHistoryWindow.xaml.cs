@@ -123,7 +123,7 @@ internal sealed partial class SafeguardHistoryWindow : Window
             };
 
             _inspection?.Close();
-            var window = new SafeguardExecutionWindow(report, _runtime.Preferences, Root.XamlRoot.RasterizationScale);
+            var window = new SafeguardExecutionWindow(report, _runtime, this);
             _inspection = window;
             window.Closed += (_, _) =>
             {

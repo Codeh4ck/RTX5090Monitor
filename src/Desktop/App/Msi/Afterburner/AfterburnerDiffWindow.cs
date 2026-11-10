@@ -90,12 +90,12 @@ internal sealed class AfterburnerDiffWindow : Window
                 CurrentPreview = null;
             }
         };
-        AppWindow.Resize(new global::Windows.Graphics.SizeInt32(1100, 760));
     }
 
-    internal static Task<bool> ShowAsync(AfterburnerChangeSet plan, AppPreferences preferences)
+    internal static Task<bool> ShowAsync(AfterburnerChangeSet plan, AppRuntime runtime)
     {
-        var window = new AfterburnerDiffWindow(plan, preferences);
+        var window = new AfterburnerDiffWindow(plan, runtime.Preferences);
+        runtime.TrackWindow(window, "afterburner-preview", 1100, 760);
         CurrentPreview = window;
         window.Activate();
         return window._decision.Task;

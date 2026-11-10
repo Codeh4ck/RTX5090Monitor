@@ -2,7 +2,6 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Windowing;
-using RTXLens.App.Platform.Windowing;
 using RTXLens.App.Services;
 using RTXLens.App.Views;
 using RTXLens.Presentation.Telemetry;
@@ -13,16 +12,13 @@ namespace RTXLens.App;
 public sealed partial class MainWindow : Window
 {
     private readonly AppRuntime _runtime;
-    private readonly nint _windowHandle;
     private string _page = "hardware";
     private string? _panelId;
     private bool _rendering = true;
     private string? _preferredPanelId;
     private string? _configurationSection;
     private bool _selectionQueued;
-    private bool _rememberWindowSize;
     private Task _closingCharts = Task.CompletedTask;
-    private readonly Microsoft.UI.Dispatching.DispatcherQueueTimer _sizeSaveTimer;
     public Presentation.Updates.UpdateViewModel Updates => _runtime.Updates;
     public DashboardViewModel Model { get; private set; }
     internal FrameworkElement ThemeRoot => Root;
@@ -60,29 +56,12 @@ public sealed partial class MainWindow : Window
         _page = _preferredPanelId == "performance" ? "performance" : "hardware";
         Model = runtime.Dashboard;
         InitializeComponent();
-        _windowHandle = WinRT.Interop.WindowNative.GetWindowHandle(this);
         if (AppWindow.Presenter is OverlappedPresenter presenter)
         {
             presenter.IsMaximizable = true;
             presenter.IsResizable = true;
         }
 
-        _sizeSaveTimer = DispatcherQueue.CreateTimer();
-        _sizeSaveTimer.Interval = TimeSpan.FromMilliseconds(400);
-        _sizeSaveTimer.IsRepeating = false;
-        _sizeSaveTimer.Tick += (_, _) => SaveNormalWindowSize();
-
-        AppWindow.Changed += (_, args) =>
-        {
-            if (args.DidSizeChange && _rememberWindowSize
-                && AppWindow.Presenter is OverlappedPresenter { State: OverlappedPresenterState.Restored })
-            {
-                _sizeSaveTimer.Stop();
-                _sizeSaveTimer.Start();
-            }
-        };
-
-        Closed += (_, _) => _sizeSaveTimer.Stop();
         runtime.OperationCompleted += message =>
         {
             OperationStatus.Text = message;
@@ -126,36 +105,6 @@ public sealed partial class MainWindow : Window
         RenderPage();
     }
 
-    internal void EnableWindowSizePersistence() => _rememberWindowSize = true;
-
-    internal void SaveNormalWindowSize()
-    {
-        if (!_rememberWindowSize || AppWindow.Presenter is not OverlappedPresenter { State: OverlappedPresenterState.Restored })
-        {
-            return;
-        }
-
-        var scale = Math.Max(96, Platform.Interop.NativeMethods.GetDpiForWindow(_windowHandle)) / 96d;
-        var size = AppWindow.Size;
-        _runtime.Settings.SaveWindowSize(
-            Math.Clamp(size.Width / scale, WindowSizeLimits.MinimumWidth, WindowSizeLimits.MaximumWidth),
-            Math.Clamp(size.Height / scale, WindowSizeLimits.MinimumHeight, WindowSizeLimits.MaximumHeight));
-    }
-
-    internal void ApplyWindowSize()
-    {
-        if (AppWindow.Presenter is OverlappedPresenter presenter)
-        {
-            presenter.Restore();
-        }
-
-        var scale = Math.Max(96, Platform.Interop.NativeMethods.GetDpiForWindow(_windowHandle)) / 96d;
-        var maximum = WindowSizeLimits.GetMaximumPixels(_windowHandle);
-        AppWindow.Resize(new Windows.Graphics.SizeInt32(
-            Math.Min(maximum.Width, (int)(_runtime.Preferences.WindowWidth * scale)),
-            Math.Min(maximum.Height, (int)(_runtime.Preferences.WindowHeight * scale))));
-    }
-
     private void SelectInitialPanel()
     {
         if (_page != "hardware")
@@ -191,6 +140,33 @@ public sealed partial class MainWindow : Window
     private void Performance_Click(object sender, RoutedEventArgs args) => Navigate("performance");
 
     private void Configuration_Click(object sender, RoutedEventArgs args) => Navigate("configuration");
+
+    private void ApplicationHeader_SizeChanged(object sender, SizeChangedEventArgs args)
+    {
+        var compact = args.NewSize.Width < 960;
+        ApplicationHeader.RowSpacing = compact ? 6 : 0;
+        Grid.SetRow(WebsiteLinks, compact ? 1 : 0);
+        Grid.SetColumn(WebsiteLinks, compact ? 0 : 1);
+        Grid.SetColumnSpan(WebsiteLinks, compact ? 3 : 1);
+    }
+
+    private async void ReleaseNotes_Click(object sender, RoutedEventArgs args) => await _runtime.OpenReleaseNotesAsync();
+
+    private async void Support_Click(object sender, RoutedEventArgs args)
+    {
+        try
+        {
+            if (!await Windows.System.Launcher.LaunchUriAsync(new Uri("https://rtxlens.com/support")))
+            {
+                OperationStatus.Text = "The support page could not be opened.";
+            }
+        }
+        catch (Exception error) when (error is InvalidOperationException or System.Runtime.InteropServices.COMException)
+        {
+            OperationStatus.Text = "The support page could not be opened.";
+        }
+    }
+
     private void Settings_Click(object sender, RoutedEventArgs args) => Navigate("settings");
 
     internal void Navigate(string page)
@@ -270,6 +246,7 @@ public sealed partial class MainWindow : Window
             _ => new TextBlock { Text = "No plugins are reporting. Open Configuration to check device and plugin settings.", TextWrapping = TextWrapping.Wrap,
                 VerticalAlignment = VerticalAlignment.Center, HorizontalAlignment = HorizontalAlignment.Center, Margin = new Thickness(24) }
         };
+
 
         if (PageHost.Content is ConfigurationView configuration && _configurationSection is { } section)
         {

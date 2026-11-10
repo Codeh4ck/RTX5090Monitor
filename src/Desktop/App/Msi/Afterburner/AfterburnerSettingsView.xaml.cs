@@ -31,9 +31,7 @@ public sealed partial class AfterburnerSettingsView : UserControl
     private DateTimeOffset _startPendingUntil;
 
     internal event Action? CloseRequested;
-    internal event Action? PreferredHeightChanged;
     internal bool IsBusy => _busy;
-    internal double PreferredContentHeight => HeaderLayout.ActualHeight + ((Grid)Content).RowSpacing + Panels.ActualHeight + Panels.Margin.Top + Panels.Margin.Bottom;
     internal bool HasPendingChanges => _savedFields is { } saved
         && (_invalidNumericInput || !saved.Equals(CurrentFields()) || _connector1.HasPendingChanges || _connector2.HasPendingChanges);
 
@@ -275,7 +273,7 @@ public sealed partial class AfterburnerSettingsView : UserControl
     private async Task<bool> ConfirmPlanAsync(AfterburnerChangeSet plan, string title)
     {
 #if DEBUG || TELEMETRY_DEBUG
-        return await AfterburnerDiffWindow.ShowAsync(plan, _runtime.Preferences);
+        return await AfterburnerDiffWindow.ShowAsync(plan, _runtime);
 #else
         var dialog = new ContentDialog
         {
@@ -422,11 +420,6 @@ public sealed partial class AfterburnerSettingsView : UserControl
 
     private void PageLayout_Changed(object sender, SizeChangedEventArgs args)
     {
-        if (!ReferenceEquals(sender, PageScroll) && args.NewSize.Height != args.PreviousSize.Height)
-        {
-            PreferredHeightChanged?.Invoke();
-        }
-
         if (_gutterUpdateQueued)
         {
             return;
