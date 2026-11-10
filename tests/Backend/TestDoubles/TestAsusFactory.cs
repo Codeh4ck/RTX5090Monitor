@@ -1,16 +1,16 @@
-using Rtx5090Monitoring.Plugins.Asus.Analysis.Warnings;
-using Rtx5090Monitoring.Warnings;
-using Rtx5090Monitoring.Plugins.Asus.Contracts.Configuration;
+using RTXLens.Plugins.Asus.Analysis.Warnings;
+using RTXLens.Warnings;
+using RTXLens.Plugins.Asus.Contracts.Configuration;
 using System.Text.Json;
 using Microsoft.Extensions.Configuration;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Core.Plugins;
-using Rtx5090Monitoring.Plugins.Asus;
-using Rtx5090Monitoring.Plugins.Asus.Configuration;
-using Rtx5090Monitoring.Plugins.Asus.Serialization;
-using Rtx5090Monitoring.Plugins.Asus.Streaming;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Core.Plugins;
+using RTXLens.Plugins.Asus;
+using RTXLens.Plugins.Asus.Configuration;
+using RTXLens.Plugins.Asus.Serialization;
+using RTXLens.Plugins.Asus.Streaming;
 
-namespace Rtx5090Monitoring.Tests.TestDoubles;
+namespace RTXLens.Tests.TestDoubles;
 
 internal sealed class TestAsusFactory(AsusTestState state, AsusStream stream) : ISensorPluginFactory
 {

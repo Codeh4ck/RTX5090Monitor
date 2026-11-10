@@ -1,14 +1,14 @@
 using System.Collections.ObjectModel;
 using System.Text.Json;
-using Rtx5090Monitoring.Client.Serialization;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Contracts.Discovery;
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Contracts.Sensors;
-using Rtx5090Monitoring.Presentation.Infrastructure;
-using Rtx5090Monitoring.Presentation.Settings;
+using RTXLens.Client.Serialization;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Contracts.Discovery;
+using RTXLens.Contracts.Enums;
+using RTXLens.Contracts.Sensors;
+using RTXLens.Presentation.Infrastructure;
+using RTXLens.Presentation.Settings;
 
-namespace Rtx5090Monitoring.Presentation.Telemetry;
+namespace RTXLens.Presentation.Telemetry;
 
 public sealed class DashboardViewModel : ObservableObject
 {
@@ -109,7 +109,7 @@ public sealed class DashboardViewModel : ObservableObject
         if (_configuration is { } configured)
         {
             var options = configured.Configuration.Plugins.GetValueOrDefault("asus-astral")?.Options?.Deserialize(ClientJsonContext.Default.AsusOptions)
-                ?? new Rtx5090Monitoring.Plugins.Asus.Contracts.Configuration.AsusOptions();
+                ?? new RTXLens.Plugins.Asus.Contracts.Configuration.AsusOptions();
             preferences = preferences with { CoreTemperatureWarningC = options.EffectiveCoreTemperatureWarningC,
                 MemoryTemperatureWarningC = options.EffectiveMemoryTemperatureWarningC };
         }

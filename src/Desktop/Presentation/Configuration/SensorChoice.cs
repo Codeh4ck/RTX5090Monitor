@@ -1,6 +1,6 @@
-using Rtx5090Monitoring.Contracts.Sensors;
+using RTXLens.Contracts.Sensors;
 
-namespace Rtx5090Monitoring.Presentation.Configuration;
+namespace RTXLens.Presentation.Configuration;
 
 public sealed record SensorChoice(SensorIdentity Identity)
 {

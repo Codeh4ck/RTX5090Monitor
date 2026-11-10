@@ -1,10 +1,10 @@
 using System.Text;
 using System.Text.Json;
-using Rtx5090Monitoring.Presentation.Msi.Afterburner;
-using Rtx5090Monitoring.Plugins.Msi.Contracts.Safeguard;
-using Rtx5090Monitoring.Tests.Infrastructure;
+using RTXLens.Presentation.Msi.Afterburner;
+using RTXLens.Plugins.Msi.Contracts.Safeguard;
+using RTXLens.Tests.Infrastructure;
 
-namespace Rtx5090Monitoring.UI.Tests.Configuration;
+namespace RTXLens.UI.Tests.Configuration;
 
 internal static class AfterburnerConfigurationTests
 {

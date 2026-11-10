@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { UpdateChecker } from '../src/updates/UpdateChecker.ts';
 import { UpdateStateStore } from '../src/updates/UpdateStateStore.ts';
-import { isNewerVersion, nextUpdateCheck, parseReleaseManifest, parseVersion, latestReleaseApi, rawReleaseRoot } from '../src/updates/versions.ts';
+import { isNewerVersion, nextUpdateCheck, parseReleaseManifest, parseVersion, updateManifestUrl } from '../src/updates/versions.ts';
 
 function setup(storage = new Map()) {
     const values = { schemaVersion: 1, releaseTag: 'v1.1.0', desktop: '1.1.0', service: '1.1.0', widget: '1.1.0' };
@@ -18,8 +18,7 @@ function setup(storage = new Map()) {
         requests.push(String(url));
         assert.equal(options.signal.aborted, false);
         if (fail) throw new Error('offline');
-        if (url === latestReleaseApi) return Response.json({ tag_name: values.releaseTag, draft: false, prerelease: false });
-        assert.equal(url, `${rawReleaseRoot}${values.releaseTag}/version.json`);
+        assert.equal(url, updateManifestUrl);
         return Response.json(values);
     };
     const create = () => new UpdateChecker('1.0.0', store, () => changes++, request, () => now);
@@ -49,16 +48,16 @@ test('widget startup always checks enabled updates and persists scheduled check 
     first.configure(true, 'Weekly');
     await first.check();
     assert.equal(first.availableVersion, '1.1.0');
-    assert.equal(first.releaseUrl, 'https://github.com/Codeh4ck/RTX5090Monitor/releases/tag/v1.1.0');
+    assert.equal(first.releaseUrl, 'https://github.com/Codeh4ck/RTXLens/releases/tag/v1.1.0');
     await first.check();
-    assert.equal(fixture.requests.length, 2);
+    assert.equal(fixture.requests.length, 1);
     fixture.advance(7 * 86400000);
     await first.check();
-    assert.equal(fixture.requests.length, 4);
+    assert.equal(fixture.requests.length, 2);
     const restarted = fixture.create();
     assert.notEqual(restarted.lastChecked, 'Never');
     await restarted.check();
-    assert.equal(fixture.requests.length, 6);
+    assert.equal(fixture.requests.length, 3);
 });
 
 test('disabling automatic widget checks permits explicit manual checks only', async () => {
@@ -68,7 +67,7 @@ test('disabling automatic widget checks permits explicit manual checks only', as
     await checker.check();
     assert.equal(fixture.requests.length, 0);
     await checker.check(true);
-    assert.equal(fixture.requests.length, 2);
+    assert.equal(fixture.requests.length, 1);
     assert.equal(checker.availableVersion, '1.1.0');
 });
 
@@ -98,7 +97,7 @@ test('widget reminders expire after 24 hours without an unnecessary weekly reque
     fixture.advance(86400000);
     await checker.check();
     assert.equal(checker.availableVersion, '1.1.0');
-    assert.equal(fixture.requests.length, 2);
+    assert.equal(fixture.requests.length, 1);
 });
 
 test('offline widget checks back off, allow manual retry and tolerate unavailable storage', async () => {
@@ -118,7 +117,7 @@ test('offline widget checks back off, allow manual retry and tolerate unavailabl
     assert.doesNotThrow(() => blocked.save(fixture.store.load()));
 });
 
-test('widget rejects a mismatched release manifest and stops in-flight checks', async () => {
+test('widget rejects an untrusted release URL and stops in-flight checks', async () => {
     let resolve;
     const pending = new Promise(done => resolve = done);
     const store = new UpdateStateStore('stopped', null);
@@ -128,10 +127,8 @@ test('widget rejects a mismatched release manifest and stops in-flight checks', 
     resolve(Response.json({ tag_name: 'v1.1.0', draft: true, prerelease: false }));
     await check;
     assert.equal(checker.availableVersion, null);
-    let step = 0;
-    const mismatch = new UpdateChecker('1.0.0', store, () => {}, async () => step++ === 0
-        ? Response.json({ tag_name: 'v1.1.0', draft: false, prerelease: false })
-        : Response.json({ schemaVersion: 1, releaseTag: 'v1.2.0', desktop: '1.2.0', service: '1.2.0', widget: '1.2.0' }));
+
+    const mismatch = new UpdateChecker('1.0.0', store, () => {}, async () => Response.json({ schemaVersion: 1, releaseTag: 'v1.2.0', desktop: '1.2.0', service: '1.2.0', widget: '1.2.0', releaseUrl: 'https://example.com' }));
     await mismatch.check();
     assert.equal(mismatch.availableVersion, null);
     assert.equal(mismatch.lastChecked, 'Never');

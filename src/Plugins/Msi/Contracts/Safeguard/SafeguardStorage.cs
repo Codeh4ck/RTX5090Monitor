@@ -3,7 +3,7 @@ using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Text.Json;
 
-namespace Rtx5090Monitoring.Plugins.Msi.Contracts.Safeguard;
+namespace RTXLens.Plugins.Msi.Contracts.Safeguard;
 
 [SupportedOSPlatform("windows")]
 public sealed class SafeguardStorage
@@ -12,7 +12,7 @@ public sealed class SafeguardStorage
     private static readonly SecurityIdentifier SystemAccount = new(WellKnownSidType.LocalSystemSid, null);
     private static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web) { WriteIndented = true };
 
-    public static string DefaultRoot => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "Rtx5090Monitoring.Safeguard");
+    public static string DefaultRoot => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "RTXLens.Safeguard");
 
     private readonly string _root;
     private readonly HashSet<string> _verifiedAreas = [];

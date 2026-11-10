@@ -1,11 +1,11 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Rtx5090Monitoring.App.Services;
-using Rtx5090Monitoring.Client.Http;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Presentation.Configuration;
+using RTXLens.App.Services;
+using RTXLens.Client.Http;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Presentation.Configuration;
 
-namespace Rtx5090Monitoring.App.Views;
+namespace RTXLens.App.Views;
 
 public sealed partial class DeviceWarningProfilesView
 {

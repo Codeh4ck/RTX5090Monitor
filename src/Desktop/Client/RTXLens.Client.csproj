@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <ItemGroup>
+        <ProjectReference Include="../../Plugins/Nvidia/Contracts/RTXLens.Plugins.GenericNvidia.Contracts.csproj" />
+        <ProjectReference Include="../../Plugins/Msi/Contracts/RTXLens.Plugins.Msi.Contracts.csproj" />
+        <ProjectReference Include="../../Common/Contracts/RTXLens.Contracts.csproj" />
+        <ProjectReference Include="../../Plugins/Asus/Contracts/RTXLens.Plugins.Asus.Contracts.csproj" />
+        <ProjectReference Include="../../Plugins/WireView/Contracts/RTXLens.Plugins.WireView.Contracts.csproj" />
+    </ItemGroup>
+</Project>

@@ -2,11 +2,11 @@ using System.ComponentModel;
 using System.Collections.Specialized;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Rtx5090Monitoring.App.Controls;
-using Rtx5090Monitoring.App.Services;
-using Rtx5090Monitoring.Presentation.Telemetry;
+using RTXLens.App.Controls;
+using RTXLens.App.Services;
+using RTXLens.Presentation.Telemetry;
 
-namespace Rtx5090Monitoring.App.Views;
+namespace RTXLens.App.Views;
 
 public sealed partial class HardwareView : UserControl
 {
@@ -14,10 +14,12 @@ public sealed partial class HardwareView : UserControl
     private bool? _wide;
     private bool _showPins;
     public HardwarePanelViewModel Model { get; }
+    internal double HiddenContentHeight => HardwareScroll.ScrollableHeight;
+
     internal bool IsResetPeakVisible => ResetPeakButton.Visibility == Visibility.Visible;
-    public string DetailsHeading => Model.IsWireView ? "Temperatures and faults" : "GPU status";
+    public string DetailsHeading => "GPU status";
     public string DeviceIconName => Model.IsAsus ? "asus" : Model.IsWireView ? "tg" : "pin";
-    public string DetailsIconName => Model.IsWireView ? "vtemp" : "vcore";
+
 
     internal HardwareView(HardwarePanelViewModel model, AppRuntime runtime)
     {
@@ -27,11 +29,11 @@ public sealed partial class HardwareView : UserControl
 
         if (Model.HasGpuStatus)
         {
-            GpuStatusHost.Children.Add(new GpuStatusView(runtime.Dashboard.GpuStatus, Model.IsNvidia));
-            if (!Model.IsWireView)
-            {
-                NativeDetailsCard.Visibility = Visibility.Collapsed;
-            }
+            var additionalMetrics = Model.IsWireView
+                ? new[] { Model.BoardTemperatures, Model.ExternalTemperatures }
+                : [];
+            GpuStatusHost.Children.Add(new GpuStatusView(runtime.Dashboard.GpuStatus, Model.IsNvidia, additionalMetrics));
+            NativeDetailsCard.Visibility = Visibility.Collapsed;
         }
 
         if (!Model.HasGpuStatus)
@@ -59,10 +61,18 @@ public sealed partial class HardwareView : UserControl
 
         SizeChanged += OnSizeChanged;
         Model.PropertyChanged += OnModelChanged;
-        Model.Metrics.CollectionChanged += RebuildMetrics;
+        if (!Model.HasGpuStatus)
+        {
+            Model.Metrics.CollectionChanged += RebuildMetrics;
+        }
+
         Model.Faults.CollectionChanged += RebuildFaults;
         Unloaded += OnUnloaded;
-        RebuildMetrics(null, null);
+        if (!Model.HasGpuStatus)
+        {
+            RebuildMetrics(null, null);
+        }
+
         RebuildFaults(null, null);
     }
 
@@ -83,7 +93,7 @@ public sealed partial class HardwareView : UserControl
 
     private void LayoutHeadlines()
     {
-        var columns = ActualWidth >= 650 ? 3 : 2;
+        var columns = Model.IsWireView && ActualWidth >= 1160 ? 6 : ActualWidth >= 650 ? 3 : 2;
         var cards = HeadlineGrid.Children.OfType<FrameworkElement>().Where(card => card.Visibility == Visibility.Visible).ToArray();
         HeadlineGrid.ColumnDefinitions.Clear();
         HeadlineGrid.RowDefinitions.Clear();
@@ -125,10 +135,7 @@ public sealed partial class HardwareView : UserControl
 
     private void OnModelChanged(object? sender, PropertyChangedEventArgs args)
     {
-        if (args.PropertyName == nameof(Model.HasFaults))
-        {
-            DetailsIcon.Tone = Model.HasFaults ? StatusTone.Negative : StatusTone.Neutral;
-        }
+
         if (args.PropertyName == nameof(Model.HasPins))
         {
             UpdateLayoutColumns();
@@ -151,7 +158,7 @@ public sealed partial class HardwareView : UserControl
         {
             FaultsHost.Children.Add(new MetricTile(fault));
         }
-        DetailsIcon.Tone = Model.HasFaults ? StatusTone.Negative : StatusTone.Neutral;
+
     }
 
     private void OnUnloaded(object sender, RoutedEventArgs args)

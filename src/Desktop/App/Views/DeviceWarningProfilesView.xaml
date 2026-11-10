@@ -1,8 +1,8 @@
 <UserControl
-    x:Class="Rtx5090Monitoring.App.Views.DeviceWarningProfilesView"
+    x:Class="RTXLens.App.Views.DeviceWarningProfilesView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:controls="using:Rtx5090Monitoring.App.Controls">
+    xmlns:controls="using:RTXLens.App.Controls">
     <controls:SectionPanel Header="Device warning profiles">
         <StackPanel Spacing="12">
             <TextBlock Text="Each enabled profile monitors its own source. WireView firmware alerts still report independently."

@@ -1,7 +1,0 @@
-<Project Sdk="Microsoft.NET.Sdk">
-    <ItemGroup>
-        <ProjectReference Include="../../../Common/Warnings/Rtx5090Monitoring.Warnings.csproj" />
-        <ProjectReference Include="../../../Common/Contracts/Rtx5090Monitoring.Contracts.csproj" />
-        <ProjectReference Include="../Contracts/Rtx5090Monitoring.Plugins.Asus.Contracts.csproj" />
-    </ItemGroup>
-</Project>

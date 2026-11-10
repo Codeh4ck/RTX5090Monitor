@@ -1,21 +1,21 @@
 using System.Net;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
-using Rtx5090Monitoring.Client.Http;
-using Rtx5090Monitoring.Client.Serialization;
-using Rtx5090Monitoring.Plugins.Asus.Contracts.Configuration;
-using Rtx5090Monitoring.Plugins.Msi.Contracts.Configuration;
-using Rtx5090Monitoring.Plugins.Msi.Contracts.Devices;
-using Rtx5090Monitoring.Plugins.Asus.Contracts.Common;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Contracts.Discovery;
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Contracts.Health;
-using Rtx5090Monitoring.Contracts.Sensors;
-using Rtx5090Monitoring.Plugins.WireView.Contracts.Common;
-using Rtx5090Monitoring.Plugins.WireView.Contracts.Input;
+using RTXLens.Client.Http;
+using RTXLens.Client.Serialization;
+using RTXLens.Plugins.Asus.Contracts.Configuration;
+using RTXLens.Plugins.Msi.Contracts.Configuration;
+using RTXLens.Plugins.Msi.Contracts.Devices;
+using RTXLens.Plugins.Asus.Contracts.Common;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Contracts.Discovery;
+using RTXLens.Contracts.Enums;
+using RTXLens.Contracts.Health;
+using RTXLens.Contracts.Sensors;
+using RTXLens.Plugins.WireView.Contracts.Common;
+using RTXLens.Plugins.WireView.Contracts.Input;
 
-namespace Rtx5090Monitoring.App.Demo;
+namespace RTXLens.App.Demo;
 
 internal sealed class DemoMonitoringApi : IMonitoringApi
 {
@@ -26,18 +26,18 @@ internal sealed class DemoMonitoringApi : IMonitoringApi
     private readonly DateTimeOffset _started = DateTimeOffset.UtcNow;
     private ConfigurationSnapshot _configuration = new(1, new ServiceConfiguration
     {
-        Monitoring = new() { ConnectorProfiles = Rtx5090Monitoring.Debugging.Processing.SimulationConnectorProfiles.CreateResolver().CreateDefaults() },
+        Monitoring = new() { ConnectorProfiles = RTXLens.Debugging.Processing.SimulationConnectorProfiles.CreateResolver().CreateDefaults() },
         Plugins = new Dictionary<string, PluginSettings>
         {
             ["wireview-pro2"] = new(),
             ["msi-psu"] = new() { Enabled = false, Options = JsonSerializer.SerializeToElement(new MsiOptions(), ClientJsonContext.Default.MsiOptions) },
             ["asus-astral"] = new() { Options = JsonSerializer.SerializeToElement(new AsusOptions(), ClientJsonContext.Default.AsusOptions) },
-            ["generic-nvidia"] = new() { Options = JsonSerializer.SerializeToElement(new Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.Configuration.GenericNvidiaOptions(), ClientJsonContext.Default.GenericNvidiaOptions) }
+            ["generic-nvidia"] = new() { Options = JsonSerializer.SerializeToElement(new RTXLens.Plugins.GenericNvidia.Contracts.Configuration.GenericNvidiaOptions(), ClientJsonContext.Default.GenericNvidiaOptions) }
         }
     }, Version: "demo:1");
-    private readonly Core.ConnectorProfileResolver _profiles = Rtx5090Monitoring.Debugging.Processing.SimulationConnectorProfiles.CreateResolver();
+    private readonly Core.ConnectorProfileResolver _profiles = RTXLens.Debugging.Processing.SimulationConnectorProfiles.CreateResolver();
     private long _sequence;
-    private readonly Warnings.WarningEngine _warnings = new(Rtx5090Monitoring.Debugging.Catalog.DebugWarningCatalog.Registry);
+    private readonly Warnings.WarningEngine _warnings = new(RTXLens.Debugging.Catalog.DebugWarningCatalog.Registry);
     private readonly HashSet<string> _unavailable = [];
 
     internal void SetDeviceAvailable(string pluginId, bool available)
@@ -55,7 +55,7 @@ internal sealed class DemoMonitoringApi : IMonitoringApi
         }
     }
 
-    public Task<Rtx5090Monitoring.Plugins.Msi.Contracts.Telemetry.MsiSnapshot> GetMsiSnapshotAsync(CancellationToken token)
+    public Task<RTXLens.Plugins.Msi.Contracts.Telemetry.MsiSnapshot> GetMsiSnapshotAsync(CancellationToken token)
     {
         token.ThrowIfCancellationRequested();
 
@@ -72,7 +72,7 @@ internal sealed class DemoMonitoringApi : IMonitoringApi
             const double temperature = 48;
             var duty = MsiFanDuty(options, temperature);
 
-            return Task.FromResult(new Rtx5090Monitoring.Plugins.Msi.Contracts.Telemetry.MsiSnapshot(
+            return Task.FromResult(new RTXLens.Plugins.Msi.Contracts.Telemetry.MsiSnapshot(
                 "demo-psu", "MPG Ai1300TS", "SIMULATED", DateTimeOffset.UtcNow,
                 [[1, 1, 1, 1, 1, 1], [0, 0, 0, 0, 0, 0]], temperature, duty * 21,
                 options.FanControl is MsiFanControl.Automatic or MsiFanControl.Unmanaged || duty == 0, duty)
@@ -122,7 +122,7 @@ internal sealed class DemoMonitoringApi : IMonitoringApi
                             PluginCapability.DeviceConfigurationRead, PluginCapability.FaultClear
                         ]
                         : [PluginCapability.Telemetry, PluginCapability.Configuration, PluginCapability.Restart, PluginCapability.DeviceSelection])
-                    { Warnings = Rtx5090Monitoring.Debugging.Catalog.DebugWarningCatalog.ForPlugin(pair.Key) })
+                    { Warnings = RTXLens.Debugging.Catalog.DebugWarningCatalog.ForPlugin(pair.Key) })
             ]));
         }
     }
@@ -160,8 +160,8 @@ internal sealed class DemoMonitoringApi : IMonitoringApi
     public Task<MsiDeviceInfo[]> GetMsiDevicesAsync(CancellationToken token) => Task.FromResult<MsiDeviceInfo[]>([new MsiDeviceInfo("demo-psu", "MPG Ai1300TS · DEMO")]);
     public Task ClearWireViewFaultsAsync(ClearFaultsRequest request, CancellationToken token) => Task.CompletedTask;
     public Task RestartPluginAsync(string pluginId, CancellationToken token) => Task.CompletedTask;
-    public Task<Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.Devices.NvidiaDeviceInfo[]> GetNvidiaDevicesAsync(CancellationToken token) =>
-        Task.FromResult<Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.Devices.NvidiaDeviceInfo[]>([new("demo-gpu0", "DEMO GeForce RTX GPU", "demo-gpu0")]);
+    public Task<RTXLens.Plugins.GenericNvidia.Contracts.Devices.NvidiaDeviceInfo[]> GetNvidiaDevicesAsync(CancellationToken token) =>
+        Task.FromResult<RTXLens.Plugins.GenericNvidia.Contracts.Devices.NvidiaDeviceInfo[]>([new("demo-gpu0", "DEMO GeForce RTX GPU", "demo-gpu0")]);
 
     public Task RestartServiceAsync(CancellationToken token) => Task.CompletedTask;
 

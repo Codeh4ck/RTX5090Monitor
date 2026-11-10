@@ -72,11 +72,8 @@ await page.route('**/*', async route => {
     const url = new URL(request.url());
     if (url.protocol === 'file:' || url.protocol === 'data:') return route.continue();
     requests.push({ url: request.url(), method: request.method() });
-    if (request.url() === 'https://api.github.com/repos/Codeh4ck/RTX5090Monitor/releases/latest') {
-        return route.fulfill({ status: updateFailure ? 503 : 200,
-            json: { tag_name: updateManifest.releaseTag, draft: false, prerelease: false }, headers: { 'Access-Control-Allow-Origin': '*' } });
-    }
-    if (request.url() === `https://raw.githubusercontent.com/Codeh4ck/RTX5090Monitor/${updateManifest.releaseTag}/version.json`) {
+    if (request.url() === 'https://rtxlens.com/updates/version.json') {
+        if (updateFailure) return route.fulfill({ status: 503, headers: { 'Access-Control-Allow-Origin': '*' } });
         return route.fulfill({ json: updateManifest, headers: { 'Access-Control-Allow-Origin': '*' } });
     }
     if (url.hostname !== 'localhost'  || url.port !== '59273' || request.method() !== 'GET') return route.abort();
@@ -355,7 +352,7 @@ try {
     paused = true;
 
     const runtimeHtml=await readFile(join(latest.runtime,'index.html'),'utf8');
-    const reader=runtimeHtml.slice(runtimeHtml.indexOf('function readRtxProperty(name)'),runtimeHtml.indexOf('function configureRtxMonitor('));
+    const reader=runtimeHtml.slice(runtimeHtml.indexOf('function readRtxProperty(name)'),runtimeHtml.indexOf('function configureRTXLens('));
     const lexicalProperty=await page.evaluate(source=>{
         delete window.panel1;
         const read=Function('panel1',source+'; return readRtxProperty;')('msiConnector2');
@@ -393,8 +390,7 @@ try {
     assert.equal(messages.length, 0, 'No commands sent through the telemetry socket');
     assert.ok(requests.every(request => request.method === 'GET' && (
         request.url.startsWith('http://localhost:59273/')
-        || request.url === 'https://api.github.com/repos/Codeh4ck/RTX5090Monitor/releases/latest'
-        || /^https:\/\/raw\.githubusercontent\.com\/Codeh4ck\/RTX5090Monitor\/v\d+\.\d+\.\d+\/version\.json$/.test(request.url))));
+        || request.url === 'https://rtxlens.com/updates/version.json')));
     assert.deepEqual(errors, []);
     const overflow = reports.filter(report=>report.overflow.length || report.barHeights.some(height=>height<20));
     await writeFile(join(output, 'report.json'), JSON.stringify({ reports, voltage, errors, requests, clientSocketMessages:messages }, null, 2));

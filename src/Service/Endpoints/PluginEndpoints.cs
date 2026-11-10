@@ -1,9 +1,9 @@
-using Rtx5090Monitoring.Contracts.Discovery;
-using Rtx5090Monitoring.Core;
-using Rtx5090Monitoring.Core.Configuration;
-using Rtx5090Monitoring.Core.Plugins;
+using RTXLens.Contracts.Discovery;
+using RTXLens.Core;
+using RTXLens.Core.Configuration;
+using RTXLens.Core.Plugins;
 
-namespace Rtx5090Monitoring.Service.Endpoints;
+namespace RTXLens.Service.Endpoints;
 
 internal static class PluginEndpoints
 {

@@ -6,7 +6,7 @@
         <ImplicitUsings>disable</ImplicitUsings>
     </PropertyGroup>
     <ItemGroup>
-        <ProjectReference Include="../../installer/Actions/Rtx5090Monitoring.Installer.Actions.csproj" />
+        <ProjectReference Include="../../installer/Actions/RTXLens.Installer.Actions.csproj" />
         <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" PrivateAssets="all" />
     </ItemGroup>
 </Project>

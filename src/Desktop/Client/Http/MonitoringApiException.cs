@@ -1,6 +1,6 @@
 using System.Net;
 
-namespace Rtx5090Monitoring.Client.Http;
+namespace RTXLens.Client.Http;
 
 public sealed class MonitoringApiException(HttpStatusCode statusCode, string message) : Exception(message)
 {

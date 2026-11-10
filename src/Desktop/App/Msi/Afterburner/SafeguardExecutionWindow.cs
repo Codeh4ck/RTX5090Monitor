@@ -1,14 +1,11 @@
 using System.Runtime.InteropServices;
-using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.Web.WebView2.Core;
-using Rtx5090Monitoring.App.Services;
-using Rtx5090Monitoring.Presentation.Settings;
-using Rtx5090Monitoring.SafeguardReporting;
-using Windows.Graphics;
+using RTXLens.App.Services;
+using RTXLens.SafeguardReporting;
 
-namespace Rtx5090Monitoring.App.Msi.Afterburner;
+namespace RTXLens.App.Msi.Afterburner;
 
 internal sealed class SafeguardExecutionWindow : Window
 {
@@ -19,14 +16,11 @@ internal sealed class SafeguardExecutionWindow : Window
 
     public Guid ExecutionId { get; }
 
-    public SafeguardExecutionWindow(SafeguardReport report, AppPreferences preferences, double scale)
+    public SafeguardExecutionWindow(SafeguardReport report, AppRuntime runtime, Window owner)
     {
         ExecutionId = report.Id;
-        Title = "RTX Monitor - Safeguard+ execution";
+        Title = "RTX Lens - Safeguard+ execution";
         AppWindow.SetIcon(Path.Combine(AppContext.BaseDirectory, "Assets", "monitor.ico"));
-        var area = DisplayArea.GetFromWindowId(AppWindow.Id, DisplayAreaFallback.Primary).WorkArea;
-        AppWindow.Resize(new SizeInt32(Math.Min(area.Width, (int)(820 * scale)), Math.Min(area.Height, (int)(780 * scale))));
-
         var (html, plain) = SafeguardReportRenderer.Render(report);
         _fallback = new ScrollViewer
         {
@@ -37,7 +31,9 @@ internal sealed class SafeguardExecutionWindow : Window
         root.Children.Add(_browser);
         root.Children.Add(_fallback);
         Content = root;
-        ThemeService.Apply(root, preferences);
+        ThemeService.Apply(root, runtime.Preferences);
+
+        runtime.TrackWindow(this, "safeguard-execution", 820, 780, owner: owner);
 
         root.Loaded += (_, _) => _initialization ??= InitializeAsync(html);
         Closed += async (_, _) =>
@@ -57,7 +53,7 @@ internal sealed class SafeguardExecutionWindow : Window
         try
         {
             var folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "Rtx5090Monitoring", "SafeguardReport.WebView2");
+                "RTXLens", "SafeguardReport.WebView2");
             var environment = await CoreWebView2Environment.CreateWithOptionsAsync(null, folder, new CoreWebView2EnvironmentOptions());
             if (_closed)
             {

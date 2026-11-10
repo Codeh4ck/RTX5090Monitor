@@ -1,12 +1,12 @@
 using HidSharp;
 using Microsoft.Extensions.Logging;
-using Rtx5090Monitoring.Plugins.Msi.Contracts.Configuration;
-using Rtx5090Monitoring.Plugins.Msi.Contracts.Devices;
-using Rtx5090Monitoring.Plugins.Msi.Contracts.Telemetry;
-using Rtx5090Monitoring.Plugins.Msi.Control;
-using Rtx5090Monitoring.Plugins.Msi.Protocol;
+using RTXLens.Plugins.Msi.Contracts.Configuration;
+using RTXLens.Plugins.Msi.Contracts.Devices;
+using RTXLens.Plugins.Msi.Contracts.Telemetry;
+using RTXLens.Plugins.Msi.Control;
+using RTXLens.Plugins.Msi.Protocol;
 
-namespace Rtx5090Monitoring.Plugins.Msi.Device;
+namespace RTXLens.Plugins.Msi.Device;
 
 public sealed class MsiPsuReader(ILogger<MsiPsuReader> logger) : IMsiPsuReader
 {

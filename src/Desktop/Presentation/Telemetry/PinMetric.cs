@@ -1,4 +1,4 @@
-namespace Rtx5090Monitoring.Presentation.Telemetry;
+namespace RTXLens.Presentation.Telemetry;
 
 public enum PinMetric
 {

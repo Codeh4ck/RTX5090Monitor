@@ -1,11 +1,11 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Rtx5090Monitoring.App.Views.Dialogs;
-using Rtx5090Monitoring.App.Services;
-using Rtx5090Monitoring.Presentation.Telemetry;
-using Rtx5090Monitoring.Presentation.Configuration;
+using RTXLens.App.Views.Dialogs;
+using RTXLens.App.Services;
+using RTXLens.Presentation.Telemetry;
+using RTXLens.Presentation.Configuration;
 
-namespace Rtx5090Monitoring.App.Views;
+namespace RTXLens.App.Views;
 
 public sealed partial class WarningOptionsView : UserControl
 {

@@ -1,4 +1,4 @@
-namespace Rtx5090Monitoring.Presentation.Configuration;
+namespace RTXLens.Presentation.Configuration;
 
 public static class NumericInput
 {

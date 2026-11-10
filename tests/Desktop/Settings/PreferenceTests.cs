@@ -1,8 +1,8 @@
 using System.Text.Json.Nodes;
-using Rtx5090Monitoring.Presentation.Settings;
-using Rtx5090Monitoring.Tests.Infrastructure;
+using RTXLens.Presentation.Settings;
+using RTXLens.Tests.Infrastructure;
 
-namespace Rtx5090Monitoring.UI.Tests.Settings;
+namespace RTXLens.UI.Tests.Settings;
 
 internal static class PreferenceTests
 {
@@ -12,6 +12,43 @@ internal static class PreferenceTests
         await runner.RunAsync(PersistsExitConfirmationChoiceAsync);
         await runner.RunAsync(PersistsAndRecoversFromCorruptPreferencesAsync);
         await runner.RunAsync(MigratesWindowHeightOnceWithoutLosingPreferencesAsync);
+        await runner.RunAsync(WindowPlacementPreferencesAreIndependentAsync);
+    }
+
+    private static async Task WindowPlacementPreferencesAreIndependentAsync()
+    {
+        var path = Path.Combine(Path.GetTempPath(), "rtxlens-window-layout-" + Guid.NewGuid().ToString("N") + ".json");
+        try
+        {
+            var store = new PreferencesStore(path);
+            var settings = new AppSettingsViewModel(store.Load());
+            TestAssert.True(settings.RememberWindowSize && settings.RememberWindowPosition,
+                "Both remember settings must be enabled by default.");
+
+            settings.SaveWindowPlacement("main", new WindowPlacement(1100, 800, -1300, 50));
+            settings.SaveWindowPlacement("release-notes", new WindowPlacement(700, 440, 100, 200));
+            settings.RememberWindowPosition = false;
+            await store.SaveAsync(settings.Value);
+
+            var reloaded = new AppSettingsViewModel(store.Load());
+            TestAssert.True(reloaded.RememberWindowSize && !reloaded.RememberWindowPosition, "Position is independent of the size mode.");
+            TestAssert.Equal(new WindowPlacement(1100, 800, -1300, 50), reloaded.Value.WindowPlacements!["main"]);
+            TestAssert.Equal(new WindowPlacement(700, 440, 100, 200), reloaded.Value.WindowPlacements!["release-notes"]);
+            reloaded.RememberWindowPosition = true;
+            reloaded.RememberWindowSize = false;
+            TestAssert.True(reloaded.RememberWindowPosition, "Turning size persistence off must preserve position persistence.");
+            await store.SaveAsync(reloaded.Value);
+            TestAssert.False(store.Load().RememberWindowSize, "An explicit opt-out must survive reloading.");
+
+            var previous = JsonNode.Parse(await File.ReadAllTextAsync(path))!.AsObject();
+            previous["autoResizeWindows"] = true;
+            await File.WriteAllTextAsync(path, previous.ToJsonString());
+            TestAssert.True(store.Load().RememberWindowSize, "The old auto-resize mode must no longer prevent remembering size.");
+        }
+        finally
+        {
+            File.Delete(path);
+        }
     }
 
     private static async Task MigratesWindowHeightOnceWithoutLosingPreferencesAsync()
@@ -19,7 +56,8 @@ internal static class PreferenceTests
         var path = Path.Combine(Path.GetTempPath(), "rtx-window-test-" + Guid.NewGuid().ToString("N") + ".json");
         try
         {
-            TestAssert.Equal(1050d, new AppPreferences().WindowHeight);
+            TestAssert.Equal(1565d, new AppPreferences().WindowWidth);
+            TestAssert.Equal(1103d, new AppPreferences().WindowHeight);
             var store = new PreferencesStore(path);
             await store.SaveAsync(new AppPreferences { WindowWidth = 1120, WindowHeight = 800, Theme = AppTheme.Dark, StartMinimized = true });
             var legacy = JsonNode.Parse(await File.ReadAllTextAsync(path))!.AsObject();
@@ -27,7 +65,7 @@ internal static class PreferenceTests
             await File.WriteAllTextAsync(path, legacy.ToJsonString());
             var migrated = store.Load();
             TestAssert.True(store.LastError is null, store.LastError ?? "Legacy preferences must load successfully.");
-            TestAssert.Equal((double)AppPreferences.DefaultWindowHeight, migrated.WindowHeight);
+            TestAssert.Equal(1050d, migrated.WindowHeight);
             TestAssert.Equal(1120d, migrated.WindowWidth);
             TestAssert.True(migrated is { Theme: AppTheme.Dark, StartMinimized: true }, "Migrating window height must preserve other preferences.");
             await store.SaveAsync(migrated with { WindowHeight = 900 });

@@ -2,13 +2,13 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Hosting;
-using Rtx5090Monitoring.Core.Plugins;
-using Rtx5090Monitoring.Core.Streaming;
-using Rtx5090Monitoring.Plugins.WireView.Services;
-using Rtx5090Monitoring.Plugins.WireView.Streaming;
-using Rtx5090Monitoring.Plugins.WireView.Serialization;
+using RTXLens.Core.Plugins;
+using RTXLens.Core.Streaming;
+using RTXLens.Plugins.WireView.Services;
+using RTXLens.Plugins.WireView.Streaming;
+using RTXLens.Plugins.WireView.Serialization;
 
-namespace Rtx5090Monitoring.Plugins.WireView.Endpoints;
+namespace RTXLens.Plugins.WireView.Endpoints;
 
 internal static class WireViewSensorEndpoints
 {

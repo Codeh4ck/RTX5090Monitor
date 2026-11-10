@@ -1,9 +1,9 @@
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Contracts.Sensors;
-using Rtx5090Monitoring.Core.Plugins;
-using Rtx5090Monitoring.Contracts.Configuration;
+using RTXLens.Contracts.Enums;
+using RTXLens.Contracts.Sensors;
+using RTXLens.Core.Plugins;
+using RTXLens.Contracts.Configuration;
 
-namespace Rtx5090Monitoring.Tests.TestDoubles;
+namespace RTXLens.Tests.TestDoubles;
 
 internal sealed class TestSensorPlugin(string pluginId, TestPluginBehavior behavior = TestPluginBehavior.PublishReadings) : ISensorPlugin
 {

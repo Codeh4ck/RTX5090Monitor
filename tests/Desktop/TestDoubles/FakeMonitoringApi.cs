@@ -1,25 +1,25 @@
 using System.Net;
 using System.Runtime.CompilerServices;
 using System.Threading.Channels;
-using Rtx5090Monitoring.Client.Http;
-using Rtx5090Monitoring.Plugins.Asus.Contracts.Common;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Contracts.Discovery;
-using Rtx5090Monitoring.Contracts.Health;
-using Rtx5090Monitoring.Contracts.Sensors;
-using Rtx5090Monitoring.Plugins.WireView.Contracts.Common;
-using Rtx5090Monitoring.Plugins.WireView.Contracts.Input;
-using Rtx5090Monitoring.UI.Tests.Fixtures;
+using RTXLens.Client.Http;
+using RTXLens.Plugins.Asus.Contracts.Common;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Contracts.Discovery;
+using RTXLens.Contracts.Health;
+using RTXLens.Contracts.Sensors;
+using RTXLens.Plugins.WireView.Contracts.Common;
+using RTXLens.Plugins.WireView.Contracts.Input;
+using RTXLens.UI.Tests.Fixtures;
 
-namespace Rtx5090Monitoring.UI.Tests.TestDoubles;
+namespace RTXLens.UI.Tests.TestDoubles;
 
 internal sealed class FakeMonitoringApi : IMonitoringApi
 {
-    public Task<Rtx5090Monitoring.Contracts.Updates.ServiceVersionResponse?> GetVersionAsync(CancellationToken token) =>
-        Task.FromResult<Rtx5090Monitoring.Contracts.Updates.ServiceVersionResponse?>(new(1, "1.0.0"));
+    public Task<RTXLens.Contracts.Updates.ServiceVersionResponse?> GetVersionAsync(CancellationToken token) =>
+        Task.FromResult<RTXLens.Contracts.Updates.ServiceVersionResponse?>(new(1, "1.0.0"));
 
-    public Task<Rtx5090Monitoring.Plugins.Msi.Contracts.Devices.MsiDeviceInfo[]> GetMsiDevicesAsync(CancellationToken token) =>
-        Task.FromResult<Rtx5090Monitoring.Plugins.Msi.Contracts.Devices.MsiDeviceInfo[]>([]);
+    public Task<RTXLens.Plugins.Msi.Contracts.Devices.MsiDeviceInfo[]> GetMsiDevicesAsync(CancellationToken token) =>
+        Task.FromResult<RTXLens.Plugins.Msi.Contracts.Devices.MsiDeviceInfo[]>([]);
     public Uri Address { get; } = new("http://localhost:59273/");
     public ConfigurationSnapshot Configuration = UiTestData.Configuration;
     public Channel<SensorSnapshot> Frames { get; } = Channel.CreateUnbounded<SensorSnapshot>();

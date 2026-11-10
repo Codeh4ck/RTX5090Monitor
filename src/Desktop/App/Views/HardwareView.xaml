@@ -1,10 +1,16 @@
-<UserControl x:Class="Rtx5090Monitoring.App.Views.HardwareView"
+<UserControl x:Class="RTXLens.App.Views.HardwareView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:controls="using:Rtx5090Monitoring.App.Controls"
-    xmlns:converters="using:Rtx5090Monitoring.App.Converters">
-    <UserControl.Resources><converters:BooleanVisibilityConverter x:Key="BoolVisibility" /></UserControl.Resources>
-    <ScrollViewer HorizontalScrollBarVisibility="Disabled" Padding="12,12">
+    xmlns:controls="using:RTXLens.App.Controls"
+    xmlns:telemetry="using:RTXLens.Presentation.Telemetry"
+    xmlns:converters="using:RTXLens.App.Converters">
+    <UserControl.Resources>
+        <converters:BooleanVisibilityConverter x:Key="BoolVisibility" />
+        <DataTemplate x:Key="WireViewHeadline" x:DataType="telemetry:MetricViewModel">
+            <controls:WireViewHeadlineCard Tone="{x:Bind Tone, Mode=OneWay}" />
+        </DataTemplate>
+    </UserControl.Resources>
+    <ScrollViewer x:Name="HardwareScroll" HorizontalScrollBarVisibility="Disabled" Padding="12,12">
         <StackPanel Spacing="12">
             <Grid x:Name="DeviceHeader" ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="16" RowSpacing="10">
                 <StackPanel x:Name="DeviceIdentity" Orientation="Horizontal" Spacing="12">
@@ -47,6 +53,9 @@
             <InfoBar IsOpen="{x:Bind Model.HasWarning, Mode=OneWay}" IsClosable="False" Severity="Error"
                 Visibility="{x:Bind Model.IsAsus, Converter={StaticResource BoolVisibility}}" Title="Hardware warning" Message="{x:Bind Model.WarningText, Mode=OneWay}" />
             <Grid x:Name="HeadlineGrid" ColumnDefinitions="*,*,*" ColumnSpacing="12" RowSpacing="12">
+                <ContentControl Content="{x:Bind Model.CableRating}" ContentTemplate="{StaticResource WireViewHeadline}"
+                    HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
+                    Visibility="{x:Bind Model.IsWireView, Converter={StaticResource BoolVisibility}}" />
                 <Border Style="{StaticResource MonitorAccentCard}" Padding="14,12">
                     <StackPanel Spacing="4">
                         <StackPanel Orientation="Horizontal" Spacing="8"><controls:WidgetIcon IconName="pin" Width="20" Height="20" />
@@ -68,6 +77,12 @@
                         <TextBlock Text="{x:Bind Model.VoltageText, Mode=OneWay}" FontSize="26" FontWeight="SemiBold" />
                     </StackPanel>
                 </Border>
+                <ContentControl Content="{x:Bind Model.FaultStatus}" ContentTemplate="{StaticResource WireViewHeadline}"
+                    HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
+                    Visibility="{x:Bind Model.IsWireView, Converter={StaticResource BoolVisibility}}" />
+                <ContentControl Content="{x:Bind Model.FaultLogStatus}" ContentTemplate="{StaticResource WireViewHeadline}"
+                    HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
+                    Visibility="{x:Bind Model.IsWireView, Converter={StaticResource BoolVisibility}}" />
             </Grid>
             <Grid x:Name="TelemetryGrid" RowDefinitions="Auto,Auto" ColumnDefinitions="*,0" RowSpacing="14">
                 <Border Style="{StaticResource MonitorCard}" VerticalAlignment="Top"
@@ -117,7 +132,7 @@
                     <Border x:Name="NativeDetailsCard" Style="{StaticResource MonitorCard}">
                         <StackPanel Spacing="14">
                             <StackPanel x:Name="NativeStatusHeading" Orientation="Horizontal" Spacing="9">
-                                <controls:WidgetIcon x:Name="DetailsIcon" IconName="{x:Bind DetailsIconName}" Width="28" Height="28" />
+                                <controls:WidgetIcon IconName="vcore" Width="28" Height="28" />
                                 <TextBlock Text="{x:Bind DetailsHeading}" Style="{StaticResource MonitorSectionHeading}" VerticalAlignment="Center" />
                             </StackPanel>
                             <StackPanel x:Name="MetricsHost" Spacing="8" />

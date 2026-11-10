@@ -1,3 +1,3 @@
-namespace Rtx5090Monitoring.Core.Plugins;
+namespace RTXLens.Core.Plugins;
 
 public sealed class PluginUnavailableException(string message) : Exception(message);

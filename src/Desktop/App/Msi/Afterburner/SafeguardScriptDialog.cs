@@ -2,10 +2,10 @@ using System.Security.Cryptography;
 using System.Text;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Rtx5090Monitoring.Plugins.Msi.Contracts.Safeguard;
-using Rtx5090Monitoring.Presentation.Msi.Afterburner;
+using RTXLens.Plugins.Msi.Contracts.Safeguard;
+using RTXLens.Presentation.Msi.Afterburner;
 
-namespace Rtx5090Monitoring.App.Msi.Afterburner;
+namespace RTXLens.App.Msi.Afterburner;
 
 internal sealed class SafeguardScriptDialog(SafeguardScriptDefinition script, SafeguardBinding? previous)
 {

@@ -49,7 +49,7 @@ export function previewWarnings(selection: string): WarningNotice[] {
         offline: {
             id: 'preview/offline',
             title: 'Service unavailable',
-            detail: 'The widget is reconnecting. Check that the RTX Monitor service is running.',
+            detail: 'The widget is reconnecting. Check that the RTX Lens service is running.',
             icon: 'overcurrent'
         },
         stale: {

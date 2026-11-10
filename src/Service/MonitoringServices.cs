@@ -1,19 +1,19 @@
-using Rtx5090Monitoring.Core.Configuration;
-using Rtx5090Monitoring.Core;
-using Rtx5090Monitoring.Core.Plugins;
-using Rtx5090Monitoring.Core.Streaming;
-using Rtx5090Monitoring.Service.Configuration;
-using Rtx5090Monitoring.Service.Services;
-using Rtx5090Monitoring.Service.Utilities;
+using RTXLens.Core.Configuration;
+using RTXLens.Core;
+using RTXLens.Core.Plugins;
+using RTXLens.Core.Streaming;
+using RTXLens.Service.Configuration;
+using RTXLens.Service.Services;
+using RTXLens.Service.Utilities;
 
-namespace Rtx5090Monitoring.Service;
+namespace RTXLens.Service;
 
 public static class MonitoringServices
 {
     public static IServiceCollection AddMonitoringCore(this IServiceCollection services, IConfiguration configuration)
     {
         var defaultPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
-            "Rtx5090Monitoring", "appsettings.json");
+            "RTXLens", "appsettings.json");
         var configurationPath = configuration["RuntimeConfiguration:FilePath"] ?? defaultPath;
 
         services.AddSingleton(new RuntimeConfigurationFile(Path.GetFullPath(configurationPath)));

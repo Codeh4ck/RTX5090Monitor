@@ -1,4 +1,4 @@
-<UserControl x:Class="Rtx5090Monitoring.App.Msi.Afterburner.AfterburnerSettingsView" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:controls="using:Rtx5090Monitoring.App.Controls" xmlns:local="using:Rtx5090Monitoring.App.Msi.Afterburner">
+<UserControl x:Class="RTXLens.App.Msi.Afterburner.AfterburnerSettingsView" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:controls="using:RTXLens.App.Controls" xmlns:local="using:RTXLens.App.Msi.Afterburner">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

@@ -1,6 +1,6 @@
-using Rtx5090Monitoring.App.Platform.Interop;
+using RTXLens.App.Platform.Interop;
 
-namespace Rtx5090Monitoring.App.Platform.Startup;
+namespace RTXLens.App.Platform.Startup;
 
 internal sealed partial class SingleInstance : IDisposable
 {
@@ -9,16 +9,16 @@ internal sealed partial class SingleInstance : IDisposable
 
     public SingleInstance(bool diagnostic = false)
     {
-        _mutex = new Mutex(false, @"Local\Rtx5090Monitoring.App." + Environment.UserName + (diagnostic ? ".SmokeTest" : string.Empty), out var created);
+        _mutex = new Mutex(false, @"Local\RTXLens.App." + Environment.UserName + (diagnostic ? ".SmokeTest" : string.Empty), out var created);
         IsFirst = created;
     }
 
     public static void ShowExisting()
     {
-        var window = NativeMethods.FindWindowW(null, "RTX Monitor");
+        var window = NativeMethods.FindWindowW(null, "RTX Lens");
         if (window != 0)
         {
-            var message = NativeMethods.RegisterWindowMessageW("Rtx5090Monitoring.App.Show");
+            var message = NativeMethods.RegisterWindowMessageW("RTXLens.App.Show");
             NativeMethods.PostMessageW(window, message, 0, 0);
         }
     }

@@ -1,6 +1,6 @@
-using Rtx5090Monitoring.Contracts.Warnings;
+using RTXLens.Contracts.Warnings;
 
-namespace Rtx5090Monitoring.Contracts.Configuration;
+namespace RTXLens.Contracts.Configuration;
 
 public sealed record DeviceWarningProfile
 {

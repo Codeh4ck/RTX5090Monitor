@@ -1,8 +1,8 @@
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Core.Plugins;
-using Rtx5090Monitoring.Warnings;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Core.Plugins;
+using RTXLens.Warnings;
 
-namespace Rtx5090Monitoring.Tests.TestDoubles;
+namespace RTXLens.Tests.TestDoubles;
 
 internal sealed class WarningOnlyFactory : ISensorPluginFactory
 {

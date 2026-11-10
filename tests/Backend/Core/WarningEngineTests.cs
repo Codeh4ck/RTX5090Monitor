@@ -1,16 +1,16 @@
-using Rtx5090Monitoring.Plugins.WireView.Contracts.Warnings;
-using Rtx5090Monitoring.Plugins.Asus.Contracts.Warnings;
-using Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.Warnings;
-using Rtx5090Monitoring.Contracts.Alerts;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Contracts.Health;
-using Rtx5090Monitoring.Contracts.Warnings;
-using Rtx5090Monitoring.Tests.Fixtures;
-using Rtx5090Monitoring.Tests.Infrastructure;
-using Rtx5090Monitoring.Warnings;
+using RTXLens.Plugins.WireView.Contracts.Warnings;
+using RTXLens.Plugins.Asus.Contracts.Warnings;
+using RTXLens.Plugins.GenericNvidia.Contracts.Warnings;
+using RTXLens.Contracts.Alerts;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Contracts.Enums;
+using RTXLens.Contracts.Health;
+using RTXLens.Contracts.Warnings;
+using RTXLens.Tests.Fixtures;
+using RTXLens.Tests.Infrastructure;
+using RTXLens.Warnings;
 
-namespace Rtx5090Monitoring.Tests.Core;
+namespace RTXLens.Tests.Core;
 
 internal static class WarningEngineTests
 {

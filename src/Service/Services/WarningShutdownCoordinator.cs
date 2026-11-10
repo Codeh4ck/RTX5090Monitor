@@ -1,10 +1,10 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Text.Json;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Service.Configuration;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Service.Configuration;
 
-namespace Rtx5090Monitoring.Service.Services;
+namespace RTXLens.Service.Services;
 
 internal interface IWarningShutdown
 {
@@ -20,7 +20,7 @@ internal sealed class WindowsWarningShutdown : IWarningShutdown
             UseShellExecute = false,
             CreateNoWindow = true
         };
-        foreach (var argument in new[] { "/s", "/t", "0", "/d", "p:0:0", "/c", "RTX Monitor protection warning" })
+        foreach (var argument in new[] { "/s", "/t", "0", "/d", "p:0:0", "/c", "RTX Lens protection warning" })
         {
             start.ArgumentList.Add(argument);
         }

@@ -1,6 +1,6 @@
-using Rtx5090Monitoring.Core.Streaming;
+using RTXLens.Core.Streaming;
 
-namespace Rtx5090Monitoring.Plugins.WireView.Streaming;
+namespace RTXLens.Plugins.WireView.Streaming;
 
 public sealed class WireViewStream : IDisposable
 {

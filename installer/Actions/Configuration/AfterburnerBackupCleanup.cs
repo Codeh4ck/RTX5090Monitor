@@ -7,12 +7,12 @@ using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using Microsoft.Win32.SafeHandles;
 
-namespace Rtx5090Monitoring.Installer.Actions.Configuration;
+namespace RTXLens.Installer.Actions.Configuration;
 
 public static class AfterburnerBackupCleanup
 {
     private const string BackupFolder = "AfterburnerBackups";
-    private const string LegacyFolder = "Rtx5090Monitoring.AfterburnerBackups";
+    private const string LegacyFolder = "RTXLens.AfterburnerBackups";
     private const FileAttributes UnsafeEntry = FileAttributes.Directory | FileAttributes.ReparsePoint;
 
     private static readonly Regex InstallationKey = new(@"\A[0-9a-f]{20}\z", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
@@ -46,7 +46,7 @@ public static class AfterburnerBackupCleanup
             }
             catch (Exception error) when (error is IOException or UnauthorizedAccessException or Win32Exception or ArgumentException)
             {
-                log("Could not remove RTX Monitor's Afterburner backups: " + error.Message);
+                log("Could not remove RTX Lens's Afterburner backups: " + error.Message);
             }
         }
     }

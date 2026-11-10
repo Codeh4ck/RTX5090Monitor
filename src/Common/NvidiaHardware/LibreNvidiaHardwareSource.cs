@@ -1,6 +1,6 @@
 using LibreHardwareMonitor.Hardware;
 
-namespace Rtx5090Monitoring.Hardware.Nvidia;
+namespace RTXLens.Hardware.Nvidia;
 
 public sealed class LibreNvidiaHardwareSource : INvidiaHardwareSource
 {

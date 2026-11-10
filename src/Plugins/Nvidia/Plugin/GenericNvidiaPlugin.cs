@@ -1,12 +1,12 @@
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Core.Plugins;
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Hardware.Nvidia;
-using Rtx5090Monitoring.Plugins.GenericNvidia.Configuration;
-using Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.Configuration;
-using Rtx5090Monitoring.Plugins.GenericNvidia.Mapping;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Core.Plugins;
+using RTXLens.Contracts.Enums;
+using RTXLens.Hardware.Nvidia;
+using RTXLens.Plugins.GenericNvidia.Configuration;
+using RTXLens.Plugins.GenericNvidia.Contracts.Configuration;
+using RTXLens.Plugins.GenericNvidia.Mapping;
 
-namespace Rtx5090Monitoring.Plugins.GenericNvidia;
+namespace RTXLens.Plugins.GenericNvidia;
 
 public sealed class GenericNvidiaPlugin(PluginSettings settings, NvidiaTelemetryReader reader) : ISensorPlugin
 {

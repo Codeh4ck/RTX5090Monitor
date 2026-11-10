@@ -1,9 +1,9 @@
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Contracts.Sensors;
-using Rtx5090Monitoring.Presentation.Infrastructure;
-using Rtx5090Monitoring.Presentation.Settings;
+using RTXLens.Contracts.Enums;
+using RTXLens.Contracts.Sensors;
+using RTXLens.Presentation.Infrastructure;
+using RTXLens.Presentation.Settings;
 
-namespace Rtx5090Monitoring.Presentation.Telemetry;
+namespace RTXLens.Presentation.Telemetry;
 
 public sealed class MsiPanelViewModel : ObservableObject
 {

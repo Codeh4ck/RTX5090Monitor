@@ -1,7 +1,7 @@
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Contracts.Discovery;
-using Rtx5090Monitoring.Contracts.Sensors;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Contracts.Discovery;
+using RTXLens.Contracts.Sensors;
 
-namespace Rtx5090Monitoring.Debugging.Models;
+namespace RTXLens.Debugging.Models;
 
 public sealed record DebugFrame(PluginCatalog Catalog, ConfigurationSnapshot Configuration, SensorSnapshot Snapshot);

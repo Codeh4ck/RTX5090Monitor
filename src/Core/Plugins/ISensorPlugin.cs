@@ -1,6 +1,6 @@
-using Rtx5090Monitoring.Contracts.Configuration;
+using RTXLens.Contracts.Configuration;
 
-namespace Rtx5090Monitoring.Core.Plugins;
+namespace RTXLens.Core.Plugins;
 
 public interface ISensorPlugin : IDisposable
 {

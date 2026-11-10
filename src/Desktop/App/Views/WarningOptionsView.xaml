@@ -1,8 +1,8 @@
-<UserControl x:Class="Rtx5090Monitoring.App.Views.WarningOptionsView"
+<UserControl x:Class="RTXLens.App.Views.WarningOptionsView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:warnings="using:Rtx5090Monitoring.Contracts.Warnings"
-    xmlns:controls="using:Rtx5090Monitoring.App.Controls">
+    xmlns:warnings="using:RTXLens.Contracts.Warnings"
+    xmlns:controls="using:RTXLens.App.Controls">
     <StackPanel Spacing="14">
         <controls:SectionPanel x:Name="NvidiaTemperaturePanel" Header="NVIDIA GPU temperature warnings"
             x:Load="{x:Bind Editor.HasNvidiaWarnings, Mode=OneWay}">

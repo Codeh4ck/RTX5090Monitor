@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <ItemGroup>
+        <ProjectReference Include="../../../Common/Warnings/RTXLens.Warnings.csproj" />
+        <ProjectReference Include="../Contracts/RTXLens.Plugins.WireView.Contracts.csproj" />
+    </ItemGroup>
+</Project>

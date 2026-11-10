@@ -1,4 +1,4 @@
-namespace Rtx5090Monitoring.Tests.Infrastructure;
+namespace RTXLens.Tests.Infrastructure;
 
 internal static class TestWait
 {

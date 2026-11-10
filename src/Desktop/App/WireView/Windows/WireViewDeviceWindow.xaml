@@ -1,8 +1,8 @@
-<Window x:Class="Rtx5090Monitoring.App.WireView.Windows.WireViewDeviceWindow"
+<Window x:Class="RTXLens.App.WireView.Windows.WireViewDeviceWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:controls="using:Rtx5090Monitoring.App.Controls"
-    Title="RTX Monitor · WireView device settings">
+    xmlns:controls="using:RTXLens.App.Controls"
+    Title="RTX Lens · WireView device settings">
     <Grid x:Name="Root" Background="{ThemeResource MonitorBackground}" Padding="20" RowDefinitions="Auto,*" RowSpacing="14">
         <StackPanel Spacing="8">
             <TextBlock Text="WireView device settings" Style="{StaticResource MonitorHeading}" />

@@ -1,6 +1,6 @@
-using Rtx5090Monitoring.Plugins.Msi.Contracts.Safeguard;
+using RTXLens.Plugins.Msi.Contracts.Safeguard;
 
-namespace Rtx5090Monitoring.SafeguardReporting;
+namespace RTXLens.SafeguardReporting;
 
 internal sealed record SafeguardReport(Guid Id, string ScriptId, DateTimeOffset StartedAt, int? Connector,
     int? DelayMs, string Status, SafeguardTelemetry? Telemetry)

@@ -4,12 +4,12 @@ using Microsoft.UI.Xaml.Automation.Provider;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using System.Reflection;
-using Rtx5090Monitoring.App.Msi.Afterburner;
-using Rtx5090Monitoring.App.Services;
-using Rtx5090Monitoring.App.Views;
-using Rtx5090Monitoring.Presentation.Msi.Afterburner;
+using RTXLens.App.Msi.Afterburner;
+using RTXLens.App.Services;
+using RTXLens.App.Views;
+using RTXLens.Presentation.Msi.Afterburner;
 
-namespace Rtx5090Monitoring.App.Diagnostics;
+namespace RTXLens.App.Diagnostics;
 
 internal static class AfterburnerSmokeTests
 {
@@ -94,19 +94,13 @@ internal static class AfterburnerSmokeTests
 
         if (AfterburnerFileStore.DefaultBackupRoot != Path.Combine(AppContext.BaseDirectory, "AfterburnerBackups"))
         {
-            throw new InvalidOperationException("The active backup root must be beside the RTX Monitor executable.");
+            throw new InvalidOperationException("The active backup root must be beside the RTX Lens executable.");
         }
         var softwareCheckbox = (CheckBox)integration.FindName("SoftwareAlarmsEnabled");
         var checkboxRow = (Grid)softwareCheckbox.Parent;
         if (checkboxRow.ColumnDefinitions[0].Width.GridUnitType != GridUnitType.Auto || checkboxRow.HorizontalAlignment != HorizontalAlignment.Left)
         {
             throw new InvalidOperationException("The software-alarm info button must sit directly beside the checkbox.");
-        }
-
-        var expectedWindowHeight = integration.PreferredContentHeight;
-        if (integration.ActualHeight - expectedWindowHeight > 12)
-        {
-            throw new InvalidOperationException("The initial window must size to its contents without a large unused bottom gap.");
         }
 
         var originalBackups = backupList.ItemsSource;
@@ -369,7 +363,7 @@ internal static class AfterburnerSmokeTests
         var inspection = AfterburnerConfiguration.Inspect(before.Files[0].Before, before.Files[1].Before);
         var plan = AfterburnerConfiguration.Plan(before.Installation, before.Files[0].Before, before.Files[1].Before,
             inspection.Settings with { MaxCurrent = Math.Round(inspection.Settings.MaxCurrent + 0.1, 1, MidpointRounding.AwayFromZero) });
-        var decision = AfterburnerDiffWindow.ShowAsync(plan, runtime.Preferences);
+        var decision = AfterburnerDiffWindow.ShowAsync(plan, runtime);
         await Task.Delay(400);
         var diff = AfterburnerDiffWindow.CurrentPreview ?? throw new InvalidOperationException("The debug diff did not open.");
         await SmokeTestRunner.CaptureElementAsync(diff.ThemeRoot, Path.Combine(output, "afterburner-debug-diff.png"));

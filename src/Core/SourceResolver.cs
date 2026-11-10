@@ -1,8 +1,8 @@
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Contracts.Sensors;
-using Rtx5090Monitoring.Contracts.Monitoring;
+using RTXLens.Contracts.Enums;
+using RTXLens.Contracts.Sensors;
+using RTXLens.Contracts.Monitoring;
 
-namespace Rtx5090Monitoring.Core;
+namespace RTXLens.Core;
 
 public static class SourceResolver
 {

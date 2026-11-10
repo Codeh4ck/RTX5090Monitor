@@ -1,3 +1,3 @@
-﻿namespace Rtx5090Monitoring.Core.Plugins;
+﻿namespace RTXLens.Core.Plugins;
 
 public sealed record PluginDescriptor(string Id, string Name, TimeSpan PollInterval, TimeSpan StaleAfter);

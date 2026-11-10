@@ -1,9 +1,9 @@
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Contracts.Sensors;
-using Rtx5090Monitoring.Contracts.Warnings;
-using Rtx5090Monitoring.Warnings.State;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Contracts.Sensors;
+using RTXLens.Contracts.Warnings;
+using RTXLens.Warnings.State;
 
-namespace Rtx5090Monitoring.Warnings;
+namespace RTXLens.Warnings;
 
 public sealed class WarningEngine
 {

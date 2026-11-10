@@ -1,9 +1,9 @@
-<Window x:Class="Rtx5090Monitoring.App.Msi.Windows.MsiFanCurveWindow"
+<Window x:Class="RTXLens.App.Msi.Windows.MsiFanCurveWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:configuration="using:Rtx5090Monitoring.Presentation.Configuration"
-    xmlns:controls="using:Rtx5090Monitoring.App.Controls"
-    Title="RTX Monitor - MSI PSU fan curve">
+    xmlns:configuration="using:RTXLens.Presentation.Configuration"
+    xmlns:controls="using:RTXLens.App.Controls"
+    Title="RTX Lens - MSI PSU fan curve">
     <Grid x:Name="Root" Background="{ThemeResource MonitorBackground}" Padding="20" RowDefinitions="Auto,*" RowSpacing="14">
         <StackPanel x:Name="HeaderPanel" Spacing="8">
             <StackPanel Orientation="Horizontal" Spacing="10">

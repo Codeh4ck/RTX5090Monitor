@@ -1,19 +1,19 @@
 using System.Net;
 using Microsoft.Extensions.Logging.Abstractions;
-using Rtx5090Monitoring.Client.Http;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Contracts.Health;
-using Rtx5090Monitoring.Contracts.Sensors;
-using Rtx5090Monitoring.Contracts.Warnings;
-using Rtx5090Monitoring.Service.Configuration;
-using Rtx5090Monitoring.Service.Services;
-using Rtx5090Monitoring.Tests.Fixtures;
-using Rtx5090Monitoring.Tests.Infrastructure;
-using Rtx5090Monitoring.Tests.TestDoubles;
-using Rtx5090Monitoring.Warnings;
+using RTXLens.Client.Http;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Contracts.Enums;
+using RTXLens.Contracts.Health;
+using RTXLens.Contracts.Sensors;
+using RTXLens.Contracts.Warnings;
+using RTXLens.Service.Configuration;
+using RTXLens.Service.Services;
+using RTXLens.Tests.Fixtures;
+using RTXLens.Tests.Infrastructure;
+using RTXLens.Tests.TestDoubles;
+using RTXLens.Warnings;
 
-namespace Rtx5090Monitoring.Tests.Service;
+namespace RTXLens.Tests.Service;
 
 internal static class DeviceWarningProfileTests
 {

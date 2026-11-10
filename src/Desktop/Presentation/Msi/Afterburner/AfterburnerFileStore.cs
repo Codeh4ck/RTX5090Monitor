@@ -2,7 +2,7 @@ using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
-namespace Rtx5090Monitoring.Presentation.Msi.Afterburner;
+namespace RTXLens.Presentation.Msi.Afterburner;
 
 public sealed partial class AfterburnerFileStore(string installation, string backupRoot, string? legacyBackupDirectory = null)
 {
@@ -14,7 +14,7 @@ public sealed partial class AfterburnerFileStore(string installation, string bac
     public static string DefaultBackupRoot => Path.Combine(AppContext.BaseDirectory, "AfterburnerBackups");
 
     public static string LegacyBackupDirectoryFor(string installation) => Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "Rtx5090Monitoring.AfterburnerBackups", InstallationKey(installation));
+        Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "RTXLens.AfterburnerBackups", InstallationKey(installation));
 
     public bool HasInterruptedChange => File.Exists(Path.Combine(BackupDirectory, "pending.json")) || LegacyStore?.HasInterruptedChange == true;
 

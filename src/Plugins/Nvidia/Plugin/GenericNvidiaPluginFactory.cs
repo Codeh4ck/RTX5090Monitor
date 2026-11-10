@@ -1,18 +1,18 @@
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Contracts.Sensors;
+using RTXLens.Contracts.Enums;
+using RTXLens.Contracts.Sensors;
 using System.Text.Json;
 using Microsoft.Extensions.Configuration;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Contracts.Discovery;
-using Rtx5090Monitoring.Core.Plugins;
-using Rtx5090Monitoring.Hardware.Nvidia;
-using Rtx5090Monitoring.Plugins.GenericNvidia.Analysis.Warnings;
-using Rtx5090Monitoring.Plugins.GenericNvidia.Configuration;
-using Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.Configuration;
-using Rtx5090Monitoring.Plugins.GenericNvidia.Serialization;
-using Rtx5090Monitoring.Warnings;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Contracts.Discovery;
+using RTXLens.Core.Plugins;
+using RTXLens.Hardware.Nvidia;
+using RTXLens.Plugins.GenericNvidia.Analysis.Warnings;
+using RTXLens.Plugins.GenericNvidia.Configuration;
+using RTXLens.Plugins.GenericNvidia.Contracts.Configuration;
+using RTXLens.Plugins.GenericNvidia.Serialization;
+using RTXLens.Warnings;
 
-namespace Rtx5090Monitoring.Plugins.GenericNvidia;
+namespace RTXLens.Plugins.GenericNvidia;
 
 public sealed class GenericNvidiaPluginFactory(NvidiaTelemetryReader reader) : ISensorPluginFactory, IConnectorSourceProvider
 {

@@ -1,11 +1,11 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Microsoft.Extensions.Configuration;
-using Rtx5090Monitoring.Contracts.Warnings;
+using RTXLens.Contracts.Warnings;
 using System.Text.Json.Serialization;
-using Rtx5090Monitoring.Contracts.Configuration;
+using RTXLens.Contracts.Configuration;
 
-namespace Rtx5090Monitoring.Service.Configuration;
+namespace RTXLens.Service.Configuration;
 
 internal static class RuntimeJson
 {

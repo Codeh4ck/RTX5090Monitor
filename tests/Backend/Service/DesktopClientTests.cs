@@ -1,15 +1,15 @@
 using System.Net;
 using System.Net.Http.Json;
-using Rtx5090Monitoring.Client.Http;
-using Rtx5090Monitoring.Client.Serialization;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Contracts.Discovery;
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Contracts.Monitoring;
-using Rtx5090Monitoring.Tests.Infrastructure;
-using Rtx5090Monitoring.Tests.TestDoubles;
+using RTXLens.Client.Http;
+using RTXLens.Client.Serialization;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Contracts.Discovery;
+using RTXLens.Contracts.Enums;
+using RTXLens.Contracts.Monitoring;
+using RTXLens.Tests.Infrastructure;
+using RTXLens.Tests.TestDoubles;
 
-namespace Rtx5090Monitoring.Tests.Service;
+namespace RTXLens.Tests.Service;
 
 internal static class DesktopClientTests
 {

@@ -1,12 +1,12 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Rtx5090Monitoring.Hardware.Nvidia;
-using Rtx5090Monitoring.Core.Plugins;
-using Rtx5090Monitoring.Plugins.Asus.Factories;
-using Rtx5090Monitoring.Plugins.Asus.Serialization;
-using Rtx5090Monitoring.Plugins.Asus.Streaming;
+using RTXLens.Hardware.Nvidia;
+using RTXLens.Core.Plugins;
+using RTXLens.Plugins.Asus.Factories;
+using RTXLens.Plugins.Asus.Serialization;
+using RTXLens.Plugins.Asus.Streaming;
 
-namespace Rtx5090Monitoring.Plugins.Asus;
+namespace RTXLens.Plugins.Asus;
 
 public static class ServiceCollectionEx
 {

@@ -1,11 +1,11 @@
 using System.Collections.ObjectModel;
 using System.Text.Json;
-using Rtx5090Monitoring.Contracts.Discovery;
-using Rtx5090Monitoring.Contracts.Monitoring;
-using Rtx5090Monitoring.Contracts.Sensors;
-using Rtx5090Monitoring.Presentation.Infrastructure;
+using RTXLens.Contracts.Discovery;
+using RTXLens.Contracts.Monitoring;
+using RTXLens.Contracts.Sensors;
+using RTXLens.Presentation.Infrastructure;
 
-namespace Rtx5090Monitoring.Presentation.Configuration;
+namespace RTXLens.Presentation.Configuration;
 
 public sealed class ConnectorProfilesEditorViewModel : EditableObject
 {

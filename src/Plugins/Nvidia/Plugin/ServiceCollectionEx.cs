@@ -1,10 +1,10 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Rtx5090Monitoring.Core.Plugins;
-using Rtx5090Monitoring.Hardware.Nvidia;
-using Rtx5090Monitoring.Plugins.GenericNvidia.Serialization;
+using RTXLens.Core.Plugins;
+using RTXLens.Hardware.Nvidia;
+using RTXLens.Plugins.GenericNvidia.Serialization;
 
-namespace Rtx5090Monitoring.Plugins.GenericNvidia;
+namespace RTXLens.Plugins.GenericNvidia;
 
 public static class ServiceCollectionEx
 {

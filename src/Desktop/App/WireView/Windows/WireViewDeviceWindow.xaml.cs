@@ -2,12 +2,12 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
-using Rtx5090Monitoring.App.Controls;
-using Rtx5090Monitoring.App.Services;
-using Rtx5090Monitoring.Presentation.Settings;
-using Rtx5090Monitoring.Presentation.Telemetry;
+using RTXLens.App.Controls;
+using RTXLens.App.Services;
+using RTXLens.Presentation.Settings;
+using RTXLens.Presentation.Telemetry;
 
-namespace Rtx5090Monitoring.App.WireView.Windows;
+namespace RTXLens.App.WireView.Windows;
 
 internal sealed partial class WireViewDeviceWindow : Window
 {

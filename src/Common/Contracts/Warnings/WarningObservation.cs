@@ -1,4 +1,4 @@
-namespace Rtx5090Monitoring.Contracts.Warnings;
+namespace RTXLens.Contracts.Warnings;
 
 public sealed record WarningObservation(string PluginId, string DeviceId, string TypeId, bool Available, bool Active, string Detail)
 {

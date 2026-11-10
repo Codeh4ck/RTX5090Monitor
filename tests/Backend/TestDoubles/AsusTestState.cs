@@ -1,7 +1,7 @@
-using Rtx5090Monitoring.Plugins.Asus.Device;
-using Rtx5090Monitoring.Tests.Fixtures;
+using RTXLens.Plugins.Asus.Device;
+using RTXLens.Tests.Fixtures;
 
-namespace Rtx5090Monitoring.Tests.TestDoubles;
+namespace RTXLens.Tests.TestDoubles;
 
 internal sealed class AsusTestState
 {

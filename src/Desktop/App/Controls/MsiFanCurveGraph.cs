@@ -4,11 +4,11 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Shapes;
-using Rtx5090Monitoring.Plugins.Msi.Contracts.Telemetry;
-using Rtx5090Monitoring.Presentation.Configuration;
+using RTXLens.Plugins.Msi.Contracts.Telemetry;
+using RTXLens.Presentation.Configuration;
 using Windows.Foundation;
 
-namespace Rtx5090Monitoring.App.Controls;
+namespace RTXLens.App.Controls;
 
 internal sealed class MsiFanCurveGraph : Grid, IDisposable
 {

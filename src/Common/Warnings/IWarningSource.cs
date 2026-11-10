@@ -1,9 +1,9 @@
 using System.Text.Json;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Contracts.Sensors;
-using Rtx5090Monitoring.Contracts.Warnings;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Contracts.Sensors;
+using RTXLens.Contracts.Warnings;
 
-namespace Rtx5090Monitoring.Warnings;
+namespace RTXLens.Warnings;
 
 public interface IWarningSource
 {

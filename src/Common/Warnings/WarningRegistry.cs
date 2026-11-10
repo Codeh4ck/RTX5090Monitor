@@ -1,7 +1,7 @@
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Contracts.Warnings;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Contracts.Warnings;
 
-namespace Rtx5090Monitoring.Warnings;
+namespace RTXLens.Warnings;
 
 public sealed class WarningRegistry
 {

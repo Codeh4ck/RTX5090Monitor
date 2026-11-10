@@ -4,7 +4,7 @@ using System.Linq;
 using System.Security.AccessControl;
 using System.Security.Principal;
 
-namespace Rtx5090Monitoring.Contracts.Security;
+namespace RTXLens.Contracts.Security;
 
 #if !NETFRAMEWORK
 [System.Runtime.Versioning.SupportedOSPlatform("windows")]

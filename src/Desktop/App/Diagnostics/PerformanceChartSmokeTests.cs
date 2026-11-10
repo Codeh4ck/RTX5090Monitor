@@ -1,11 +1,11 @@
 using Microsoft.UI.Xaml.Automation.Peers;
 using Microsoft.UI.Xaml.Automation.Provider;
 using Microsoft.UI.Xaml.Controls;
-using Rtx5090Monitoring.App.Services;
-using Rtx5090Monitoring.App.Views;
-using Rtx5090Monitoring.Presentation.Performance;
+using RTXLens.App.Services;
+using RTXLens.App.Views;
+using RTXLens.Presentation.Performance;
 
-namespace Rtx5090Monitoring.App.Diagnostics;
+namespace RTXLens.App.Diagnostics;
 
 internal static class PerformanceChartSmokeTests
 {

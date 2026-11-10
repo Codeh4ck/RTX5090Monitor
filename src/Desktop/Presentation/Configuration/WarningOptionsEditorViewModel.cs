@@ -1,9 +1,9 @@
 using System.Collections.ObjectModel;
-using Rtx5090Monitoring.Contracts.Discovery;
-using Rtx5090Monitoring.Contracts.Warnings;
-using Rtx5090Monitoring.Presentation.Infrastructure;
+using RTXLens.Contracts.Discovery;
+using RTXLens.Contracts.Warnings;
+using RTXLens.Presentation.Infrastructure;
 
-namespace Rtx5090Monitoring.Presentation.Configuration;
+namespace RTXLens.Presentation.Configuration;
 
 public sealed class WarningOptionsEditorViewModel : ObservableObject
 {

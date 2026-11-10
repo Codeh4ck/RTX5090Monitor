@@ -1,9 +1,9 @@
-using Rtx5090Monitoring.Presentation.Telemetry;
+using RTXLens.Presentation.Telemetry;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Imaging;
 
-namespace Rtx5090Monitoring.App.Controls;
+namespace RTXLens.App.Controls;
 
 public sealed partial class WidgetIcon : UserControl
 {

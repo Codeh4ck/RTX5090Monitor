@@ -1,10 +1,10 @@
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Contracts.Sensors;
-using Rtx5090Monitoring.Core.Plugins;
-using Rtx5090Monitoring.Plugins.Msi.Mapping;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Contracts.Enums;
+using RTXLens.Contracts.Sensors;
+using RTXLens.Core.Plugins;
+using RTXLens.Plugins.Msi.Mapping;
 
-namespace Rtx5090Monitoring.Debugging.Processing;
+namespace RTXLens.Debugging.Processing;
 
 internal sealed class SimulationConnectorSourceProvider(string id) : IConnectorSourceProvider
 {

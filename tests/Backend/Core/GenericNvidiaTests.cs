@@ -1,14 +1,14 @@
 using LibreHardwareMonitor.Hardware;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Hardware.Nvidia;
-using Rtx5090Monitoring.Plugins.GenericNvidia;
-using Rtx5090Monitoring.Plugins.GenericNvidia.Configuration;
-using Rtx5090Monitoring.Plugins.GenericNvidia.Mapping;
-using Rtx5090Monitoring.Tests.Infrastructure;
-using Rtx5090Monitoring.Tests.TestDoubles;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Contracts.Enums;
+using RTXLens.Hardware.Nvidia;
+using RTXLens.Plugins.GenericNvidia;
+using RTXLens.Plugins.GenericNvidia.Configuration;
+using RTXLens.Plugins.GenericNvidia.Mapping;
+using RTXLens.Tests.Infrastructure;
+using RTXLens.Tests.TestDoubles;
 
-namespace Rtx5090Monitoring.Tests.Core;
+namespace RTXLens.Tests.Core;
 
 internal static class GenericNvidiaTests
 {

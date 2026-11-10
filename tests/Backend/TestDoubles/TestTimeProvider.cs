@@ -1,4 +1,4 @@
-namespace Rtx5090Monitoring.Tests.TestDoubles;
+namespace RTXLens.Tests.TestDoubles;
 
 internal sealed class TestTimeProvider : TimeProvider
 {

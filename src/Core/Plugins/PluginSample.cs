@@ -1,7 +1,7 @@
-﻿using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Contracts.Sensors;
-using Rtx5090Monitoring.Contracts.Alerts;
+﻿using RTXLens.Contracts.Enums;
+using RTXLens.Contracts.Sensors;
+using RTXLens.Contracts.Alerts;
 
-namespace Rtx5090Monitoring.Core.Plugins;
+namespace RTXLens.Core.Plugins;
 
 public sealed record PluginSample(PluginState State, SensorReading[] Sensors, string? Message = null, SensorAlert[]? Alerts = null);

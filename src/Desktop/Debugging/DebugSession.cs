@@ -1,20 +1,20 @@
 using System.Text.Json;
-using Rtx5090Monitoring.Client.Serialization;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Contracts.Discovery;
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Contracts.Health;
-using Rtx5090Monitoring.Contracts.Monitoring;
-using Rtx5090Monitoring.Contracts.Sensors;
-using Rtx5090Monitoring.Debugging.Models;
-using Rtx5090Monitoring.Debugging.Processing;
-using Rtx5090Monitoring.Debugging.ViewModels;
-using Rtx5090Monitoring.Plugins.Asus.Contracts.Configuration;
-using Rtx5090Monitoring.Plugins.Msi.Contracts.Configuration;
-using Rtx5090Monitoring.Presentation.Infrastructure;
-using Rtx5090Monitoring.Warnings;
+using RTXLens.Client.Serialization;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Contracts.Discovery;
+using RTXLens.Contracts.Enums;
+using RTXLens.Contracts.Health;
+using RTXLens.Contracts.Monitoring;
+using RTXLens.Contracts.Sensors;
+using RTXLens.Debugging.Models;
+using RTXLens.Debugging.Processing;
+using RTXLens.Debugging.ViewModels;
+using RTXLens.Plugins.Asus.Contracts.Configuration;
+using RTXLens.Plugins.Msi.Contracts.Configuration;
+using RTXLens.Presentation.Infrastructure;
+using RTXLens.Warnings;
 
-namespace Rtx5090Monitoring.Debugging;
+namespace RTXLens.Debugging;
 
 public sealed class DebugSession : ObservableObject
 {
@@ -29,7 +29,7 @@ public sealed class DebugSession : ObservableObject
     private readonly DebugAsusAlerts _asus = new();
     private bool _batch;
     private MonitoringOptions? _monitoringOverride;
-    private Rtx5090Monitoring.Contracts.Warnings.WarningOptions? _warningOverride;
+    private RTXLens.Contracts.Warnings.WarningOptions? _warningOverride;
     private WarningEngine _warningEngine = new(Catalog.DebugWarningCatalog.Registry);
 
     public event Action<bool>? Changed;
@@ -362,7 +362,7 @@ public sealed class DebugSession : ObservableObject
         Options = id switch
         {
             "asus-astral" => JsonSerializer.SerializeToElement(new AsusOptions(), ClientJsonContext.Default.AsusOptions),
-            "generic-nvidia" => JsonSerializer.SerializeToElement(new Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.Configuration.GenericNvidiaOptions(), ClientJsonContext.Default.GenericNvidiaOptions),
+            "generic-nvidia" => JsonSerializer.SerializeToElement(new RTXLens.Plugins.GenericNvidia.Contracts.Configuration.GenericNvidiaOptions(), ClientJsonContext.Default.GenericNvidiaOptions),
             "msi-psu" => JsonSerializer.SerializeToElement(new MsiOptions(), ClientJsonContext.Default.MsiOptions),
             _ => null
         }

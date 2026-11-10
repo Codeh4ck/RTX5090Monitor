@@ -1,9 +1,9 @@
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Contracts.Discovery;
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Contracts.Sensors;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Contracts.Discovery;
+using RTXLens.Contracts.Enums;
+using RTXLens.Contracts.Sensors;
 
-namespace Rtx5090Monitoring.Presentation.Performance;
+namespace RTXLens.Presentation.Performance;
 
 public sealed partial class PerformanceRecorder(TimeProvider? timeProvider = null, int maximumSamples = 2_000_000)
 {

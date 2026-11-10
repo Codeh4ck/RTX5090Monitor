@@ -1,8 +1,8 @@
 using System;
 using System.IO;
-using Rtx5090Monitoring.Installer.Actions.Configuration;
+using RTXLens.Installer.Actions.Configuration;
 
-namespace Rtx5090Monitoring.Installer.Tests.Configuration;
+namespace RTXLens.Installer.Tests.Configuration;
 
 internal static class ConfigurationBackupTests
 {
@@ -12,7 +12,7 @@ internal static class ConfigurationBackupTests
         Directory.CreateDirectory(directory);
         try
         {
-            var configuration = Path.Combine(directory, "Rtx5090Monitoring", "appsettings.json");
+            var configuration = Path.Combine(directory, "RTXLens", "appsettings.json");
             Directory.CreateDirectory(Path.GetDirectoryName(configuration)!);
             File.WriteAllText(configuration, "{\"original\":true}");
             var backup = new ConfigurationBackup(Guid.NewGuid().ToString("N"), directory);

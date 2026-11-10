@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace Rtx5090Monitoring.Presentation.Settings;
+namespace RTXLens.Presentation.Settings;
 
 public sealed class PreferencesStore(string path)
 {
@@ -21,7 +21,7 @@ public sealed class PreferencesStore(string path)
                 ?? throw new InvalidDataException("Preferences cannot be null.");
             if (!document.RootElement.TryGetProperty("windowLayoutVersion", out _))
             {
-                value = value with { WindowHeight = Math.Max(value.WindowHeight, AppPreferences.DefaultWindowHeight), WindowLayoutVersion = 1 };
+                value = value with { WindowHeight = Math.Max(value.WindowHeight, 1050), WindowLayoutVersion = 1 };
             }
             if (!document.RootElement.TryGetProperty("automaticallyCheckForUpdates", out _))
             {
@@ -31,6 +31,12 @@ public sealed class PreferencesStore(string path)
             if (!document.RootElement.TryGetProperty("updateFrequency", out _))
             {
                 value = value with { UpdateFrequency = Updates.UpdateFrequency.Daily };
+            }
+
+            // The old automatic mode forced the remember-size toggle off.
+            if (document.RootElement.TryGetProperty("autoResizeWindows", out var autoResize) && autoResize.ValueKind == JsonValueKind.True)
+            {
+                value = value with { RememberWindowSize = true };
             }
 
             value.Validate();

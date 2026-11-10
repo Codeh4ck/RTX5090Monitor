@@ -5,13 +5,13 @@ using Microsoft.Win32;
 using WixToolset.Dtf.WindowsInstaller;
 using MsiInstaller = WixToolset.Dtf.WindowsInstaller.Installer;
 
-namespace Rtx5090Monitoring.Installer.Tests.Packaging;
+namespace RTXLens.Installer.Tests.Packaging;
 
 internal static class PlatformRequirementsTests
 {
     public static void Run(string path, Database database)
     {
-        var condition = database.ExecuteStringQuery("SELECT `Condition` FROM `LaunchCondition` WHERE `Description`='RTX Monitor requires 64-bit Windows 10 (build 17763+) or Windows 11.'")[0];
+        var condition = database.ExecuteStringQuery("SELECT `Condition` FROM `LaunchCondition` WHERE `Description`='RTX Lens requires 64-bit Windows 10 (build 17763+) or Windows 11.'")[0];
         var previousUi = MsiInstaller.SetInternalUI(InstallUIOptions.Silent);
         try
         {

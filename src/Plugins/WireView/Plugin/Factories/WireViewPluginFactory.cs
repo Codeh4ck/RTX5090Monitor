@@ -1,14 +1,14 @@
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Contracts.Sensors;
-using Rtx5090Monitoring.Plugins.WireView.Analysis.Warnings;
-using Rtx5090Monitoring.Warnings;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Core.Plugins;
-using Rtx5090Monitoring.Plugins.WireView.Device;
-using Rtx5090Monitoring.Plugins.WireView.Streaming;
-using Rtx5090Monitoring.Contracts.Discovery;
+using RTXLens.Contracts.Enums;
+using RTXLens.Contracts.Sensors;
+using RTXLens.Plugins.WireView.Analysis.Warnings;
+using RTXLens.Warnings;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Core.Plugins;
+using RTXLens.Plugins.WireView.Device;
+using RTXLens.Plugins.WireView.Streaming;
+using RTXLens.Contracts.Discovery;
 
-namespace Rtx5090Monitoring.Plugins.WireView.Factories;
+namespace RTXLens.Plugins.WireView.Factories;
 
 // ReSharper disable once ContextualLoggerProblem
 public sealed class WireViewPluginFactory(TimeProvider clock, WireViewStream stream, ILogger<WireViewPlugin> logger) : ISensorPluginFactory, IConnectorSourceProvider

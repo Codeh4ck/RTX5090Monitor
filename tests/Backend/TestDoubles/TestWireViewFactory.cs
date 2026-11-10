@@ -1,11 +1,11 @@
-using Rtx5090Monitoring.Plugins.WireView.Analysis.Warnings;
-using Rtx5090Monitoring.Warnings;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Core.Plugins;
-using Rtx5090Monitoring.Plugins.WireView;
-using Rtx5090Monitoring.Plugins.WireView.Streaming;
+using RTXLens.Plugins.WireView.Analysis.Warnings;
+using RTXLens.Warnings;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Core.Plugins;
+using RTXLens.Plugins.WireView;
+using RTXLens.Plugins.WireView.Streaming;
 
-namespace Rtx5090Monitoring.Tests.TestDoubles;
+namespace RTXLens.Tests.TestDoubles;
 
 internal sealed class TestWireViewFactory(WireViewTestState state, WireViewStream stream) : ISensorPluginFactory
 {

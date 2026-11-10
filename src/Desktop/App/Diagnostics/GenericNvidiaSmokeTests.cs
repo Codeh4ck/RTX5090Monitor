@@ -1,9 +1,9 @@
 using Microsoft.UI.Xaml.Controls;
-using Rtx5090Monitoring.App.Services;
-using Rtx5090Monitoring.App.Views;
-using Rtx5090Monitoring.Debugging.Models;
+using RTXLens.App.Services;
+using RTXLens.App.Views;
+using RTXLens.Debugging.Models;
 
-namespace Rtx5090Monitoring.App.Diagnostics;
+namespace RTXLens.App.Diagnostics;
 
 internal static class GenericNvidiaSmokeTests
 {

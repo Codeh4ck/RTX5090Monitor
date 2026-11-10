@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Rtx5090Monitoring.Contracts.Warnings;
+namespace RTXLens.Contracts.Warnings;
 
 public sealed record WarningOptions
 {

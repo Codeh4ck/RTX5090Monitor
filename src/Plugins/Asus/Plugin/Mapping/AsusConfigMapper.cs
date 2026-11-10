@@ -1,9 +1,9 @@
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Plugins.Asus.Configuration;
-using Rtx5090Monitoring.Plugins.Asus.Contracts.Input;
-using Rtx5090Monitoring.Plugins.Asus.Contracts.Output;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Plugins.Asus.Configuration;
+using RTXLens.Plugins.Asus.Contracts.Input;
+using RTXLens.Plugins.Asus.Contracts.Output;
 
-namespace Rtx5090Monitoring.Plugins.Asus.Mapping;
+namespace RTXLens.Plugins.Asus.Mapping;
 
 internal static class AsusConfigMapper
 {

@@ -1,21 +1,21 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Contracts.Health;
-using Rtx5090Monitoring.Contracts.Sensors;
-using Rtx5090Monitoring.Core.Configuration;
-using Rtx5090Monitoring.Hardware.Nvidia;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Contracts.Enums;
+using RTXLens.Contracts.Health;
+using RTXLens.Contracts.Sensors;
+using RTXLens.Core.Configuration;
+using RTXLens.Hardware.Nvidia;
 
-using Rtx5090Monitoring.Service.Configuration;
+using RTXLens.Service.Configuration;
 
-using Rtx5090Monitoring.Tests.Fixtures;
-using Rtx5090Monitoring.Tests.Infrastructure;
-using Rtx5090Monitoring.Tests.TestDoubles;
+using RTXLens.Tests.Fixtures;
+using RTXLens.Tests.Infrastructure;
+using RTXLens.Tests.TestDoubles;
 
 
-namespace Rtx5090Monitoring.Tests.Service;
+namespace RTXLens.Tests.Service;
 
 internal static class SettingsProfileTests
 {
@@ -67,13 +67,13 @@ internal static class SettingsProfileTests
         var configuration = WarningTestData.Configuration();
         var previous = configuration.Plugins["asus-astral"];
         configuration.Plugins["asus-astral"] = Plugins.Asus.Configuration.AsusSettings.WithOptions(previous,
-            new Rtx5090Monitoring.Plugins.Asus.Contracts.Configuration.AsusOptions { WireOvercurrentAmperageThreshold = 8 });
+            new RTXLens.Plugins.Asus.Contracts.Configuration.AsusOptions { WireOvercurrentAmperageThreshold = 8 });
         TestAssert.Equal(8d, Resolve("NVIDIA GeForce RTX 5080", snapshot, configuration).Profile.OvercurrentAmperes);
     }
 
     private static void SavesNamedProfilesAndRestoresThemAfterRestart()
     {
-        var path = Path.Combine(Path.GetTempPath(), "rtx-monitor-profile-test-" + Guid.NewGuid().ToString("N"));
+        var path = Path.Combine(Path.GetTempPath(), "rtxlens-profile-test-" + Guid.NewGuid().ToString("N"));
         try
         {
             var options = StoreConfiguration(path);

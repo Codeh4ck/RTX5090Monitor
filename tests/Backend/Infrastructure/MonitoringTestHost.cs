@@ -9,27 +9,27 @@ using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Rtx5090Monitoring.Core.Plugins;
-using Rtx5090Monitoring.Hardware.Nvidia;
-using Rtx5090Monitoring.Plugins.GenericNvidia;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Plugins.WireView;
-using Rtx5090Monitoring.Plugins.WireView.Endpoints;
-using Rtx5090Monitoring.Plugins.WireView.Streaming;
-using Rtx5090Monitoring.Service;
-using Rtx5090Monitoring.Service.Configuration;
-using Rtx5090Monitoring.Service.Services;
-using Rtx5090Monitoring.Service.Endpoints;
-using Rtx5090Monitoring.Tests.TestDoubles;
-using Rtx5090Monitoring.Plugins.Asus.Endpoints;
-using Rtx5090Monitoring.Plugins.Asus;
-using Rtx5090Monitoring.Plugins.Asus.Serialization;
-using Rtx5090Monitoring.Plugins.Asus.Streaming;
-using Rtx5090Monitoring.Plugins.Msi;
-using Rtx5090Monitoring.Plugins.Msi.Endpoints;
-using Rtx5090Monitoring.Plugins.Msi.Serialization;
+using RTXLens.Core.Plugins;
+using RTXLens.Hardware.Nvidia;
+using RTXLens.Plugins.GenericNvidia;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Plugins.WireView;
+using RTXLens.Plugins.WireView.Endpoints;
+using RTXLens.Plugins.WireView.Streaming;
+using RTXLens.Service;
+using RTXLens.Service.Configuration;
+using RTXLens.Service.Services;
+using RTXLens.Service.Endpoints;
+using RTXLens.Tests.TestDoubles;
+using RTXLens.Plugins.Asus.Endpoints;
+using RTXLens.Plugins.Asus;
+using RTXLens.Plugins.Asus.Serialization;
+using RTXLens.Plugins.Asus.Streaming;
+using RTXLens.Plugins.Msi;
+using RTXLens.Plugins.Msi.Endpoints;
+using RTXLens.Plugins.Msi.Serialization;
 
-namespace Rtx5090Monitoring.Tests.Infrastructure;
+namespace RTXLens.Tests.Infrastructure;
 
 internal sealed class MonitoringTestHost : IAsyncDisposable
 {

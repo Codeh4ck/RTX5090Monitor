@@ -1,8 +1,8 @@
-using Rtx5090Monitoring.Contracts.Sensors;
-using Rtx5090Monitoring.Contracts.Warnings;
-using Rtx5090Monitoring.Presentation.Settings;
+using RTXLens.Contracts.Sensors;
+using RTXLens.Contracts.Warnings;
+using RTXLens.Presentation.Settings;
 
-namespace Rtx5090Monitoring.Presentation.Notifications;
+namespace RTXLens.Presentation.Notifications;
 
 public sealed class WarningTransitionTracker
 {
@@ -49,7 +49,7 @@ public sealed class WarningTransitionTracker
         {
             return [];
         }
-        var title = due.Count == 1 ? due[0].Title : $"RTX Monitor - {due.Count} warnings";
+        var title = due.Count == 1 ? due[0].Title : $"RTX Lens - {due.Count} warnings";
         var message = string.Join(Environment.NewLine, due.Take(3).Select(state => due.Count == 1 ? state.Detail : state.Title + ": " + state.Detail));
         if (due.Count > 3)
         {

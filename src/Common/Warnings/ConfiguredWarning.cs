@@ -1,5 +1,5 @@
-using Rtx5090Monitoring.Contracts.Warnings;
+using RTXLens.Contracts.Warnings;
 
-namespace Rtx5090Monitoring.Warnings;
+namespace RTXLens.Warnings;
 
 public sealed record ConfiguredWarning(WarningDefinition Definition, WarningObservation Observation, WarningPolicy? Policy);

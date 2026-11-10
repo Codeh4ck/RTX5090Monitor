@@ -1,9 +1,9 @@
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Debugging.Catalog;
-using Rtx5090Monitoring.Debugging.Models;
-using Rtx5090Monitoring.Presentation.Infrastructure;
+using RTXLens.Contracts.Enums;
+using RTXLens.Debugging.Catalog;
+using RTXLens.Debugging.Models;
+using RTXLens.Presentation.Infrastructure;
 
-namespace Rtx5090Monitoring.Debugging.ViewModels;
+namespace RTXLens.Debugging.ViewModels;
 
 public sealed class DebugPluginViewModel : ObservableObject
 {

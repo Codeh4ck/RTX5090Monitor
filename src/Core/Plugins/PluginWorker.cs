@@ -1,11 +1,11 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
-using Rtx5090Monitoring.Contracts.Discovery;
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Core.Utilities;
+using RTXLens.Contracts.Discovery;
+using RTXLens.Contracts.Enums;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Core.Utilities;
 
-namespace Rtx5090Monitoring.Core.Plugins;
+namespace RTXLens.Core.Plugins;
 
 internal sealed class PluginWorker
 {

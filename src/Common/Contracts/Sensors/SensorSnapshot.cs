@@ -1,8 +1,8 @@
-using Rtx5090Monitoring.Contracts.Health;
+using RTXLens.Contracts.Health;
 
-using Rtx5090Monitoring.Contracts.Alerts;
+using RTXLens.Contracts.Alerts;
 
-namespace Rtx5090Monitoring.Contracts.Sensors;
+namespace RTXLens.Contracts.Sensors;
 
 public sealed record SensorSnapshot(int SchemaVersion, long Sequence, DateTimeOffset Timestamp, SensorReading[] Sensors,
     PluginHealth[] Plugins, ResolvedSelection[] Selections, long ConfigurationRevision = 0)

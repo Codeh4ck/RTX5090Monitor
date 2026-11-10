@@ -114,7 +114,7 @@ try
     {
         $signTool = Get-ReleaseSignTool
 
-        foreach ($file in Get-ChildItem -LiteralPath $payload -Recurse -File | Where-Object { $_.Name -like 'Rtx5090Monitoring.*' -and $_.Extension -in @('.exe', '.dll') })
+        foreach ($file in Get-ChildItem -LiteralPath $payload -Recurse -File | Where-Object { $_.Name -like 'RTXLens.*' -and $_.Extension -in @('.exe', '.dll') })
         {
             Invoke-ReleaseCommand $signTool @('sign', '/sha1', $SigningCertificateThumbprint, '/fd', 'SHA256', '/tr', $TimestampUrl, '/td', 'SHA256', $file.FullName)
         }
@@ -122,9 +122,9 @@ try
 
     $buildProperties = @('-t:Rebuild', '-c', 'Release', "-p:InstallerVersion=$Version", "-p:PayloadDirectory=$payload")
 
-    Invoke-ReleaseCommand dotnet (@('build', 'installer/Package/Rtx5090Monitoring.Installer.wixproj') + $buildProperties)
+    Invoke-ReleaseCommand dotnet (@('build', 'installer/Package/RTXLens.Installer.wixproj') + $buildProperties)
 
-    $msi = Join-Path $solution "installer\Package\bin\x64\Release\RtxMonitor-$Version-win-x64.msi"
+    $msi = Join-Path $solution "installer\Package\bin\x64\Release\RTXLens-$Version-win-x64.msi"
 
     if ($SigningCertificateThumbprint)
     {
@@ -136,11 +136,11 @@ try
         Invoke-ReleaseCommand dotnet @('run', '--project', 'tests/Installer', '-c', 'Release', '--', '--msi', $msi, $payload)
     }
 
-    Invoke-ReleaseCommand dotnet (@('build', 'installer/Bootstrapper/Rtx5090Monitoring.Bootstrapper.wixproj') + $buildProperties +
+    Invoke-ReleaseCommand dotnet (@('build', 'installer/Bootstrapper/RTXLens.Bootstrapper.wixproj') + $buildProperties +
         @('-p:BuildProjectReferences=false', "-p:VcRedistPath=$VcRedistPath", "-p:VcRedistVersion=$vcVersion",
             "-p:SigningCertificateThumbprint=$SigningCertificateThumbprint", "-p:TimestampUrl=$TimestampUrl", "-p:SignToolPath=$signTool"))
 
-    $setup = Join-Path $solution "installer\Bootstrapper\bin\x64\Release\RtxMonitor-Setup-$Version-win-x64.exe"
+    $setup = Join-Path $solution "installer\Bootstrapper\bin\x64\Release\RTXLens-Setup-$Version-win-x64.exe"
 
     if (-not $SkipChecks)
     {
@@ -151,13 +151,13 @@ try
 
     Copy-Item -LiteralPath $manifestPath -Destination (Join-Path $release 'version.json') -Force
     Copy-Item -LiteralPath $setup -Destination $release -Force
-    Copy-Item -LiteralPath (Join-Path $solution '.dist\rtx5090monitor.icuewidget') -Destination $release -Force
+    Copy-Item -LiteralPath (Join-Path $solution '.dist\rtxlens.icuewidget') -Destination $release -Force
     Copy-Item -LiteralPath (Join-Path $solution 'installer\Resources\ReleaseReadme.txt') -Destination (Join-Path $release 'README.txt') -Force
     Copy-Item -LiteralPath (Join-Path $solution 'installer\Resources\CHANGELOG.txt') -Destination $release -Force
 
     & (Join-Path $PSScriptRoot 'Collect-Licenses.ps1') -SolutionDirectory $solution -OutputPath (Join-Path $release 'THIRD-PARTY-NOTICES.txt')
 
-    Copy-Item -LiteralPath (Join-Path $solution 'scripts/uninstall.ps1') -Destination (Join-Path $release 'Uninstall-RTXMonitor.ps1') -Force
+    Copy-Item -LiteralPath (Join-Path $solution 'scripts/uninstall.ps1') -Destination (Join-Path $release 'Uninstall-RTXLens.ps1') -Force
 
     $widget = Get-Content -LiteralPath (Join-Path $solution '.dist\latest.json') -Raw | ConvertFrom-Json
     $commit = 'unavailable'
@@ -197,7 +197,7 @@ try
 
     Write-ReleaseFileManifest $release
 
-    $zip = Join-Path $release "RtxMonitor-$Version-win-x64.zip"
+    $zip = Join-Path $release 'RTXLens-win-x64.zip'
     $entries = Get-ChildItem -LiteralPath $release -File | Where-Object Extension -ne '.zip'
 
     Compress-Archive -LiteralPath $entries.FullName -DestinationPath $zip -Force

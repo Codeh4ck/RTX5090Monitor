@@ -1,7 +1,7 @@
-using Rtx5090Monitoring.Contracts.Monitoring;
-using Rtx5090Monitoring.Presentation.Infrastructure;
+using RTXLens.Contracts.Monitoring;
+using RTXLens.Presentation.Infrastructure;
 
-namespace Rtx5090Monitoring.Presentation.Configuration;
+namespace RTXLens.Presentation.Configuration;
 
 public sealed class ConnectorProfileEditorViewModel : EditableObject
 {

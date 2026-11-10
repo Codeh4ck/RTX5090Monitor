@@ -1,14 +1,14 @@
 using System.Globalization;
 using System.Text.Json;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Contracts.Sensors;
-using Rtx5090Monitoring.Contracts.Warnings;
-using Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.Configuration;
-using Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.Warnings;
-using Rtx5090Monitoring.Warnings;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Contracts.Enums;
+using RTXLens.Contracts.Sensors;
+using RTXLens.Contracts.Warnings;
+using RTXLens.Plugins.GenericNvidia.Contracts.Configuration;
+using RTXLens.Plugins.GenericNvidia.Contracts.Warnings;
+using RTXLens.Warnings;
 
-namespace Rtx5090Monitoring.Plugins.GenericNvidia.Analysis.Warnings;
+namespace RTXLens.Plugins.GenericNvidia.Analysis.Warnings;
 
 public sealed class GenericNvidiaWarningSource : IWarningSource
 {

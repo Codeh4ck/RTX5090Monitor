@@ -1,8 +1,8 @@
 using System.Diagnostics;
 using HidSharp;
-using Rtx5090Monitoring.Plugins.Msi.Protocol;
+using RTXLens.Plugins.Msi.Protocol;
 
-namespace Rtx5090Monitoring.Plugins.Msi.Device;
+namespace RTXLens.Plugins.Msi.Device;
 
 internal sealed class MsiPsuTransport : IDisposable
 {

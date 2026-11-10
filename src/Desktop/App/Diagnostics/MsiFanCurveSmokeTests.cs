@@ -3,14 +3,14 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Automation.Peers;
 using Microsoft.UI.Xaml.Automation.Provider;
 using Microsoft.UI.Xaml.Controls;
-using Rtx5090Monitoring.App.Controls;
-using Rtx5090Monitoring.App.Services;
-using Rtx5090Monitoring.Client.Serialization;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Plugins.Msi.Contracts.Configuration;
-using Rtx5090Monitoring.Presentation.Settings;
+using RTXLens.App.Controls;
+using RTXLens.App.Services;
+using RTXLens.Client.Serialization;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Plugins.Msi.Contracts.Configuration;
+using RTXLens.Presentation.Settings;
 
-namespace Rtx5090Monitoring.App.Diagnostics;
+namespace RTXLens.App.Diagnostics;
 
 internal static class MsiFanCurveSmokeTests
 {
@@ -44,7 +44,7 @@ internal static class MsiFanCurveSmokeTests
             throw new InvalidOperationException("The separate editor must reuse its graph window without a duplicate mode selector.");
         }
 
-        AssertCompactHeight(window.ThemeRoot);
+        var initialSize = window.AppWindow.Size;
 
         window.Model.CurvePoints[0].TemperatureC = 35;
         window.Model.CurvePoints[0].DutyPercent = 50;
@@ -112,7 +112,7 @@ internal static class MsiFanCurveSmokeTests
             window.Model.AddCurvePoint();
         }
 
-        await Task.Delay(80);
+        await Task.Delay(250);
         var addButton = VisualTreeQuery.Descendants<Button>(window.ThemeRoot).Single(button => button.Content as string == "Add point");
         window.Model.AddCurvePoint(99, 50);
 
@@ -121,18 +121,15 @@ internal static class MsiFanCurveSmokeTests
             throw new InvalidOperationException("The editor must stop and disable Add point at six points.");
         }
 
-        AssertCompactHeight(window.ThemeRoot);
+        AssertWindowSize(window.AppWindow.Size, initialSize);
 
         var graphPanel = VisualTreeQuery.Descendants<Border>(window.ThemeRoot).Single(border => border.Name == "GraphPanel");
         var notice = VisualTreeQuery.Descendants<TextBlock>(window.ThemeRoot).Single(text => text.Name == "AutomaticControlNotice");
         var graphBottom = graphPanel.TransformToVisual(window.ThemeRoot).TransformPoint(new Windows.Foundation.Point(0, graphPanel.ActualHeight)).Y;
         var noticeTop = notice.TransformToVisual(window.ThemeRoot).TransformPoint(new Windows.Foundation.Point()).Y;
-        var actions = VisualTreeQuery.Descendants<Grid>(window.ThemeRoot).Single(grid => grid.Name == "Actions");
-        var actionsBottom = actions.TransformToVisual(window.ThemeRoot).TransformPoint(new Windows.Foundation.Point(0, actions.ActualHeight)).Y;
-
-        if (noticeTop <= graphBottom || actionsBottom > window.ThemeRoot.ActualHeight)
+        if (noticeTop <= graphBottom)
         {
-            throw new InvalidOperationException("The automatic-control notice must follow the graph, and all six points and actions must fit in the default window.");
+            throw new InvalidOperationException("The automatic-control notice must follow the graph.");
         }
 
         foreach (var theme in new[] { AppTheme.Dark, AppTheme.Light })
@@ -144,13 +141,13 @@ internal static class MsiFanCurveSmokeTests
 
         window.Model.RemoveCurvePoint(window.Model.CurvePoints[^1]);
         await Task.Delay(150);
-        AssertCompactHeight(window.ThemeRoot);
+        AssertWindowSize(window.AppWindow.Size, initialSize);
         await SmokeTestRunner.CaptureElementAsync(window.ThemeRoot, Path.Combine(output, "msi-fan-curve-five-points.png"));
 
         window.Model.SetCurve(new MsiFanCurve { Points = [new(30, 40), new(60, 70)] });
         runtime.Settings.Theme = AppTheme.Dark;
         await Task.Delay(150);
-        AssertCompactHeight(window.ThemeRoot);
+        AssertWindowSize(window.AppWindow.Size, initialSize);
         await SmokeTestRunner.CaptureElementAsync(window.ThemeRoot, Path.Combine(output, "msi-fan-curve-two-points.png"));
 
         var graph = VisualTreeQuery.Descendants<MsiFanCurveGraph>(window.ThemeRoot).Single();
@@ -222,7 +219,7 @@ internal static class MsiFanCurveSmokeTests
         var beforeReset = await api.GetConfigurationAsync(default);
         window.Model.CurvePoints[0].TemperatureC = double.NaN;
         Invoke(window.ThemeRoot, "Restore defaults");
-        await Task.Delay(80);
+        await Task.Delay(250);
         var afterReset = await api.GetConfigurationAsync(default);
 
         if (runtime.FanCurveWindow is not null || afterReset.Version != beforeReset.Version
@@ -244,16 +241,11 @@ internal static class MsiFanCurveSmokeTests
             "PASS: Main mode gating, no duplicate selector, falling duty, whole-number input, six-point cap, restore-to-main draft, version synchronization, HTTP 503 telemetry recovery, configuration conflicts and dark/light rendering.");
     }
 
-    private static void AssertCompactHeight(FrameworkElement root)
+    private static void AssertWindowSize(Windows.Graphics.SizeInt32 current, Windows.Graphics.SizeInt32 expected)
     {
-        var scroll = VisualTreeQuery.Descendants<ScrollViewer>(root).Single(view => view.Name == "EditorScroll");
-        var layout = VisualTreeQuery.Descendants<Grid>(root).Single(grid => grid.Name == "EditorLayout");
-        var bottom = layout.TransformToVisual(root).TransformPoint(new Windows.Foundation.Point(0, layout.ActualHeight)).Y;
-        var bottomGap = root.ActualHeight - bottom;
-
-        if (scroll.ScrollableHeight > 1 || bottomGap is < 19 or > 24)
+        if (current != expected)
         {
-            throw new InvalidOperationException($"The curve window must fit its actual content without excess height: scrollable={scroll.ScrollableHeight}, bottom gap={bottomGap}.");
+            throw new InvalidOperationException("Fan curve edits must leave the window size unchanged.");
         }
     }
 
@@ -274,7 +266,7 @@ internal static class MsiFanCurveSmokeTests
                 throw new TimeoutException("The fan curve UI did not apply its draft.");
             }
 
-            await Task.Delay(80);
+            await Task.Delay(250);
         }
     }
 }

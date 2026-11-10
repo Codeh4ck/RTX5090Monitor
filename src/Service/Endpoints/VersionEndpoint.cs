@@ -1,7 +1,7 @@
 using System.Reflection;
-using Rtx5090Monitoring.Contracts.Updates;
+using RTXLens.Contracts.Updates;
 
-namespace Rtx5090Monitoring.Service.Endpoints;
+namespace RTXLens.Service.Endpoints;
 
 internal static class VersionEndpoint
 {

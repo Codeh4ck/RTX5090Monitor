@@ -1,9 +1,9 @@
 <UserControl
-    x:Class="Rtx5090Monitoring.App.Views.ConfigurationView"
+    x:Class="RTXLens.App.Views.ConfigurationView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:controls="using:Rtx5090Monitoring.App.Controls"
-    xmlns:converters="using:Rtx5090Monitoring.App.Converters">
+    xmlns:controls="using:RTXLens.App.Controls"
+    xmlns:converters="using:RTXLens.App.Converters">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

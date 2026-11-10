@@ -1,4 +1,4 @@
-namespace Rtx5090Monitoring.Plugins.Msi.Contracts.Safeguard;
+namespace RTXLens.Plugins.Msi.Contracts.Safeguard;
 
 public sealed record SafeguardMailSettings(string Host, int Port, string Security, bool Authenticate,
     string Username, string Sender, string[] Recipients);

@@ -2,7 +2,7 @@ using System.Net.WebSockets;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 
-namespace Rtx5090Monitoring.Core.Streaming;
+namespace RTXLens.Core.Streaming;
 
 public static class SensorWebSocket
 {

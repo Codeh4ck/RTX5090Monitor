@@ -1,13 +1,13 @@
 using System.Collections.ObjectModel;
 using System.Globalization;
-using Rtx5090Monitoring.Contracts.Discovery;
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Contracts.Sensors;
-using Rtx5090Monitoring.Plugins.WireView.Contracts.Common;
-using Rtx5090Monitoring.Presentation.Infrastructure;
-using Rtx5090Monitoring.Presentation.Settings;
+using RTXLens.Contracts.Discovery;
+using RTXLens.Contracts.Enums;
+using RTXLens.Contracts.Sensors;
+using RTXLens.Plugins.WireView.Contracts.Common;
+using RTXLens.Presentation.Infrastructure;
+using RTXLens.Presentation.Settings;
 
-namespace Rtx5090Monitoring.Presentation.Telemetry;
+namespace RTXLens.Presentation.Telemetry;
 
 public sealed class HardwarePanelViewModel : ObservableObject
 {
@@ -181,6 +181,11 @@ public sealed class HardwarePanelViewModel : ObservableObject
     public string DeviceConfigurationStatus { get; private set; } = "Read settings from the connected device.";
     public ObservableCollection<PinViewModel> Pins { get; } = [.. Enumerable.Range(1, 6).Select(channel => new PinViewModel(channel))];
     public ObservableCollection<MetricViewModel> Metrics { get; } = [];
+    public MetricViewModel CableRating { get; } = new("Cable rating");
+    public MetricViewModel BoardTemperatures { get; } = new("Board Temp In/Out");
+    public MetricViewModel ExternalTemperatures { get; } = new("External Temp 1/2");
+    public MetricViewModel FaultStatus { get; } = new("Fault Status");
+    public MetricViewModel FaultLogStatus { get; } = new("Fault Log Status");
     public bool HasFaults => Faults.Count > 0;
     public ObservableCollection<MetricViewModel> Faults { get; } = [];
     public ObservableCollection<MetricViewModel> DeviceDetails { get; } = [];
@@ -193,12 +198,13 @@ public sealed class HardwarePanelViewModel : ObservableObject
         Enabled = plugin.Enabled;
         State = plugin.State.ToString();
         Message = plugin.Message ?? State;
-        var labels = IsWireView
-            ? new[] { "Cable rating", "Board Temp In/Out", "External Temp 1/2", "Fault Status", "Fault Log Status" }
-            : new[] { "Core clock", "Memory clock", "VRAM usage", "Core / VRAM temp", "Fan 1 / Fan 2" };
-        foreach (var label in IsWireView ? labels : [])
+        if (IsWireView)
         {
-            Metrics.Add(new MetricViewModel(label));
+            Metrics.Add(CableRating);
+            Metrics.Add(BoardTemperatures);
+            Metrics.Add(ExternalTemperatures);
+            Metrics.Add(FaultStatus);
+            Metrics.Add(FaultLogStatus);
         }
     }
 
@@ -337,16 +343,16 @@ public sealed class HardwarePanelViewModel : ObservableObject
             var status = (ushort)(statusValue ?? 0);
             var log = (ushort)(logValue ?? 0);
 
-            SetMetrics([
-                Format(Value(SensorComponent.GpuConnector, SensorMetric.PowerCapability, 1), "W", 0),
-                Pair(Temperature(Value(SensorComponent.MonitorBoard, SensorMetric.Temperature, 1), preferences),
-                    Temperature(Value(SensorComponent.MonitorBoard, SensorMetric.Temperature, 2), preferences)),
+            CableRating.Value = Format(Value(SensorComponent.GpuConnector, SensorMetric.PowerCapability, 1), "W", 0);
+            BoardTemperatures.Value = Pair(
+                Temperature(Value(SensorComponent.MonitorBoard, SensorMetric.Temperature, 1), preferences),
+                Temperature(Value(SensorComponent.MonitorBoard, SensorMetric.Temperature, 2), preferences));
+            ExternalTemperatures.Value = Pair(
+                Temperature(Value(SensorComponent.ExternalProbe, SensorMetric.Temperature, 1), preferences),
+                Temperature(Value(SensorComponent.ExternalProbe, SensorMetric.Temperature, 2), preferences));
 
-                Pair(Temperature(Value(SensorComponent.ExternalProbe, SensorMetric.Temperature, 1), preferences),
-                    Temperature(Value(SensorComponent.ExternalProbe, SensorMetric.Temperature, 2), preferences)),
-
-                statusValue is null ? "Unavailable" : status == 0 ? "OK" : "Fault detected",
-                logValue is null ? "Unavailable" : log == 0 ? "OK" : "Faults logged"]);
+            FaultStatus.Value = statusValue is null ? "Unavailable" : status == 0 ? "OK" : "Fault detected";
+            FaultLogStatus.Value = logValue is null ? "Unavailable" : log == 0 ? "OK" : "Faults logged";
 
             UpdateFaults(status, log);
 
@@ -523,13 +529,6 @@ public sealed class HardwarePanelViewModel : ObservableObject
         }
     }
 
-    private void SetMetrics(string[] values)
-    {
-        for (var index = 0; index < values.Length; index++)
-        {
-            Metrics[index].Value = values[index];
-        }
-    }
 
     private static string Temperature(double? value, AppPreferences preferences) =>
         Format(preferences.Fahrenheit && value is not null ? (value * 9 / 5) + 32 : value, preferences.Fahrenheit ? "°F" : "°C", 1);

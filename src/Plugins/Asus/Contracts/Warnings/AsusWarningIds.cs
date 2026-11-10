@@ -1,4 +1,4 @@
-namespace Rtx5090Monitoring.Plugins.Asus.Contracts.Warnings;
+namespace RTXLens.Plugins.Asus.Contracts.Warnings;
 
 public static class AsusWarningIds
 {

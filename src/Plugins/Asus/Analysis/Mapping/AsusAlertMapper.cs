@@ -1,9 +1,9 @@
-using Rtx5090Monitoring.Plugins.Asus.Contracts.Warnings;
+using RTXLens.Plugins.Asus.Contracts.Warnings;
 using System.Globalization;
-using Rtx5090Monitoring.Contracts.Alerts;
-using Rtx5090Monitoring.Plugins.Asus.Analysis.Monitoring;
+using RTXLens.Contracts.Alerts;
+using RTXLens.Plugins.Asus.Analysis.Monitoring;
 
-namespace Rtx5090Monitoring.Plugins.Asus.Analysis.Mapping;
+namespace RTXLens.Plugins.Asus.Analysis.Mapping;
 
 public static class AsusAlertMapper
 {

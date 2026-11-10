@@ -1,13 +1,13 @@
-using Rtx5090Monitoring.Contracts.Alerts;
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Contracts.Sensors;
-using Rtx5090Monitoring.Presentation.Notifications;
-using Rtx5090Monitoring.Presentation.Settings;
-using Rtx5090Monitoring.Presentation.Telemetry;
-using Rtx5090Monitoring.Tests.Infrastructure;
-using Rtx5090Monitoring.UI.Tests.Fixtures;
+using RTXLens.Contracts.Alerts;
+using RTXLens.Contracts.Enums;
+using RTXLens.Contracts.Sensors;
+using RTXLens.Presentation.Notifications;
+using RTXLens.Presentation.Settings;
+using RTXLens.Presentation.Telemetry;
+using RTXLens.Tests.Infrastructure;
+using RTXLens.UI.Tests.Fixtures;
 
-namespace Rtx5090Monitoring.UI.Tests.Telemetry;
+namespace RTXLens.UI.Tests.Telemetry;
 
 internal static class TelemetryTests
 {

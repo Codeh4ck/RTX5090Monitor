@@ -1,8 +1,8 @@
 using Microsoft.Extensions.Logging;
-using Rtx5090Monitoring.Plugins.Msi.Contracts.Configuration;
-using Rtx5090Monitoring.Plugins.Msi.Protocol;
+using RTXLens.Plugins.Msi.Contracts.Configuration;
+using RTXLens.Plugins.Msi.Protocol;
 
-namespace Rtx5090Monitoring.Plugins.Msi.Control;
+namespace RTXLens.Plugins.Msi.Control;
 
 internal sealed class MsiFanControlSession(ILogger logger)
 {

@@ -1,6 +1,6 @@
 using System.IO.Ports;
 
-namespace Rtx5090Monitoring.Plugins.WireView.Device;
+namespace RTXLens.Plugins.WireView.Device;
 
 internal sealed class SharedSerialPort(string portName, int baudRate, Parity parity, int dataBits, StopBits stopBits)
     : SerialPort(portName, baudRate, parity, dataBits, stopBits)

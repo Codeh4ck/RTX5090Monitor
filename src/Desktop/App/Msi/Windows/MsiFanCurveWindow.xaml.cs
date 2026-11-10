@@ -3,16 +3,16 @@ using Microsoft.UI.Dispatching;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Rtx5090Monitoring.App.Controls;
-using Rtx5090Monitoring.App.Services;
-using Rtx5090Monitoring.Client.Http;
-using Rtx5090Monitoring.Client.Serialization;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Plugins.Msi.Contracts.Configuration;
-using Rtx5090Monitoring.Presentation.Configuration;
-using Rtx5090Monitoring.Presentation.Settings;
+using RTXLens.App.Controls;
+using RTXLens.App.Services;
+using RTXLens.Client.Http;
+using RTXLens.Client.Serialization;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Plugins.Msi.Contracts.Configuration;
+using RTXLens.Presentation.Configuration;
+using RTXLens.Presentation.Settings;
 
-namespace Rtx5090Monitoring.App.Msi.Windows;
+namespace RTXLens.App.Msi.Windows;
 
 internal sealed partial class MsiFanCurveWindow : Window
 {
@@ -28,8 +28,6 @@ internal sealed partial class MsiFanCurveWindow : Window
     private bool _reading;
     private bool _closed;
     private bool? _stacked;
-    private bool _readyToFitHeight;
-    private bool _heightFitQueued;
 
     public MsiSettingsEditorViewModel Model => _model;
     internal FrameworkElement ThemeRoot => Root;
@@ -51,9 +49,6 @@ internal sealed partial class MsiFanCurveWindow : Window
         _timer.Tick += OnTick;
         Closed += OnClosed;
         Root.SizeChanged += (_, _) => LayoutEditor();
-        Root.Loaded += (_, _) => QueueHeightFit();
-        HeaderPanel.SizeChanged += (_, _) => QueueHeightFit();
-        EditorLayout.SizeChanged += (_, _) => QueueHeightFit();
         SetActionsEnabled(false);
     }
 
@@ -67,51 +62,6 @@ internal sealed partial class MsiFanCurveWindow : Window
         {
             await ReadLiveAsync();
             _timer.Start();
-            _readyToFitHeight = true;
-            QueueHeightFit();
-        }
-    }
-
-    private void QueueHeightFit()
-    {
-        if (_closed || !_readyToFitHeight || _heightFitQueued)
-        {
-            return;
-        }
-
-        _heightFitQueued = DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, () =>
-        {
-            _heightFitQueued = false;
-            FitContentHeight();
-        });
-    }
-
-    private void FitContentHeight()
-    {
-        if (_closed || !Root.IsLoaded || Root.XamlRoot is not { } xamlRoot)
-        {
-            return;
-        }
-
-        Root.UpdateLayout();
-
-        if (Root.ActualHeight <= 0 || EditorLayout.ActualHeight <= 0)
-        {
-            return;
-        }
-
-        var scale = xamlRoot.RasterizationScale;
-        var frameHeight = AppWindow.Size.Height - (int)Math.Round(Root.ActualHeight * scale);
-        var contentHeight = Root.Padding.Top + HeaderPanel.ActualHeight + Root.RowSpacing
-            + EditorScroll.Padding.Top + EditorLayout.ActualHeight + EditorScroll.Padding.Bottom + Root.Padding.Bottom;
-        var area = DisplayArea.GetFromWindowId(AppWindow.Id, DisplayAreaFallback.Primary).WorkArea;
-        var height = Math.Min(area.Height, (int)Math.Ceiling((contentHeight + 2) * scale) + frameHeight);
-        var top = Math.Clamp(AppWindow.Position.Y, area.Y, area.Y + area.Height - height);
-
-        if (AppWindow.Size.Height != height || AppWindow.Position.Y != top)
-        {
-            AppWindow.MoveAndResize(new global::Windows.Graphics.RectInt32(
-                AppWindow.Position.X, top, AppWindow.Size.Width, height));
         }
     }
 

@@ -1,4 +1,4 @@
-namespace Rtx5090Monitoring.Contracts.Configuration;
+namespace RTXLens.Contracts.Configuration;
 
 public sealed record ActiveSettingsProfile(SettingsProfile Profile, string GpuDeviceId, string? WireViewDeviceId)
 {

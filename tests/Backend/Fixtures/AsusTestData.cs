@@ -1,8 +1,8 @@
 using LibreHardwareMonitor.Hardware;
-using Rtx5090Monitoring.Plugins.Asus.Device;
-using Rtx5090Monitoring.Plugins.Asus.Mapping;
+using RTXLens.Plugins.Asus.Device;
+using RTXLens.Plugins.Asus.Mapping;
 
-namespace Rtx5090Monitoring.Tests.Fixtures;
+namespace RTXLens.Tests.Fixtures;
 
 internal static class AsusTestData
 {

@@ -1,6 +1,6 @@
-using Rtx5090Monitoring.Plugins.WireView.Device;
+using RTXLens.Plugins.WireView.Device;
 
-namespace Rtx5090Monitoring.Tests.TestDoubles;
+namespace RTXLens.Tests.TestDoubles;
 
 internal sealed class WireViewTestState
 {

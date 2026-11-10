@@ -1,12 +1,12 @@
-using Rtx5090Monitoring.Core.Configuration;
+using RTXLens.Core.Configuration;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
-using Rtx5090Monitoring.Plugins.WireView.Contracts.Input;
-using Rtx5090Monitoring.Plugins.WireView.Contracts.Output;
-using Rtx5090Monitoring.Plugins.WireView.Serialization;
+using RTXLens.Plugins.WireView.Contracts.Input;
+using RTXLens.Plugins.WireView.Contracts.Output;
+using RTXLens.Plugins.WireView.Serialization;
 
-namespace Rtx5090Monitoring.Plugins.WireView.Endpoints;
+namespace RTXLens.Plugins.WireView.Endpoints;
 
 internal static class WireViewConfigEndpoints
 {

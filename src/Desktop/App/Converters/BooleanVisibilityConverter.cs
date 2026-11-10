@@ -1,7 +1,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Data;
 
-namespace Rtx5090Monitoring.App.Converters;
+namespace RTXLens.App.Converters;
 
 public sealed partial class BooleanVisibilityConverter : IValueConverter
 {

@@ -2,10 +2,10 @@ using System.Buffers;
 using System.Net.WebSockets;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
-using Rtx5090Monitoring.Client.Serialization;
-using Rtx5090Monitoring.Contracts.Sensors;
+using RTXLens.Client.Serialization;
+using RTXLens.Contracts.Sensors;
 
-namespace Rtx5090Monitoring.Client.Streaming;
+namespace RTXLens.Client.Streaming;
 
 public static class SensorFrameReader
 {

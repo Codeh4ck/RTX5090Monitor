@@ -1,16 +1,16 @@
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Text.Json;
-using Rtx5090Monitoring.Client.Serialization;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Contracts.Monitoring;
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Contracts.Sensors;
-using Rtx5090Monitoring.Presentation.Infrastructure;
-using Rtx5090Monitoring.Presentation.Settings;
-using Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.Configuration;
+using RTXLens.Client.Serialization;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Contracts.Monitoring;
+using RTXLens.Contracts.Enums;
+using RTXLens.Contracts.Sensors;
+using RTXLens.Presentation.Infrastructure;
+using RTXLens.Presentation.Settings;
+using RTXLens.Plugins.GenericNvidia.Contracts.Configuration;
 
-namespace Rtx5090Monitoring.Presentation.Telemetry;
+namespace RTXLens.Presentation.Telemetry;
 
 public sealed class GpuStatusViewModel : ObservableObject
 {

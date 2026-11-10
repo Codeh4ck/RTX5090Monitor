@@ -64,18 +64,18 @@ function openRtxRelease(url) {
     } catch (_) {}
     return false;
 }
-function configureRtxMonitor(ready) {
+function configureRTXLens(ready) {
     var temperature = '°C';
     try { if (typeof iCUE !== 'undefined' && typeof iCUE.defaultTemperatureUnit === 'function') temperature = iCUE.defaultTemperatureUnit(); } catch (_) {}
     var instance = typeof uniqueId !== 'undefined' ? String(uniqueId) : 'default';
-    RtxMonitorRuntime.initialize(readRtxProperty, temperature, instance, openRtxRelease, typeof iCUE === 'undefined' || ready === true);
+    RTXLensRuntime.initialize(readRtxProperty, temperature, instance, openRtxRelease, typeof iCUE === 'undefined' || ready === true);
 }
 if (typeof icueEvents === 'undefined') globalThis.icueEvents = {};
 icueEvents = {
-    onICUEInitialized: function () { configureRtxMonitor(true); },
-    onDataUpdated: function () { configureRtxMonitor(true); }
+    onICUEInitialized: function () { configureRTXLens(true); },
+    onDataUpdated: function () { configureRTXLens(true); }
 };
-configureRtxMonitor(false);`;
+configureRTXLens(false);`;
 }
 
 try {
@@ -90,7 +90,7 @@ try {
     run(cli, ['--version']);
     await mkdir(output, { recursive: true });
     const manifest = JSON.parse(await readFile(join(root, 'manifest.json'), 'utf8'));
-    const name = 'rtx5090monitor';
+    const name = 'rtxlens';
     const stage = join(output, name);
     const packagePath = join(output, `${name}.icuewidget`);
     const versions = JSON.parse(await readFile(join(root, '../../version.json'), 'utf8'));
@@ -105,7 +105,7 @@ try {
     await mkdir(stage, { recursive: true });
     const bundle = await build({ entryPoints: [join(root, 'src/main.ts')], bundle: true, write: false,
         define: { RTX_WIDGET_VERSION: JSON.stringify(version) },
-        target: 'chrome130', format: 'iife', globalName: 'RtxMonitorRuntime', minify: false, legalComments: 'inline' });
+        target: 'chrome130', format: 'iife', globalName: 'RTXLensRuntime', minify: false, legalComments: 'inline' });
     const styles = await Promise.all(['tokens', 'panels', 'charts', 'icons', 'flyouts'].map(name => readFile(join(root, `src/styles/${name}.css`), 'utf8')));
     let stylesheet = styles.join('\n');
     // Chromium masks loaded from a file origin can be blocked by CORS. Keep the original SVGs
@@ -124,7 +124,7 @@ try {
         .replace('/* WIDGET_RUNTIME */', () => runtime.replaceAll('</script', '<\\/script'));
     await writeFile(join(stage, 'index.html'), html);
     await writeFile(join(stage, 'manifest.json'), JSON.stringify({ ...manifest, version }, null, 2));
-    const translations = { 'RTX Monitor': 'RTX Monitor' };
+    const translations = { 'RTX Lens': 'RTX Lens' };
     for (const definition of definitions) {
         translations[definition.label] = definition.label;
         translations[definition.group] = definition.group;
@@ -138,7 +138,7 @@ try {
     await cp(join(root, 'THIRD-PARTY-NOTICES.md'), join(stage, 'THIRD-PARTY-NOTICES.md'));
     // CLI 0.2.3 excludes hidden path components, including a .dist ancestor. Package a temporary
     // copy outside .dist, then retain the actual runtime and package only under the requested output.
-    temporary = await mkdtemp(join(tmpdir(), 'rtx5090monitor-'));
+    temporary = await mkdtemp(join(tmpdir(), 'rtxlens-'));
     await cp(stage, temporary, { recursive: true });
     if (!skipChecks) run(cli, ['validate', temporary]);
     run(cli, ['package', temporary, '--output', pendingPackage]);
@@ -170,7 +170,7 @@ try {
     console.error(error instanceof Error ? error.message : error);
     process.exitCode = 1;
 } finally {
-    if (temporary && resolve(temporary).startsWith(resolve(tmpdir()) + sep) && basename(temporary).startsWith('rtx5090monitor-')) {
+    if (temporary && resolve(temporary).startsWith(resolve(tmpdir()) + sep) && basename(temporary).startsWith('rtxlens-')) {
         await rm(temporary, { recursive: true, force: true });
     }
     if (lock) { await lock.close(); await unlink(lockPath); }

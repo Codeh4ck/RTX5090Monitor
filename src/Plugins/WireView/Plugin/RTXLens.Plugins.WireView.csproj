@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="System.IO.Ports" />
+    <ProjectReference Include="../Analysis/RTXLens.Plugins.WireView.Analysis.csproj" />
+    <ProjectReference Include="../../../Core/RTXLens.Core.csproj" />
+    <ProjectReference Include="../Contracts/RTXLens.Plugins.WireView.Contracts.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Using Include="Microsoft.Extensions.Logging" />
+    <InternalsVisibleTo Include="RTXLens.Tests" />
+  </ItemGroup>
+</Project>

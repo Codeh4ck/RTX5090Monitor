@@ -1,6 +1,6 @@
-using Rtx5090Monitoring.Core.Streaming;
+using RTXLens.Core.Streaming;
 
-namespace Rtx5090Monitoring.Service.Endpoints;
+namespace RTXLens.Service.Endpoints;
 
 internal static class Sensors
 {

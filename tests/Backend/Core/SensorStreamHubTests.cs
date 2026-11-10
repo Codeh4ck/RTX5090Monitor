@@ -1,7 +1,7 @@
-using Rtx5090Monitoring.Core.Streaming;
-using Rtx5090Monitoring.Tests.Infrastructure;
+using RTXLens.Core.Streaming;
+using RTXLens.Tests.Infrastructure;
 
-namespace Rtx5090Monitoring.Tests.Core;
+namespace RTXLens.Tests.Core;
 
 internal static class SensorStreamHubTests
 {

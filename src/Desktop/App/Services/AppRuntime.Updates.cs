@@ -1,13 +1,13 @@
 using System.Reflection;
 using Microsoft.UI.Dispatching;
-using Rtx5090Monitoring.Client.Updates;
-using Rtx5090Monitoring.Presentation.Updates;
+using RTXLens.Client.Updates;
+using RTXLens.Presentation.Updates;
 
-namespace Rtx5090Monitoring.App.Services;
+namespace RTXLens.App.Services;
 
 internal sealed partial class AppRuntime
 {
-    private readonly HttpClient _updateHttp = new() { Timeout = TimeSpan.FromSeconds(10), MaxResponseContentBufferSize = 16384 };
+    private readonly HttpClient _updateHttp = new() { Timeout = TimeSpan.FromSeconds(10), MaxResponseContentBufferSize = 131072 };
     private DispatcherQueueTimer? _updateTimer;
 
     public UpdateViewModel Updates { get; private set; } = null!;
@@ -19,6 +19,14 @@ internal sealed partial class AppRuntime
         var client = new UpdateManifestClient(_updateHttp);
         Updates = new UpdateViewModel(version, client.GetAsync, async token => (await _api.GetVersionAsync(token))?.Version,
             new UpdateStateStore(Path.Combine(directory, _diagnostic || IsDemo ? "demo-updates.json" : "updates.json")));
+        Updates.PropertyChanged += (_, args) =>
+        {
+            if (args.PropertyName == nameof(UpdateViewModel.HasUpdates))
+            {
+                PrefetchAvailableReleaseNotes();
+            }
+        };
+
         ConfigureUpdates();
         _updateTimer = _dispatcher.CreateTimer();
         _updateTimer.Interval = TimeSpan.FromMinutes(1);

@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
-using Rtx5090Monitoring.Contracts.Enums;
+using RTXLens.Contracts.Enums;
 
-namespace Rtx5090Monitoring.Contracts.Sensors;
+namespace RTXLens.Contracts.Sensors;
 
 public sealed record SensorIdentity(
     string PluginId,

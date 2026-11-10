@@ -1,14 +1,14 @@
 using System.Net;
 using System.Text.Json;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Client.Http;
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Plugins.Msi.Configuration;
-using Rtx5090Monitoring.Plugins.Msi.Contracts.Configuration;
-using Rtx5090Monitoring.Tests.Infrastructure;
-using Rtx5090Monitoring.Tests.TestDoubles;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Client.Http;
+using RTXLens.Contracts.Enums;
+using RTXLens.Plugins.Msi.Configuration;
+using RTXLens.Plugins.Msi.Contracts.Configuration;
+using RTXLens.Tests.Infrastructure;
+using RTXLens.Tests.TestDoubles;
 
-namespace Rtx5090Monitoring.Tests.Service;
+namespace RTXLens.Tests.Service;
 
 internal static class MsiEndpointTests
 {
@@ -54,7 +54,7 @@ internal static class MsiEndpointTests
         await host.SetPluginSettingsAsync("msi-psu", curveSettings);
         var settingsJson = await host.Client.GetStringAsync("/plugins/msi-psu/settings");
         var roundTrip = JsonSerializer.Deserialize(settingsJson,
-            Rtx5090Monitoring.Service.AppJsonContext.Default.PluginSettings);
+            RTXLens.Service.AppJsonContext.Default.PluginSettings);
         TestAssert.True(roundTrip is not null && MsiSettings.GetOptions(roundTrip).FanCurve.Matches(curveOptions.FanCurve),
             "Curve settings must round-trip through the service API.");
 

@@ -1,6 +1,6 @@
-using Rtx5090Monitoring.Contracts.Monitoring;
+using RTXLens.Contracts.Monitoring;
 
-namespace Rtx5090Monitoring.Contracts.Configuration;
+namespace RTXLens.Contracts.Configuration;
 
 public sealed record ServiceConfiguration
 {

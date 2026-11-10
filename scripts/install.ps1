@@ -17,7 +17,7 @@ if (-not (Test-Path -LiteralPath $InstallerPath -PathType Leaf))
     throw "Installer not found: $InstallerPath"
 }
 
-if ($PSCmdlet.ShouldProcess($InstallerPath, 'Open RTX Monitor setup (service required, desktop optional)'))
+if ($PSCmdlet.ShouldProcess($InstallerPath, 'Open RTX Lens setup (service required, desktop optional)'))
 {
     $process = Start-Process -FilePath $InstallerPath -PassThru -Wait
 

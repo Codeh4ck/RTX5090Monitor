@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <ItemGroup>
+        <ProjectReference Include="../../../Core/RTXLens.Core.csproj" />
+        <ProjectReference Include="../../../Common/NvidiaHardware/RTXLens.Hardware.Nvidia.csproj" />
+        <ProjectReference Include="../Contracts/RTXLens.Plugins.GenericNvidia.Contracts.csproj" />
+        <ProjectReference Include="../Analysis/RTXLens.Plugins.GenericNvidia.Analysis.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+        <InternalsVisibleTo Include="RTXLens.Tests" />
+    </ItemGroup>
+</Project>

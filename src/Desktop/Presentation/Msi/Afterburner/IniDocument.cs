@@ -1,7 +1,11 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Rtx5090Monitoring.Presentation.Msi.Afterburner;
+namespace RTXLens.Presentation.Msi.Afterburner;
 
 // A lossless editor: untouched lines and all original terminators round-trip byte for byte.
 public sealed partial class IniDocument
@@ -11,7 +15,11 @@ public sealed partial class IniDocument
     private readonly List<Line> _lines;
     private readonly string _newline;
 
-    private sealed record Line(string Text, string Ending);
+    private sealed class Line(string text, string ending)
+    {
+        public string Text { get; } = text;
+        public string Ending { get; } = ending;
+    }
 
     public string EncodingName { get; }
     public string Text => string.Concat(_lines.Select(line => line.Text + line.Ending));
@@ -20,7 +28,7 @@ public sealed partial class IniDocument
     {
         (_encoding, _preamble, EncodingName) = DecodeEncoding(bytes);
         var text = _encoding.GetString(bytes, _preamble.Length, bytes.Length - _preamble.Length);
-        _lines = SplitLines().Matches(text).Where(match => match.Length > 0)
+        _lines = SplitLines().Matches(text).Cast<Match>().Where(match => match.Length > 0)
             .Select(match => new Line(match.Groups[1].Value, match.Groups[2].Value)).ToList();
         _newline = _lines.FirstOrDefault(line => line.Ending.Length > 0)?.Ending ?? "\r\n";
 
@@ -36,7 +44,7 @@ public sealed partial class IniDocument
         }
         catch (DecoderFallbackException)
         {
-            return (Encoding.Latin1.GetString(bytes), "Damaged content (original bytes preserved in backup)");
+            return (Encoding.GetEncoding(28591).GetString(bytes), "Damaged content (original bytes preserved in backup)");
         }
     }
 
@@ -67,15 +75,15 @@ public sealed partial class IniDocument
             var line = _lines[location.Key];
             var match = KeyLine().Match(line.Text);
             var current = match.Groups[3].Value;
-            var leading = current[..(current.Length - current.TrimStart().Length)];
-            var trailing = current.Trim().Length == 0 ? "" : current[current.TrimEnd().Length..];
+            var leading = current.Substring(0, current.Length - current.TrimStart().Length);
+            var trailing = current.Trim().Length == 0 ? "" : current.Substring(current.TrimEnd().Length);
 
             if (current.Trim() == value)
             {
                 return;
             }
 
-            _lines[location.Key] = line with { Text = match.Groups[1].Value + "=" + leading + value + trailing };
+            _lines[location.Key] = new Line(match.Groups[1].Value + "=" + leading + value + trailing, line.Ending);
             return;
         }
 
@@ -94,7 +102,7 @@ public sealed partial class IniDocument
 
         if (insert > 0 && _lines[insert - 1].Ending.Length == 0)
         {
-            _lines[insert - 1] = _lines[insert - 1] with { Ending = _newline };
+            _lines[insert - 1] = new Line(_lines[insert - 1].Text, _newline);
         }
 
         _lines.Insert(insert, new Line(key + "=" + value, _newline));
@@ -104,9 +112,9 @@ public sealed partial class IniDocument
 
     private void Append(Line line)
     {
-        if (_lines.Count > 0 && _lines[^1].Ending.Length == 0)
+        if (_lines.Count > 0 && _lines[_lines.Count - 1].Ending.Length == 0)
         {
-            _lines[^1] = _lines[^1] with { Ending = _newline };
+            _lines[_lines.Count - 1] = new Line(_lines[_lines.Count - 1].Text, _newline);
         }
 
         _lines.Add(line);
@@ -158,12 +166,12 @@ public sealed partial class IniDocument
         foreach (var line in _lines)
         {
             var text = line.Text.Trim();
-            if (text.Length == 0 || text.StartsWith(';') || text.StartsWith('#'))
+            if (text.Length == 0 || text.StartsWith(";", StringComparison.Ordinal) || text.StartsWith("#", StringComparison.Ordinal))
             {
                 continue;
             }
 
-            if (text.Contains('\0'))
+            if (text.IndexOf('\0') >= 0)
             {
                 throw new InvalidDataException("NUL characters are not supported in an INI document.");
             }
@@ -174,7 +182,7 @@ public sealed partial class IniDocument
                 continue;
             }
 
-            if (!hasSection || !KeyLine().IsMatch(line.Text) || text.Contains('\0'))
+            if (!hasSection || !KeyLine().IsMatch(line.Text) || text.IndexOf('\0') >= 0)
             {
                 throw new InvalidDataException("Unsupported or malformed INI line. The file was not changed: " + text);
             }
@@ -183,17 +191,17 @@ public sealed partial class IniDocument
 
     private static (Encoding, byte[], string) DecodeEncoding(byte[] bytes)
     {
-        if (bytes.AsSpan().StartsWith(new byte[] { 0xEF, 0xBB, 0xBF }))
+        if (bytes.Length >= 3 && bytes[0] == 0xEF && bytes[1] == 0xBB && bytes[2] == 0xBF)
         {
             return (new UTF8Encoding(false, true), [0xEF, 0xBB, 0xBF], "UTF-8 BOM");
         }
 
-        if (bytes.AsSpan().StartsWith(new byte[] { 0xFF, 0xFE }))
+        if (bytes.Length >= 2 && bytes[0] == 0xFF && bytes[1] == 0xFE)
         {
             return (new UnicodeEncoding(false, false, true), [0xFF, 0xFE], "UTF-16 LE");
         }
 
-        if (bytes.AsSpan().StartsWith(new byte[] { 0xFE, 0xFF }))
+        if (bytes.Length >= 2 && bytes[0] == 0xFE && bytes[1] == 0xFF)
         {
             return (new UnicodeEncoding(true, false, true), [0xFE, 0xFF], "UTF-16 BE");
         }
@@ -207,16 +215,16 @@ public sealed partial class IniDocument
         catch (DecoderFallbackException)
         {
             // One-to-one byte mapping keeps legacy ANSI files intact without guessing their code page.
-            return (Encoding.Latin1, [], "ANSI (original bytes preserved)");
+            return (Encoding.GetEncoding(28591), [], "ANSI (original bytes preserved)");
         }
     }
 
-    [GeneratedRegex(@"([^\r\n]*)(\r\n|\r|\n|$)")]
-    private static partial Regex SplitLines();
+    private static Regex SplitLines() => SplitLinesPattern;
+    private static readonly Regex SplitLinesPattern = new(@"([^\r\n]*)(\r\n|\r|\n|$)", RegexOptions.Compiled);
 
-    [GeneratedRegex(@"^\s*\[([^\]\r\n]+)\]\s*$")]
-    private static partial Regex SectionLine();
+    private static Regex SectionLine() => SectionLinePattern;
+    private static readonly Regex SectionLinePattern = new(@"^\s*\[([^\]\r\n]+)\]\s*$", RegexOptions.Compiled);
 
-    [GeneratedRegex(@"^(([^=;#\[\]\r\n]+?)\s*)=(.*)$")]
-    private static partial Regex KeyLine();
+    private static Regex KeyLine() => KeyLinePattern;
+    private static readonly Regex KeyLinePattern = new(@"^(([^=;#\[\]\r\n]+?)\s*)=(.*)$", RegexOptions.Compiled);
 }

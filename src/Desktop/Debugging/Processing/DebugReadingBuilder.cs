@@ -1,9 +1,9 @@
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Contracts.Sensors;
-using Rtx5090Monitoring.Debugging.Models;
-using Rtx5090Monitoring.Debugging.ViewModels;
+using RTXLens.Contracts.Enums;
+using RTXLens.Contracts.Sensors;
+using RTXLens.Debugging.Models;
+using RTXLens.Debugging.ViewModels;
 
-namespace Rtx5090Monitoring.Debugging.Processing;
+namespace RTXLens.Debugging.Processing;
 
 internal static class DebugReadingBuilder
 {

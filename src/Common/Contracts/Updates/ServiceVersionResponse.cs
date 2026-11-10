@@ -1,3 +1,3 @@
-namespace Rtx5090Monitoring.Contracts.Updates;
+namespace RTXLens.Contracts.Updates;
 
 public sealed record ServiceVersionResponse(int SchemaVersion, string Version);

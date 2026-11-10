@@ -1,7 +1,7 @@
-using Rtx5090Monitoring.Plugins.Asus.Contracts.Common;
-using Rtx5090Monitoring.Plugins.Asus.Device;
+using RTXLens.Plugins.Asus.Contracts.Common;
+using RTXLens.Plugins.Asus.Device;
 
-namespace Rtx5090Monitoring.Tests.TestDoubles;
+namespace RTXLens.Tests.TestDoubles;
 
 internal sealed class TestAsusReader(AsusTestState state) : IAsusGpuReader
 {

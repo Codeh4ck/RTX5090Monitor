@@ -1,8 +1,8 @@
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Tests.Fixtures;
-using Rtx5090Monitoring.Tests.Infrastructure;
+using RTXLens.Contracts.Enums;
+using RTXLens.Tests.Fixtures;
+using RTXLens.Tests.Infrastructure;
 
-namespace Rtx5090Monitoring.Tests.Core;
+namespace RTXLens.Tests.Core;
 
 internal static class SourceSelectionTests
 {

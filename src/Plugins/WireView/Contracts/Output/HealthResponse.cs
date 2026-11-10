@@ -1,4 +1,4 @@
-namespace Rtx5090Monitoring.Plugins.WireView.Contracts.Output;
+namespace RTXLens.Plugins.WireView.Contracts.Output;
 
 public class HealthResponse
 {

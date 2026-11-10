@@ -1,9 +1,9 @@
-<Window x:Class="Rtx5090Monitoring.App.Msi.Afterburner.SafeguardHistoryWindow"
+<Window x:Class="RTXLens.App.Msi.Afterburner.SafeguardHistoryWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Rtx5090Monitoring.App.Msi.Afterburner"
-    xmlns:controls="using:Rtx5090Monitoring.App.Controls"
-    Title="RTX Monitor - Safeguard+ History">
+    xmlns:local="using:RTXLens.App.Msi.Afterburner"
+    xmlns:controls="using:RTXLens.App.Controls"
+    Title="RTX Lens - Safeguard+ History">
     <Grid x:Name="Root" Background="{ThemeResource MonitorBackground}" Padding="20" RowDefinitions="Auto,Auto,Auto,*,Auto" RowSpacing="12">
         <TextBlock Text="Safeguard+ History" Style="{StaticResource MonitorHeading}" />
         <Grid Grid.Row="1" ColumnDefinitions="*,Auto" ColumnSpacing="12">

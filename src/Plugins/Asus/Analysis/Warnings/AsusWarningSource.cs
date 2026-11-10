@@ -1,15 +1,15 @@
 using System.Globalization;
 using System.Text.Json;
-using Rtx5090Monitoring.Contracts.Alerts;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Contracts.Sensors;
-using Rtx5090Monitoring.Contracts.Warnings;
-using Rtx5090Monitoring.Plugins.Asus.Contracts.Configuration;
-using Rtx5090Monitoring.Plugins.Asus.Contracts.Warnings;
-using Rtx5090Monitoring.Warnings;
+using RTXLens.Contracts.Alerts;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Contracts.Enums;
+using RTXLens.Contracts.Sensors;
+using RTXLens.Contracts.Warnings;
+using RTXLens.Plugins.Asus.Contracts.Configuration;
+using RTXLens.Plugins.Asus.Contracts.Warnings;
+using RTXLens.Warnings;
 
-namespace Rtx5090Monitoring.Plugins.Asus.Analysis.Warnings;
+namespace RTXLens.Plugins.Asus.Analysis.Warnings;
 
 public sealed class AsusWarningSource : IWarningSource
 {

@@ -14,5 +14,7 @@
         <Reference Include="Microsoft.CSharp" />
         <Compile Include="../../src/Common/Contracts/Security/ProtectedInstallationFile.cs" Link="Validation/ProtectedInstallationFile.cs" />
         <Reference Include="System.Runtime.Serialization" />
+        <Reference Include="System.Web.Extensions" />
+        <Compile Include="../../src/Desktop/Presentation/Msi/Afterburner/IniDocument.cs" Link="Configuration/IniDocument.cs" />
     </ItemGroup>
 </Project>

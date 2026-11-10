@@ -3,11 +3,11 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Documents;
 using Microsoft.UI.Xaml.Media;
-using Rtx5090Monitoring.App.Services;
-using Rtx5090Monitoring.Presentation.Msi.Afterburner;
-using Rtx5090Monitoring.Presentation.Settings;
+using RTXLens.App.Services;
+using RTXLens.Presentation.Msi.Afterburner;
+using RTXLens.Presentation.Settings;
 
-namespace Rtx5090Monitoring.App.Msi.Afterburner;
+namespace RTXLens.App.Msi.Afterburner;
 
 internal sealed class AfterburnerDiffWindow : Window
 {
@@ -18,7 +18,7 @@ internal sealed class AfterburnerDiffWindow : Window
 
     private AfterburnerDiffWindow(AfterburnerChangeSet plan, AppPreferences preferences)
     {
-        Title = "RTX Monitor - Afterburner configuration diff";
+        Title = "RTX Lens - Afterburner configuration diff";
         AppWindow.SetIcon(Path.Combine(AppContext.BaseDirectory, "Assets", "monitor.ico"));
         var themeName = preferences.Theme == AppTheme.Dark || preferences.Theme == AppTheme.System
             && Application.Current.RequestedTheme == ApplicationTheme.Dark ? "Dark" : "Light";
@@ -90,12 +90,12 @@ internal sealed class AfterburnerDiffWindow : Window
                 CurrentPreview = null;
             }
         };
-        AppWindow.Resize(new global::Windows.Graphics.SizeInt32(1100, 760));
     }
 
-    internal static Task<bool> ShowAsync(AfterburnerChangeSet plan, AppPreferences preferences)
+    internal static Task<bool> ShowAsync(AfterburnerChangeSet plan, AppRuntime runtime)
     {
-        var window = new AfterburnerDiffWindow(plan, preferences);
+        var window = new AfterburnerDiffWindow(plan, runtime.Preferences);
+        runtime.TrackWindow(window, "afterburner-preview", 1100, 760);
         CurrentPreview = window;
         window.Activate();
         return window._decision.Task;

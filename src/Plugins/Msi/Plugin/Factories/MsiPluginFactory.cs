@@ -1,17 +1,17 @@
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Contracts.Sensors;
+using RTXLens.Contracts.Enums;
+using RTXLens.Contracts.Sensors;
 using System.Text.Json;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Contracts.Discovery;
-using Rtx5090Monitoring.Core.Plugins;
-using Rtx5090Monitoring.Plugins.Msi.Configuration;
-using Rtx5090Monitoring.Plugins.Msi.Contracts.Configuration;
-using Rtx5090Monitoring.Plugins.Msi.Device;
-using Rtx5090Monitoring.Plugins.Msi.Serialization;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Contracts.Discovery;
+using RTXLens.Core.Plugins;
+using RTXLens.Plugins.Msi.Configuration;
+using RTXLens.Plugins.Msi.Contracts.Configuration;
+using RTXLens.Plugins.Msi.Device;
+using RTXLens.Plugins.Msi.Serialization;
 
-namespace Rtx5090Monitoring.Plugins.Msi.Factories;
+namespace RTXLens.Plugins.Msi.Factories;
 
 public sealed class MsiPluginFactory(TimeProvider clock, ILoggerFactory loggerFactory) : ISensorPluginFactory, IConnectorSourceProvider
 {

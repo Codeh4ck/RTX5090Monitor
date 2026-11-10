@@ -1,14 +1,14 @@
-using Rtx5090Monitoring.Plugins.Asus.Contracts.Warnings;
-using Rtx5090Monitoring.Contracts.Alerts;
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Contracts.Sensors;
-using Rtx5090Monitoring.Debugging.Models;
-using Rtx5090Monitoring.Debugging.ViewModels;
-using Rtx5090Monitoring.Plugins.Asus.Contracts.Configuration;
-using Rtx5090Monitoring.Plugins.Asus.Analysis.Mapping;
-using Rtx5090Monitoring.Plugins.Asus.Analysis.Monitoring;
+using RTXLens.Plugins.Asus.Contracts.Warnings;
+using RTXLens.Contracts.Alerts;
+using RTXLens.Contracts.Enums;
+using RTXLens.Contracts.Sensors;
+using RTXLens.Debugging.Models;
+using RTXLens.Debugging.ViewModels;
+using RTXLens.Plugins.Asus.Contracts.Configuration;
+using RTXLens.Plugins.Asus.Analysis.Mapping;
+using RTXLens.Plugins.Asus.Analysis.Monitoring;
 
-namespace Rtx5090Monitoring.Debugging.Processing;
+namespace RTXLens.Debugging.Processing;
 
 internal sealed class DebugAsusAlerts
 {

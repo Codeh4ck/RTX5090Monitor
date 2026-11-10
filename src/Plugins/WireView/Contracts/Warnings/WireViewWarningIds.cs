@@ -1,4 +1,4 @@
-namespace Rtx5090Monitoring.Plugins.WireView.Contracts.Warnings;
+namespace RTXLens.Plugins.WireView.Contracts.Warnings;
 
 public static class WireViewWarningIds
 {

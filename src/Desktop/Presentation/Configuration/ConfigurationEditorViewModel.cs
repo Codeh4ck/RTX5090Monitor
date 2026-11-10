@@ -1,16 +1,16 @@
-using Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.Devices;
+using RTXLens.Plugins.GenericNvidia.Contracts.Devices;
 using System.Collections.ObjectModel;
-using Rtx5090Monitoring.Client.Http;
-using Rtx5090Monitoring.Plugins.Asus.Contracts.Common;
-using Rtx5090Monitoring.Plugins.Msi.Contracts.Devices;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Plugins.Msi.Contracts.Configuration;
-using Rtx5090Monitoring.Contracts.Discovery;
-using Rtx5090Monitoring.Contracts.Monitoring;
-using Rtx5090Monitoring.Contracts.Sensors;
-using Rtx5090Monitoring.Presentation.Infrastructure;
+using RTXLens.Client.Http;
+using RTXLens.Plugins.Asus.Contracts.Common;
+using RTXLens.Plugins.Msi.Contracts.Devices;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Plugins.Msi.Contracts.Configuration;
+using RTXLens.Contracts.Discovery;
+using RTXLens.Contracts.Monitoring;
+using RTXLens.Contracts.Sensors;
+using RTXLens.Presentation.Infrastructure;
 
-namespace Rtx5090Monitoring.Presentation.Configuration;
+namespace RTXLens.Presentation.Configuration;
 
 public sealed class ConfigurationEditorViewModel(Func<IMonitoringApi> api, bool localOnly = false) : ObservableObject
 {

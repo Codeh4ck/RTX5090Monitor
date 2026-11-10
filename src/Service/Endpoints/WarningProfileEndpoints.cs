@@ -1,11 +1,11 @@
 using System.Net;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Core.Configuration;
-using Rtx5090Monitoring.Core.Http;
-using Rtx5090Monitoring.Service.Configuration;
-using Rtx5090Monitoring.Service.Services;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Core.Configuration;
+using RTXLens.Core.Http;
+using RTXLens.Service.Configuration;
+using RTXLens.Service.Services;
 
-namespace Rtx5090Monitoring.Service.Endpoints;
+namespace RTXLens.Service.Endpoints;
 
 internal static class WarningProfileEndpoints
 {

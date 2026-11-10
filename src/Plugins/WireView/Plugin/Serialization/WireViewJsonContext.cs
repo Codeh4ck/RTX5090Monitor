@@ -1,9 +1,9 @@
 using System.Text.Json.Serialization;
-using Rtx5090Monitoring.Plugins.WireView.Contracts.Common;
-using Rtx5090Monitoring.Plugins.WireView.Contracts.Input;
-using Rtx5090Monitoring.Plugins.WireView.Contracts.Output;
+using RTXLens.Plugins.WireView.Contracts.Common;
+using RTXLens.Plugins.WireView.Contracts.Input;
+using RTXLens.Plugins.WireView.Contracts.Output;
 
-namespace Rtx5090Monitoring.Plugins.WireView.Serialization;
+namespace RTXLens.Plugins.WireView.Serialization;
 
 [JsonSourceGenerationOptions(PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase)]
 [JsonSerializable(typeof(DeviceConfig))]

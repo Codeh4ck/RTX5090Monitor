@@ -1,10 +1,10 @@
 using Microsoft.UI.Xaml.Controls;
-using Rtx5090Monitoring.App.Controls;
-using Rtx5090Monitoring.App.Services;
-using Rtx5090Monitoring.App.Views;
-using Rtx5090Monitoring.Presentation.Settings;
+using RTXLens.App.Controls;
+using RTXLens.App.Services;
+using RTXLens.App.Views;
+using RTXLens.Presentation.Settings;
 
-namespace Rtx5090Monitoring.App.Diagnostics;
+namespace RTXLens.App.Diagnostics;
 
 internal static class PsuComparisonPreferencesSmokeTests
 {

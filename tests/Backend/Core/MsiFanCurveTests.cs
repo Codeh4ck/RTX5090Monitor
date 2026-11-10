@@ -1,12 +1,12 @@
 using System.Text.Json;
 using Microsoft.Extensions.Logging.Abstractions;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Plugins.Msi.Configuration;
-using Rtx5090Monitoring.Plugins.Msi.Contracts.Configuration;
-using Rtx5090Monitoring.Plugins.Msi.Control;
-using Rtx5090Monitoring.Tests.Infrastructure;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Plugins.Msi.Configuration;
+using RTXLens.Plugins.Msi.Contracts.Configuration;
+using RTXLens.Plugins.Msi.Control;
+using RTXLens.Tests.Infrastructure;
 
-namespace Rtx5090Monitoring.Tests.Core;
+namespace RTXLens.Tests.Core;
 
 internal static class MsiFanCurveTests
 {

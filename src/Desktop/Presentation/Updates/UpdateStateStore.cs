@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace Rtx5090Monitoring.Presentation.Updates;
+namespace RTXLens.Presentation.Updates;
 
 public sealed class UpdateStateStore(string path)
 {

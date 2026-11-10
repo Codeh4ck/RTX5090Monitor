@@ -1,9 +1,9 @@
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
-using Rtx5090Monitoring.Contracts.Security;
+using RTXLens.Contracts.Security;
 
-namespace Rtx5090Monitoring.Installer.Actions.Startup;
+namespace RTXLens.Installer.Actions.Startup;
 
 internal static class ElevatedStartupTask
 {
@@ -15,7 +15,7 @@ internal static class ElevatedStartupTask
         dynamic scheduler = Connect();
         dynamic folder = scheduler.GetFolder(@"\");
         dynamic task = scheduler.NewTask(0);
-        task.RegistrationInfo.Description = "Start RTX Monitor at sign-in with administrator privileges.";
+        task.RegistrationInfo.Description = "Start RTX Lens at sign-in with administrator privileges.";
         task.Principal.UserId = sid;
         task.Principal.LogonType = 3; // Interactive token.
         task.Principal.RunLevel = 1; // Highest available.
@@ -52,7 +52,41 @@ internal static class ElevatedStartupTask
         }
         catch (COMException error) when (error.HResult == TaskNotFound)
         {
-            // This user has no registered RTX Monitor startup task.
+            // This user has no registered RTX Lens startup task.
+        }
+    }
+
+    public static void Migrate(string sid, string previousExecutable, string executable)
+    {
+        dynamic scheduler = Connect();
+        dynamic folder = scheduler.GetFolder(@"\");
+        var previousName = "RTX Monitor Startup " + sid;
+        try
+        {
+            dynamic task = folder.GetTask(previousName);
+            dynamic actions = task.Definition.Actions;
+            if ((int)actions.Count != 1)
+            {
+                return;
+            }
+
+            dynamic action = actions.Item(1);
+            if (!string.Equals((string)action.Path, previousExecutable, StringComparison.OrdinalIgnoreCase)
+                || !string.Equals((string)action.Arguments, "--startup", StringComparison.Ordinal))
+            {
+                return;
+            }
+
+            if ((bool)task.Enabled)
+            {
+                Register(sid, executable);
+            }
+
+            folder.DeleteTask(previousName, 0);
+        }
+        catch (COMException error) when (error.HResult == TaskNotFound)
+        {
+            // No previous product task for this user.
         }
     }
 
@@ -64,5 +98,5 @@ internal static class ElevatedStartupTask
         return scheduler;
     }
 
-    private static string Name(string sid) => "RTX Monitor Startup " + sid;
+    private static string Name(string sid) => "RTX Lens Startup " + sid;
 }

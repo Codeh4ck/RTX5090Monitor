@@ -1,11 +1,11 @@
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Contracts.Health;
-using Rtx5090Monitoring.Contracts.Sensors;
-using Rtx5090Monitoring.Presentation.Performance;
-using Rtx5090Monitoring.Tests.Infrastructure;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Contracts.Enums;
+using RTXLens.Contracts.Health;
+using RTXLens.Contracts.Sensors;
+using RTXLens.Presentation.Performance;
+using RTXLens.Tests.Infrastructure;
 
-namespace Rtx5090Monitoring.UI.Tests.Performance;
+namespace RTXLens.UI.Tests.Performance;
 
 internal static class PerformanceRecordingTests
 {
@@ -291,7 +291,7 @@ internal static class PerformanceRecordingTests
 
     private static void HiddenPinUpdatesPreservePeaksAndRefreshOnReturn()
     {
-        var pin = new Rtx5090Monitoring.Presentation.Telemetry.PinViewModel(1);
+        var pin = new RTXLens.Presentation.Telemetry.PinViewModel(1);
         var notifications = 0;
         pin.PropertyChanged += (_, _) => notifications++;
         pin.Update(8, 12, 96, Presentation.Telemetry.PinMetric.Current, 9.2, true, true,

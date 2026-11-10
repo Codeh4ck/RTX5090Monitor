@@ -1,10 +1,10 @@
 using System.Text.Json;
 using Microsoft.Extensions.Configuration;
-using Rtx5090Monitoring.Warnings;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Contracts.Discovery;
+using RTXLens.Warnings;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Contracts.Discovery;
 
-namespace Rtx5090Monitoring.Core.Plugins;
+namespace RTXLens.Core.Plugins;
 
 public interface ISensorPluginFactory
 {

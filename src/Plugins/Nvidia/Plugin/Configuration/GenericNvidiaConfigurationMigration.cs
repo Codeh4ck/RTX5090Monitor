@@ -1,8 +1,8 @@
 using System.Text.Json;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.Configuration;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Plugins.GenericNvidia.Contracts.Configuration;
 
-namespace Rtx5090Monitoring.Plugins.GenericNvidia.Configuration;
+namespace RTXLens.Plugins.GenericNvidia.Configuration;
 
 internal static class GenericNvidiaConfigurationMigration
 {

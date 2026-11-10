@@ -1,4 +1,4 @@
-namespace Rtx5090Monitoring.Presentation.Performance;
+namespace RTXLens.Presentation.Performance;
 
 public sealed partial class PerformanceRecorder
 {

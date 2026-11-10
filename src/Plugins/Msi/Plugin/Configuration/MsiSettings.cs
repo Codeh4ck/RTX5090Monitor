@@ -1,9 +1,9 @@
 using System.Text.Json;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Plugins.Msi.Contracts.Configuration;
-using Rtx5090Monitoring.Plugins.Msi.Serialization;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Plugins.Msi.Contracts.Configuration;
+using RTXLens.Plugins.Msi.Serialization;
 
-namespace Rtx5090Monitoring.Plugins.Msi.Configuration;
+namespace RTXLens.Plugins.Msi.Configuration;
 
 public static class MsiSettings
 {

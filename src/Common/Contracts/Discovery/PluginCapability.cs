@@ -1,4 +1,4 @@
-namespace Rtx5090Monitoring.Contracts.Discovery;
+namespace RTXLens.Contracts.Discovery;
 
 public enum PluginCapability
 {

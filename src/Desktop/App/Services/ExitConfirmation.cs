@@ -1,10 +1,10 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
-using Rtx5090Monitoring.App.Views.Dialogs;
-using Rtx5090Monitoring.Presentation.Settings;
+using RTXLens.App.Views.Dialogs;
+using RTXLens.Presentation.Settings;
 
-namespace Rtx5090Monitoring.App.Services;
+namespace RTXLens.App.Services;
 
 internal static class ExitConfirmation
 {

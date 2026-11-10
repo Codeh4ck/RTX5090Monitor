@@ -1,35 +1,36 @@
-RTX MONITOR - WINDOWS x64
+RTX LENS - WINDOWS x64
 
 1. Extract this complete ZIP to a local folder.
-2. Run RtxMonitor-Setup-<version>-win-x64.exe. Administrator approval is required.
+2. Run RTXLens-Setup-<version>-win-x64.exe. Administrator approval is required.
 3. Keep the required monitoring service selected. The desktop app/configurator is optional.
-4. Import rtx5090monitor.icuewidget manually through iCUE's Import Widget command.
-5. Open RTX Monitor from the Start menu to configure the backend. The app can be closed afterward.
+4. Import rtxlens.icuewidget manually through iCUE's Import Widget command.
+5. Open RTX Lens from the Start menu to configure the backend. The app can be closed afterward.
 
 The service listens only on localhost:59273 and starts automatically with Windows.
 Stop older WireView/ASUS services using that port before installing.
-An existing unmanaged Rtx5090MonitoringService registration must be removed before the first MSI installation.
+An existing unmanaged RTXLensService registration must be removed before the first MSI installation.
 
 The desktop app's Start with Windows option applies to your Windows user account.
 Start minimized is a separate setting. Opening an installed app repairs an enabled startup entry pointing to an old portable folder.
 
 UPDATING AN EXISTING INSTALLATION
-Exit RTX Monitor from its tray menu, then run the new setup EXE. An installer-managed
-service and previously selected desktop app upgrade in place; feature choices and
-settings are retained. There is no need to uninstall the previous version first.
-Import the included widget into iCUE separately; setup does not update imported widgets.
-For version 1.0.0, update the service, desktop app and widget together to enable component update checks.
+Exit RTX Monitor or RTX Lens from its tray menu, then run the new setup EXE.
+RTX Lens 1.0.7 upgrades installer-managed RTX Monitor installations in place
+and migrates settings and feature choices. Setup may ask you to close MSI
+Afterburner so it can migrate configured Safeguard+ actions.
+Import the included widget into iCUE separately. Both the updated app and
+widget check rtxlens.com for future releases.
 
 MODIFY / REPAIR / UNINSTALL
-Use Windows Settings > Apps > RTX Monitor, or run the same setup EXE again.
+Use Windows Settings > Apps > RTX Lens, or run the same setup EXE again.
 Modify lets you add/remove the desktop component without removing the service.
-Uninstall removes the installed service, app, shortcuts, startup entries and RTX Monitor's Afterburner backups.
+Uninstall removes the installed service, app, shortcuts, startup entries and RTX Lens's Afterburner backups.
 Setup can reuse an installation folder left behind by an older uninstaller if it contains only those backups.
-Uninstall-RTXMonitor.ps1 is an optional launcher for the registered cached uninstaller.
+Uninstall-RTXLens.ps1 is an optional launcher for the registered cached uninstaller.
 Exit the desktop app using its tray menu first; unsaved configuration drafts are not forcibly discarded.
 
-Backend settings (%ProgramData%\Rtx5090Monitoring) and desktop preferences
-(%LocalAppData%\Rtx5090Monitoring) are retained during upgrade and uninstall.
+Backend settings (%ProgramData%\RTXLens) and desktop preferences
+(%LocalAppData%\RTXLens) are retained during upgrade and uninstall.
 The widget is imported and removed separately in iCUE.
 Shared Microsoft redistributables are retained because other applications can use them.
 

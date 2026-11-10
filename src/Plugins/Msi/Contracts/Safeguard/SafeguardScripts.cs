@@ -1,7 +1,7 @@
 using System.Net;
 using System.Net.Mail;
 
-namespace Rtx5090Monitoring.Plugins.Msi.Contracts.Safeguard;
+namespace RTXLens.Plugins.Msi.Contracts.Safeguard;
 
 public enum SafeguardParameterType { Integer, Host, Choice, Text, Secret, Mailbox, Mailboxes }
 

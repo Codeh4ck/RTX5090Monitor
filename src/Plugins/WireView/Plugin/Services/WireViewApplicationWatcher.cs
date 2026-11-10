@@ -1,6 +1,6 @@
 using System.Diagnostics;
 
-namespace Rtx5090Monitoring.Plugins.WireView.Services;
+namespace RTXLens.Plugins.WireView.Services;
 
 internal sealed class WireViewApplicationWatcher : IDisposable
 {

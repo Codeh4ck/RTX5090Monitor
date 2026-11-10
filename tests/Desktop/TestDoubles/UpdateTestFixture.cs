@@ -1,7 +1,7 @@
-using Rtx5090Monitoring.Contracts.Updates;
-using Rtx5090Monitoring.Presentation.Updates;
+using RTXLens.Contracts.Updates;
+using RTXLens.Presentation.Updates;
 
-namespace Rtx5090Monitoring.UI.Tests.TestDoubles;
+namespace RTXLens.UI.Tests.TestDoubles;
 
 internal sealed class UpdateTestFixture : IDisposable
 {

@@ -1,4 +1,4 @@
-namespace Rtx5090Monitoring.Plugins.Msi.Contracts.Safeguard;
+namespace RTXLens.Plugins.Msi.Contracts.Safeguard;
 
 public sealed record SafeguardStep(DateTimeOffset Timestamp, string Name, string Result, int? ExitCode = null);
 

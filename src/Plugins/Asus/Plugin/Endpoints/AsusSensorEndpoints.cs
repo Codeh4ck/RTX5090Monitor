@@ -2,13 +2,13 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Hosting;
-using Rtx5090Monitoring.Core.Plugins;
-using Rtx5090Monitoring.Core.Streaming;
-using Rtx5090Monitoring.Plugins.Asus.Serialization;
-using Rtx5090Monitoring.Plugins.Asus.Services;
-using Rtx5090Monitoring.Plugins.Asus.Streaming;
+using RTXLens.Core.Plugins;
+using RTXLens.Core.Streaming;
+using RTXLens.Plugins.Asus.Serialization;
+using RTXLens.Plugins.Asus.Services;
+using RTXLens.Plugins.Asus.Streaming;
 
-namespace Rtx5090Monitoring.Plugins.Asus.Endpoints;
+namespace RTXLens.Plugins.Asus.Endpoints;
 
 internal static class AsusSensorEndpoints
 {

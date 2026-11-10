@@ -1,14 +1,14 @@
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Core.Plugins;
-using Rtx5090Monitoring.Plugins.Msi.Configuration;
-using Rtx5090Monitoring.Plugins.Msi.Contracts.Configuration;
-using Rtx5090Monitoring.Plugins.Msi.Contracts.Devices;
-using Rtx5090Monitoring.Plugins.Msi.Contracts.Telemetry;
-using Rtx5090Monitoring.Plugins.Msi.Device;
-using Rtx5090Monitoring.Plugins.Msi.Mapping;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Contracts.Enums;
+using RTXLens.Core.Plugins;
+using RTXLens.Plugins.Msi.Configuration;
+using RTXLens.Plugins.Msi.Contracts.Configuration;
+using RTXLens.Plugins.Msi.Contracts.Devices;
+using RTXLens.Plugins.Msi.Contracts.Telemetry;
+using RTXLens.Plugins.Msi.Device;
+using RTXLens.Plugins.Msi.Mapping;
 
-namespace Rtx5090Monitoring.Plugins.Msi;
+namespace RTXLens.Plugins.Msi;
 
 public sealed class MsiPlugin(PluginSettings settings, TimeProvider clock, IMsiPsuReader reader) : ISensorPlugin
 {

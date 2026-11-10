@@ -1,10 +1,10 @@
-using Rtx5090Monitoring.Contracts.Monitoring;
-using Rtx5090Monitoring.Presentation.Configuration;
-using Rtx5090Monitoring.Tests.Infrastructure;
-using Rtx5090Monitoring.UI.Tests.Fixtures;
-using Rtx5090Monitoring.UI.Tests.TestDoubles;
+using RTXLens.Contracts.Monitoring;
+using RTXLens.Presentation.Configuration;
+using RTXLens.Tests.Infrastructure;
+using RTXLens.UI.Tests.Fixtures;
+using RTXLens.UI.Tests.TestDoubles;
 
-namespace Rtx5090Monitoring.UI.Tests.Configuration;
+namespace RTXLens.UI.Tests.Configuration;
 
 internal static class DirtyTrackingTests
 {
@@ -37,7 +37,7 @@ internal static class DirtyTrackingTests
 
     private static void ChangingAsusGpuPreservesLegacyThresholds()
     {
-        var original = new Rtx5090Monitoring.Plugins.Asus.Contracts.Configuration.AsusOptions
+        var original = new RTXLens.Plugins.Asus.Contracts.Configuration.AsusOptions
         {
             WireOvercurrentAmperageThreshold = 9.5f,
             ImbalancePercentageThreshold = 25

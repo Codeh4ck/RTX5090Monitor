@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <ItemGroup>
+        <ProjectReference Include="../Contracts/RTXLens.Contracts.csproj" />
+    </ItemGroup>
+</Project>

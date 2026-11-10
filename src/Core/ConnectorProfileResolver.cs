@@ -1,10 +1,10 @@
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Contracts.Monitoring;
-using Rtx5090Monitoring.Contracts.Sensors;
-using Rtx5090Monitoring.Core.Plugins;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Contracts.Enums;
+using RTXLens.Contracts.Monitoring;
+using RTXLens.Contracts.Sensors;
+using RTXLens.Core.Plugins;
 
-namespace Rtx5090Monitoring.Core;
+namespace RTXLens.Core;
 
 public sealed class ConnectorProfileResolver(IEnumerable<IConnectorSourceProvider> providers)
 {

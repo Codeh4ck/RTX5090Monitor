@@ -1,6 +1,6 @@
-using Rtx5090Monitoring.Hardware.Nvidia;
+using RTXLens.Hardware.Nvidia;
 
-namespace Rtx5090Monitoring.Tests.TestDoubles;
+namespace RTXLens.Tests.TestDoubles;
 
 internal sealed class TestNvidiaHardwareSource : INvidiaHardwareSource
 {

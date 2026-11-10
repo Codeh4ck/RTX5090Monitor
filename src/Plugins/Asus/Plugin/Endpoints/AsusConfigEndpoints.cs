@@ -1,12 +1,12 @@
-using Rtx5090Monitoring.Core.Configuration;
+using RTXLens.Core.Configuration;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
-using Rtx5090Monitoring.Plugins.Asus.Contracts.Input;
-using Rtx5090Monitoring.Plugins.Asus.Mapping;
-using Rtx5090Monitoring.Plugins.Asus.Serialization;
+using RTXLens.Plugins.Asus.Contracts.Input;
+using RTXLens.Plugins.Asus.Mapping;
+using RTXLens.Plugins.Asus.Serialization;
 
-namespace Rtx5090Monitoring.Plugins.Asus.Endpoints;
+namespace RTXLens.Plugins.Asus.Endpoints;
 
 internal static class AsusConfigEndpoints
 {

@@ -1,5 +1,0 @@
-<Project Sdk="Microsoft.NET.Sdk">
-    <ItemGroup>
-        <ProjectReference Include="../Contracts/Rtx5090Monitoring.Contracts.csproj" />
-    </ItemGroup>
-</Project>

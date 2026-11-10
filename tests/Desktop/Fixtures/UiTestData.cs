@@ -1,12 +1,12 @@
-using Rtx5090Monitoring.Plugins.Asus.Contracts.Warnings;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Contracts.Discovery;
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Contracts.Health;
-using Rtx5090Monitoring.Contracts.Sensors;
-using Rtx5090Monitoring.Contracts.Warnings;
+using RTXLens.Plugins.Asus.Contracts.Warnings;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Contracts.Discovery;
+using RTXLens.Contracts.Enums;
+using RTXLens.Contracts.Health;
+using RTXLens.Contracts.Sensors;
+using RTXLens.Contracts.Warnings;
 
-namespace Rtx5090Monitoring.UI.Tests.Fixtures;
+namespace RTXLens.UI.Tests.Fixtures;
 
 internal static class UiTestData
 {

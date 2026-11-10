@@ -1,18 +1,18 @@
-using Rtx5090Monitoring.Plugins.Asus.Contracts.Configuration;
+using RTXLens.Plugins.Asus.Contracts.Configuration;
 using System.Net;
 using System.Net.Http.Json;
 using System.Net.WebSockets;
 using System.Text.Json;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Plugins.Asus;
-using Rtx5090Monitoring.Plugins.Asus.Configuration;
-using Rtx5090Monitoring.Plugins.Asus.Mapping;
-using Rtx5090Monitoring.Service.Configuration;
-using Rtx5090Monitoring.Tests.Fixtures;
-using Rtx5090Monitoring.Tests.Infrastructure;
-using Rtx5090Monitoring.Tests.TestDoubles;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Plugins.Asus;
+using RTXLens.Plugins.Asus.Configuration;
+using RTXLens.Plugins.Asus.Mapping;
+using RTXLens.Service.Configuration;
+using RTXLens.Tests.Fixtures;
+using RTXLens.Tests.Infrastructure;
+using RTXLens.Tests.TestDoubles;
 
-namespace Rtx5090Monitoring.Tests.Service;
+namespace RTXLens.Tests.Service;
 
 internal static class AsusEndpointTests
 {

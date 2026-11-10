@@ -1,6 +1,6 @@
-using Rtx5090Monitoring.Tests.Core;
-using Rtx5090Monitoring.Tests.Infrastructure;
-using Rtx5090Monitoring.Tests.Service;
+using RTXLens.Tests.Core;
+using RTXLens.Tests.Infrastructure;
+using RTXLens.Tests.Service;
 
 var runner = new TestRunner();
 if (args.Contains("--verify-msi-hardware"))

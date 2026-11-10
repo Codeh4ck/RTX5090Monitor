@@ -1,6 +1,6 @@
-# RTX Monitor for Xeneon Edge
+# RTX Lens for Xeneon Edge
 
-Import rtx5090monitor.icuewidget into iCUE and assign RTX Monitor to a Xeneon Edge slot. The service must run locally on port 59273. Configure backend plugins and hardware in the RTX Monitor desktop app; the desktop app does not need to remain open.
+Import rtxlens.icuewidget into iCUE and assign RTX Lens to a Xeneon Edge slot. The service must run locally on port 59273. Configure backend plugins and hardware in the RTX Lens desktop app; the desktop app does not need to remain open.
 
 L horizontal (1688x696) shows two independent panels, XL horizontal (2536x696) three. Expansion requires the larger slot assigned in iCUE. Small slots show the configured starting panel; header arrows and optional automatic paging navigate hidden panels. There is no widget footer or comparison caption below the chart. The comparison connector remains selectable in settings and is included in the chart's accessible description.
 

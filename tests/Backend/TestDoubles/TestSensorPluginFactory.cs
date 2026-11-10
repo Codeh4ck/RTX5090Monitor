@@ -1,7 +1,7 @@
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Core.Plugins;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Core.Plugins;
 
-namespace Rtx5090Monitoring.Tests.TestDoubles;
+namespace RTXLens.Tests.TestDoubles;
 
 internal sealed class TestSensorPluginFactory(string id, TestPluginBehavior behavior = TestPluginBehavior.PublishReadings) : ISensorPluginFactory
 {

@@ -1,7 +1,7 @@
-using Rtx5090Monitoring.Plugins.Msi.Contracts.Configuration;
-using Rtx5090Monitoring.Presentation.Infrastructure;
+using RTXLens.Plugins.Msi.Contracts.Configuration;
+using RTXLens.Presentation.Infrastructure;
 
-namespace Rtx5090Monitoring.Presentation.Configuration;
+namespace RTXLens.Presentation.Configuration;
 
 public sealed class MsiFanCurvePointViewModel(double temperatureC, double dutyPercent) : EditableObject
 {

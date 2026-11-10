@@ -1,4 +1,4 @@
-namespace Rtx5090Monitoring.Plugins.WireView.Contracts.Common;
+namespace RTXLens.Plugins.WireView.Contracts.Common;
 
 public sealed class PinReading
 {

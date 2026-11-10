@@ -1,4 +1,4 @@
-namespace Rtx5090Monitoring.Presentation.Updates;
+namespace RTXLens.Presentation.Updates;
 
 public enum UpdateFrequency
 {

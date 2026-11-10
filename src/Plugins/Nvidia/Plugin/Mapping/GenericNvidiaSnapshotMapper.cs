@@ -1,9 +1,9 @@
 using LibreHardwareMonitor.Hardware;
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Contracts.Sensors;
-using Rtx5090Monitoring.Hardware.Nvidia;
+using RTXLens.Contracts.Enums;
+using RTXLens.Contracts.Sensors;
+using RTXLens.Hardware.Nvidia;
 
-namespace Rtx5090Monitoring.Plugins.GenericNvidia.Mapping;
+namespace RTXLens.Plugins.GenericNvidia.Mapping;
 
 public static class GenericNvidiaSnapshotMapper
 {

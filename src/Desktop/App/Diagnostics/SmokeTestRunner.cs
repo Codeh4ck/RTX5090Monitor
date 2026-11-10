@@ -5,16 +5,16 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Media;
-using Rtx5090Monitoring.App.Controls;
-using Rtx5090Monitoring.App.Views;
-using Rtx5090Monitoring.App.Services;
-using Rtx5090Monitoring.App.Platform.Windowing;
-using Rtx5090Monitoring.Presentation.Settings;
-using Rtx5090Monitoring.Presentation.Telemetry;
+using RTXLens.App.Controls;
+using RTXLens.App.Views;
+using RTXLens.App.Services;
+using RTXLens.App.Platform.Windowing;
+using RTXLens.Presentation.Settings;
+using RTXLens.Presentation.Telemetry;
 using Windows.Graphics.Imaging;
 using Windows.Storage.Streams;
 
-namespace Rtx5090Monitoring.App.Diagnostics;
+namespace RTXLens.App.Diagnostics;
 
 internal static class SmokeTestRunner
 {
@@ -37,6 +37,13 @@ internal static class SmokeTestRunner
         {
             throw new InvalidOperationException("No demo telemetry received.");
         }
+        if (Environment.GetCommandLineArgs().Contains("--release-notes-and-wireview-only"))
+        {
+            await WaitUntilAsync(() => runtime.Dashboard.ReportingPanels.Any(panel => panel.IsWireView));
+            await ReleaseNotesAndWireViewSmokeTests.RunAsync(window, runtime, output);
+            return;
+        }
+
         if (Environment.GetCommandLineArgs().Contains("--afterburner-only"))
         {
             await AfterburnerSmokeTests.RunAsync(window, runtime, output);

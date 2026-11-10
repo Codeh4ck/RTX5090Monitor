@@ -7,7 +7,7 @@ param(
     [Parameter(Mandatory)][string] $SetupPath,
     [Parameter(Mandatory)][string] $MsiPath,
     [string] $UpgradeSetupPath,
-    [string] $OutputDirectory = (Join-Path $env:TEMP 'RtxMonitorInstallerAcceptance')
+    [string] $OutputDirectory = (Join-Path $env:TEMP 'RTXLensInstallerAcceptance')
 )
 
 $ErrorActionPreference = 'Stop'
@@ -19,26 +19,26 @@ if ($model -notmatch '(?i)virtual|vmware|kvm|qemu')
     throw 'This acceptance script refuses to run on a physical machine.'
 }
 
-$serviceName = 'Rtx5090MonitoringService'
+$serviceName = 'RTXLensService'
 
 if (Get-Service -Name $serviceName -ErrorAction SilentlyContinue)
 {
-    throw 'Use a clean VM snapshot with no existing RTX Monitor service.'
+    throw 'Use a clean VM snapshot with no existing RTX Lens service.'
 }
 
-$configurationDirectory = Join-Path $env:ProgramData 'Rtx5090Monitoring'
+$configurationDirectory = Join-Path $env:ProgramData 'RTXLens'
 $configurationPath = Join-Path $configurationDirectory 'appsettings.json'
 
 if (Test-Path -LiteralPath $configurationDirectory)
 {
-    throw 'Use a clean VM snapshot with no existing RTX Monitor runtime configuration.'
+    throw 'Use a clean VM snapshot with no existing RTX Lens runtime configuration.'
 }
 
-$installDirectory = Join-Path $env:ProgramFiles 'Rtx5090Monitoring'
+$installDirectory = Join-Path $env:ProgramFiles 'RTXLens'
 
 if (Test-Path -LiteralPath $installDirectory)
 {
-    throw 'Use a clean VM snapshot with no existing RTX Monitor installation folder.'
+    throw 'Use a clean VM snapshot with no existing RTX Lens installation folder.'
 }
 
 New-Item -ItemType Directory -Path $OutputDirectory -Force | Out-Null
@@ -97,7 +97,7 @@ function Assert-Installed
         throw 'Health gate failed.'
     }
 
-    $app = Join-Path $installDirectory 'Desktop\Rtx5090Monitoring.App.exe'
+    $app = Join-Path $installDirectory 'Desktop\RTXLens.App.exe'
 
     if ((Test-Path -LiteralPath $app) -ne $Desktop)
     {
@@ -158,12 +158,12 @@ if (Get-Service -Name $serviceName -ErrorAction SilentlyContinue)
     throw 'Uninstall left the Windows service registered.'
 }
 
-if (Test-Path -LiteralPath (Join-Path $installDirectory 'Service\Rtx5090Monitoring.Service.exe'))
+if (Test-Path -LiteralPath (Join-Path $installDirectory 'Service\RTXLens.Service.exe'))
 {
     throw 'Uninstall left service binaries.'
 }
 
-if (Test-Path -LiteralPath (Join-Path $installDirectory 'Desktop\Rtx5090Monitoring.App.exe'))
+if (Test-Path -LiteralPath (Join-Path $installDirectory 'Desktop\RTXLens.App.exe'))
 {
     throw 'Uninstall left desktop binaries.'
 }

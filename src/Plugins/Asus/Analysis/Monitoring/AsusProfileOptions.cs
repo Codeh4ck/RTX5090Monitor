@@ -1,7 +1,7 @@
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Plugins.Asus.Contracts.Configuration;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Plugins.Asus.Contracts.Configuration;
 
-namespace Rtx5090Monitoring.Plugins.Asus.Analysis.Monitoring;
+namespace RTXLens.Plugins.Asus.Analysis.Monitoring;
 
 public static class AsusProfileOptions
 {

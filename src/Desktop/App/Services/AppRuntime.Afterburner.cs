@@ -1,8 +1,8 @@
 using Microsoft.UI.Windowing;
-using Rtx5090Monitoring.App.Msi.Afterburner;
-using Rtx5090Monitoring.Presentation.Msi.Afterburner;
+using RTXLens.App.Msi.Afterburner;
+using RTXLens.Presentation.Msi.Afterburner;
 
-namespace Rtx5090Monitoring.App.Services;
+namespace RTXLens.App.Services;
 
 internal sealed partial class AppRuntime
 {
@@ -13,7 +13,7 @@ internal sealed partial class AppRuntime
         try
         {
             var selection = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "Rtx5090Monitoring", "afterburner-installation.txt");
+                "RTXLens", "afterburner-installation.txt");
             var remembered = File.Exists(selection) ? await File.ReadAllTextAsync(selection) : null;
             return await Task.Run(() => AfterburnerDiscovery.Find(remembered).Length > 0);
         }
@@ -38,10 +38,7 @@ internal sealed partial class AppRuntime
             var window = new AfterburnerSettingsWindow(this);
             AfterburnerWindow = window;
             window.Closed += (_, _) => AfterburnerWindow = null;
-            var area = DisplayArea.GetFromWindowId(window.AppWindow.Id, DisplayAreaFallback.Primary).WorkArea;
-            var scale = _window?.ThemeRoot.XamlRoot?.RasterizationScale ?? 1;
-            window.AppWindow.Resize(new Windows.Graphics.SizeInt32(Math.Min(area.Width, (int)(1280 * scale)),
-                Math.Min(area.Height, (int)(1000 * scale))));
+            TrackWindow(window, "afterburner-settings", 1280, 1000);
         }
 
         AfterburnerWindow.Activate();

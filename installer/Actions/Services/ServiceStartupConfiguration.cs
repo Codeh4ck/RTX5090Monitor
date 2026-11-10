@@ -2,7 +2,7 @@ using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 
-namespace Rtx5090Monitoring.Installer.Actions.Services;
+namespace RTXLens.Installer.Actions.Services;
 
 public static class ServiceStartupConfiguration
 {
@@ -18,7 +18,7 @@ public static class ServiceStartupConfiguration
 
         try
         {
-            var service = OpenService(manager, "Rtx5090MonitoringService", 4);
+            var service = OpenService(manager, "RTXLensService", 4);
             if (service == IntPtr.Zero)
             {
                 return Marshal.GetLastWin32Error() == 1060 ? 0 : throw new Win32Exception(Marshal.GetLastWin32Error());
@@ -55,7 +55,7 @@ public static class ServiceStartupConfiguration
 
         try
         {
-            var service = OpenService(manager, "Rtx5090MonitoringService", 2);
+            var service = OpenService(manager, "RTXLensService", 2);
             if (service == IntPtr.Zero)
             {
                 throw new Win32Exception(Marshal.GetLastWin32Error());

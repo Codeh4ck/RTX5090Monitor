@@ -2,11 +2,11 @@ using System.Security.Cryptography;
 using System.Security.Principal;
 using System.Text;
 using Microsoft.UI.Windowing;
-using Rtx5090Monitoring.App.Msi.Afterburner;
-using Rtx5090Monitoring.Contracts.Sensors;
-using Rtx5090Monitoring.Plugins.Msi.Contracts.Safeguard;
+using RTXLens.App.Msi.Afterburner;
+using RTXLens.Contracts.Sensors;
+using RTXLens.Plugins.Msi.Contracts.Safeguard;
 
-namespace Rtx5090Monitoring.App.Services;
+namespace RTXLens.App.Services;
 
 internal sealed partial class AppRuntime
 {
@@ -135,10 +135,7 @@ internal sealed partial class AppRuntime
             var window = new SafeguardHistoryWindow(this);
             SafeguardHistory = window;
             window.Closed += (_, _) => SafeguardHistory = null;
-            var area = DisplayArea.GetFromWindowId(window.AppWindow.Id, DisplayAreaFallback.Primary).WorkArea;
-            var scale = _window?.ThemeRoot.XamlRoot?.RasterizationScale ?? 1;
-            window.AppWindow.Resize(new Windows.Graphics.SizeInt32(Math.Min(area.Width, (int)(1040 * scale)),
-                Math.Min(area.Height, (int)(620 * scale))));
+            TrackWindow(window, "safeguard-history", 1040, 620);
         }
 
         SafeguardHistory.Activate();

@@ -1,6 +1,6 @@
-using Rtx5090Monitoring.Presentation.Telemetry;
+using RTXLens.Presentation.Telemetry;
 
-namespace Rtx5090Monitoring.App.Msi.Afterburner;
+namespace RTXLens.App.Msi.Afterburner;
 
 public sealed record SafeguardHistoryRow(Guid Id, string Name, string Date, string Status, bool Running)
 {

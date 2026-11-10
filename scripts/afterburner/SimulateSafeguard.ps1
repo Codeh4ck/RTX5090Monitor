@@ -24,7 +24,7 @@ if ($Probe) {
 }
 
 $root = if ($Simulate) { [IO.Path]::GetFullPath($TestRoot) } else {
-    Join-Path ([Environment]::GetFolderPath([Environment+SpecialFolder]::CommonApplicationData)) 'Rtx5090Monitoring.Safeguard'
+    Join-Path ([Environment]::GetFolderPath([Environment+SpecialFolder]::CommonApplicationData)) 'RTXLens.Safeguard'
 }
 $bindingPath = Join-Path $root ('bindings\' + $BindingId.ToString('N') + '.json')
 $history = Join-Path $root 'history'

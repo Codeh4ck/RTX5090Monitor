@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <ItemGroup>
+        <EmbeddedResource Include="Performance/PerformanceChart.html" LogicalName="RTXLens.PerformanceChart.html" />
+        <ProjectReference Include="../../Plugins/Msi/Contracts/RTXLens.Plugins.Msi.Contracts.csproj" />
+        <ProjectReference Include="../Client/RTXLens.Client.csproj" />
+        <ProjectReference Include="../../Plugins/Asus/Contracts/RTXLens.Plugins.Asus.Contracts.csproj" />
+        <ProjectReference Include="../../Plugins/WireView/Contracts/RTXLens.Plugins.WireView.Contracts.csproj" />
+    </ItemGroup>
+</Project>

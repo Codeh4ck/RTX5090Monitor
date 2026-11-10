@@ -1,5 +1,5 @@
-﻿using Rtx5090Monitoring.Contracts.Enums;
+﻿using RTXLens.Contracts.Enums;
 
-namespace Rtx5090Monitoring.Contracts.Health;
+namespace RTXLens.Contracts.Health;
 
 public sealed record PluginHealth(string PluginId, PluginState State, DateTimeOffset? LastSuccessAt, string? Message);

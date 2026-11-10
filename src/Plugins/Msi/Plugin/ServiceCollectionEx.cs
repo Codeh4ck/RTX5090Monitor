@@ -1,9 +1,9 @@
 using Microsoft.Extensions.DependencyInjection;
-using Rtx5090Monitoring.Core.Plugins;
-using Rtx5090Monitoring.Plugins.Msi.Factories;
-using Rtx5090Monitoring.Plugins.Msi.Serialization;
+using RTXLens.Core.Plugins;
+using RTXLens.Plugins.Msi.Factories;
+using RTXLens.Plugins.Msi.Serialization;
 
-namespace Rtx5090Monitoring.Plugins.Msi;
+namespace RTXLens.Plugins.Msi;
 
 public static class ServiceCollectionEx
 {

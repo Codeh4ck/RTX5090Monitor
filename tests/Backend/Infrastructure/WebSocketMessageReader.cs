@@ -1,7 +1,7 @@
 using System.Net.WebSockets;
 using System.Text.Json;
 
-namespace Rtx5090Monitoring.Tests.Infrastructure;
+namespace RTXLens.Tests.Infrastructure;
 
 internal static class WebSocketMessageReader
 {

@@ -1,13 +1,13 @@
-using Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.Warnings;
+using RTXLens.Plugins.GenericNvidia.Contracts.Warnings;
 using Microsoft.UI.Xaml.Controls;
-using Rtx5090Monitoring.App.Services;
-using Rtx5090Monitoring.App.Views;
-using Rtx5090Monitoring.App.Views.Dialogs;
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Debugging.Models;
-using Rtx5090Monitoring.Presentation.Settings;
+using RTXLens.App.Services;
+using RTXLens.App.Views;
+using RTXLens.App.Views.Dialogs;
+using RTXLens.Contracts.Enums;
+using RTXLens.Debugging.Models;
+using RTXLens.Presentation.Settings;
 
-namespace Rtx5090Monitoring.App.Diagnostics;
+namespace RTXLens.App.Diagnostics;
 
 internal static class WarningPolicySmokeTests
 {

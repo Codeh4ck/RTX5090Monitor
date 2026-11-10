@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
-using Rtx5090Monitoring.Core.Http;
-using Rtx5090Monitoring.Core.Plugins;
-using Rtx5090Monitoring.Plugins.Msi.Serialization;
+using RTXLens.Core.Http;
+using RTXLens.Core.Plugins;
+using RTXLens.Plugins.Msi.Serialization;
 
-namespace Rtx5090Monitoring.Plugins.Msi.Endpoints;
+namespace RTXLens.Plugins.Msi.Endpoints;
 
 public static class MsiEndpoints
 {
