@@ -1,6 +1,6 @@
-using Rtx5090Monitoring.Service.Services;
+using RTXLens.Service.Services;
 
-namespace Rtx5090Monitoring.Tests.TestDoubles;
+namespace RTXLens.Tests.TestDoubles;
 
 internal sealed class TestServiceRestart : IServiceRestart
 {

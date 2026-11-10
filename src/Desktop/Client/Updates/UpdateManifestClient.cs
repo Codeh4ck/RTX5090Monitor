@@ -1,15 +1,15 @@
 using System.Text.Json;
-using Rtx5090Monitoring.Client.Serialization;
-using Rtx5090Monitoring.Contracts.Updates;
+using RTXLens.Client.Serialization;
+using RTXLens.Contracts.Updates;
 
-namespace Rtx5090Monitoring.Client.Updates;
+namespace RTXLens.Client.Updates;
 
 public sealed class UpdateManifestClient(HttpClient http)
 {
     public async Task<ReleaseManifest> GetAsync(CancellationToken token)
     {
         using var request = new HttpRequestMessage(HttpMethod.Get, ReleaseManifest.ManifestUrl);
-        request.Headers.UserAgent.ParseAdd("RTXMonitor-UpdateCheck/1.0");
+        request.Headers.UserAgent.ParseAdd("RTXLens-UpdateCheck/1.0");
         request.Headers.CacheControl = new System.Net.Http.Headers.CacheControlHeaderValue { NoCache = true };
         using var response = await http.SendAsync(request, token);
         response.EnsureSuccessStatusCode();

@@ -1,14 +1,14 @@
 using System.Globalization;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Contracts.Discovery;
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Contracts.Health;
-using Rtx5090Monitoring.Contracts.Sensors;
-using Rtx5090Monitoring.Presentation.Settings;
-using Rtx5090Monitoring.Presentation.Telemetry;
-using Rtx5090Monitoring.Tests.Infrastructure;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Contracts.Discovery;
+using RTXLens.Contracts.Enums;
+using RTXLens.Contracts.Health;
+using RTXLens.Contracts.Sensors;
+using RTXLens.Presentation.Settings;
+using RTXLens.Presentation.Telemetry;
+using RTXLens.Tests.Infrastructure;
 
-namespace Rtx5090Monitoring.UI.Tests.Telemetry;
+namespace RTXLens.UI.Tests.Telemetry;
 
 internal static class PsuComparisonTests
 {

@@ -1,10 +1,10 @@
-using Rtx5090Monitoring.Core.Configuration;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Contracts.Monitoring;
-using Rtx5090Monitoring.Core.Plugins;
-using Rtx5090Monitoring.Core.Utilities;
+using RTXLens.Core.Configuration;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Contracts.Monitoring;
+using RTXLens.Core.Plugins;
+using RTXLens.Core.Utilities;
 
-namespace Rtx5090Monitoring.Service.Configuration;
+namespace RTXLens.Service.Configuration;
 
 public sealed class RuntimeConfigurationService(PluginRuntimeManager runtime, RuntimeConfigurationFile file,
     IConfiguration bootstrap, ILogger<RuntimeConfigurationService> logger) : BackgroundService, IRuntimeConfiguration

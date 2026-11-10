@@ -1,6 +1,6 @@
 ﻿using System.Threading.Channels;
 
-namespace Rtx5090Monitoring.Core.Streaming;
+namespace RTXLens.Core.Streaming;
 
 public sealed class Subscription : IDisposable
 {

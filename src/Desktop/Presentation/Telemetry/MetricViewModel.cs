@@ -1,6 +1,6 @@
-using Rtx5090Monitoring.Presentation.Infrastructure;
+using RTXLens.Presentation.Infrastructure;
 
-namespace Rtx5090Monitoring.Presentation.Telemetry;
+namespace RTXLens.Presentation.Telemetry;
 
 public sealed class MetricViewModel(string label, string value = "Unavailable", string? iconName = null) : ObservableObject
 {

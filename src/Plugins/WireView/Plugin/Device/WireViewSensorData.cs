@@ -1,4 +1,4 @@
-namespace Rtx5090Monitoring.Plugins.WireView.Device;
+namespace RTXLens.Plugins.WireView.Device;
 
 public sealed record WireViewSensorData(
     double[] PinVoltage, // V  (6 pins)

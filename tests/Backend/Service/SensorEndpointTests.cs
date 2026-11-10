@@ -1,9 +1,9 @@
 using System.Net;
 using System.Net.WebSockets;
 using System.Text.Json;
-using Rtx5090Monitoring.Tests.Infrastructure;
+using RTXLens.Tests.Infrastructure;
 
-namespace Rtx5090Monitoring.Tests.Service;
+namespace RTXLens.Tests.Service;
 
 internal static class SensorEndpointTests
 {

@@ -1,11 +1,11 @@
 using System.Diagnostics;
 using System.Runtime.Versioning;
 using System.Security.Cryptography;
-using Rtx5090Monitoring.Contracts.Security;
+using RTXLens.Contracts.Security;
 using Microsoft.Win32;
-using Rtx5090Monitoring.Plugins.Msi.Contracts.Safeguard;
+using RTXLens.Plugins.Msi.Contracts.Safeguard;
 
-namespace Rtx5090Monitoring.Presentation.Msi.Afterburner;
+namespace RTXLens.Presentation.Msi.Afterburner;
 
 [SupportedOSPlatform("windows")]
 public static class AfterburnerSafeguard
@@ -22,9 +22,9 @@ public static class AfterburnerSafeguard
         get
         {
             using var hive = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
-            using var key = hive.OpenSubKey(@"SOFTWARE\Rtx5090Monitoring");
+            using var key = hive.OpenSubKey(@"SOFTWARE\RTXLens");
             var install = key?.GetValue("InstallDirectory") as string
-                ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Rtx5090Monitoring");
+                ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "RTXLens");
             return Path.GetFullPath(Path.Combine(install, "Service", "SafeguardScripts"));
         }
     }

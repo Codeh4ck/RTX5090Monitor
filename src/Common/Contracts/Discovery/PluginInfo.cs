@@ -1,6 +1,6 @@
-using Rtx5090Monitoring.Contracts.Enums;
+using RTXLens.Contracts.Enums;
 
-namespace Rtx5090Monitoring.Contracts.Discovery;
+namespace RTXLens.Contracts.Discovery;
 
 public sealed record PluginInfo(string Id, string Name, bool Enabled, PluginState State,
     DateTimeOffset? LastSuccessAt, string? Message, PluginCapability[] Capabilities)

@@ -271,7 +271,7 @@ export class FlyoutView {
     private notice(body: HTMLElement): void {
         const notice = document.createElement('p');
         notice.className = 'configuration-notice';
-        notice.textContent = 'Use the RTX Monitor desktop app to change backend service configuration.';
+        notice.textContent = 'Use the RTX Lens desktop app to change backend service configuration.';
         body.append(notice);
     }
 

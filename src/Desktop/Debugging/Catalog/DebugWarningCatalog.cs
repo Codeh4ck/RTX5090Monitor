@@ -1,10 +1,10 @@
-using Rtx5090Monitoring.Contracts.Warnings;
-using Rtx5090Monitoring.Plugins.GenericNvidia.Analysis.Warnings;
-using Rtx5090Monitoring.Plugins.Asus.Analysis.Warnings;
-using Rtx5090Monitoring.Plugins.WireView.Analysis.Warnings;
-using Rtx5090Monitoring.Warnings;
+using RTXLens.Contracts.Warnings;
+using RTXLens.Plugins.GenericNvidia.Analysis.Warnings;
+using RTXLens.Plugins.Asus.Analysis.Warnings;
+using RTXLens.Plugins.WireView.Analysis.Warnings;
+using RTXLens.Warnings;
 
-namespace Rtx5090Monitoring.Debugging.Catalog;
+namespace RTXLens.Debugging.Catalog;
 
 public static class DebugWarningCatalog
 {

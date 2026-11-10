@@ -1,7 +1,7 @@
-using Rtx5090Monitoring.Core.Configuration;
-using Rtx5090Monitoring.Core.Plugins;
+using RTXLens.Core.Configuration;
+using RTXLens.Core.Plugins;
 
-namespace Rtx5090Monitoring.Service.Services;
+namespace RTXLens.Service.Services;
 
 internal sealed class HardwareDiscoveryService(PluginRuntimeManager runtime, IRuntimeConfiguration configuration,
     ILogger<HardwareDiscoveryService> logger) : BackgroundService

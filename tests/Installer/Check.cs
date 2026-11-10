@@ -1,6 +1,6 @@
 using System;
 
-namespace Rtx5090Monitoring.Installer.Tests;
+namespace RTXLens.Installer.Tests;
 
 internal static class Check
 {

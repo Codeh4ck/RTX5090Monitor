@@ -7,7 +7,7 @@
         <ReleaseTag>$([System.Text.RegularExpressions.Regex]::Match('$(VersionManifestJson)', '&quot;releaseTag&quot;\s*:\s*&quot;([^&quot;]+)&quot;').Groups[1].Value)</ReleaseTag>
         <ReleaseVersion>$(ReleaseTag.Substring(1))</ReleaseVersion>
         <Version>$(ServiceVersion)</Version>
-        <Version Condition="'$(MSBuildProjectName)' == 'Rtx5090Monitoring.App'">$(DesktopVersion)</Version>
+        <Version Condition="'$(MSBuildProjectName)' == 'RTXLens.App'">$(DesktopVersion)</Version>
         <TargetFramework>net10.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>

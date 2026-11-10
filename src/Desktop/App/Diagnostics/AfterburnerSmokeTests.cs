@@ -4,12 +4,12 @@ using Microsoft.UI.Xaml.Automation.Provider;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using System.Reflection;
-using Rtx5090Monitoring.App.Msi.Afterburner;
-using Rtx5090Monitoring.App.Services;
-using Rtx5090Monitoring.App.Views;
-using Rtx5090Monitoring.Presentation.Msi.Afterburner;
+using RTXLens.App.Msi.Afterburner;
+using RTXLens.App.Services;
+using RTXLens.App.Views;
+using RTXLens.Presentation.Msi.Afterburner;
 
-namespace Rtx5090Monitoring.App.Diagnostics;
+namespace RTXLens.App.Diagnostics;
 
 internal static class AfterburnerSmokeTests
 {
@@ -94,7 +94,7 @@ internal static class AfterburnerSmokeTests
 
         if (AfterburnerFileStore.DefaultBackupRoot != Path.Combine(AppContext.BaseDirectory, "AfterburnerBackups"))
         {
-            throw new InvalidOperationException("The active backup root must be beside the RTX Monitor executable.");
+            throw new InvalidOperationException("The active backup root must be beside the RTX Lens executable.");
         }
         var softwareCheckbox = (CheckBox)integration.FindName("SoftwareAlarmsEnabled");
         var checkboxRow = (Grid)softwareCheckbox.Parent;

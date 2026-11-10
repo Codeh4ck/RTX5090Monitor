@@ -1,4 +1,4 @@
-namespace Rtx5090Monitoring.Service.Endpoints;
+namespace RTXLens.Service.Endpoints;
 
 internal static class MonitoringEndpoints
 {

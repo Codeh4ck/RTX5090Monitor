@@ -5,11 +5,11 @@
 
     <ItemGroup>
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
-        <ProjectReference Include="../../src/Core/Rtx5090Monitoring.Core.csproj" />
-        <ProjectReference Include="../../src/Plugins/Asus/Contracts/Rtx5090Monitoring.Plugins.Asus.Contracts.csproj" />
-        <ProjectReference Include="../../src/Plugins/WireView/Contracts/Rtx5090Monitoring.Plugins.WireView.Contracts.csproj" />
-        <ProjectReference Include="../../src/Desktop/Client/Rtx5090Monitoring.Client.csproj" />
-        <ProjectReference Include="../../src/Service/Rtx5090Monitoring.Service.csproj" />
+        <ProjectReference Include="../../src/Core/RTXLens.Core.csproj" />
+        <ProjectReference Include="../../src/Plugins/Asus/Contracts/RTXLens.Plugins.Asus.Contracts.csproj" />
+        <ProjectReference Include="../../src/Plugins/WireView/Contracts/RTXLens.Plugins.WireView.Contracts.csproj" />
+        <ProjectReference Include="../../src/Desktop/Client/RTXLens.Client.csproj" />
+        <ProjectReference Include="../../src/Service/RTXLens.Service.csproj" />
     </ItemGroup>
 
     <ItemGroup>

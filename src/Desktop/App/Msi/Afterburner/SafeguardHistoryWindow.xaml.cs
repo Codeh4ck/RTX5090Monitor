@@ -1,13 +1,13 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
-using Rtx5090Monitoring.App.Services;
-using Rtx5090Monitoring.Plugins.Msi.Contracts.Safeguard;
-using Rtx5090Monitoring.Presentation.Settings;
-using Rtx5090Monitoring.Presentation.Telemetry;
-using Rtx5090Monitoring.SafeguardReporting;
+using RTXLens.App.Services;
+using RTXLens.Plugins.Msi.Contracts.Safeguard;
+using RTXLens.Presentation.Settings;
+using RTXLens.Presentation.Telemetry;
+using RTXLens.SafeguardReporting;
 
-namespace Rtx5090Monitoring.App.Msi.Afterburner;
+namespace RTXLens.App.Msi.Afterburner;
 
 internal sealed partial class SafeguardHistoryWindow : Window
 {

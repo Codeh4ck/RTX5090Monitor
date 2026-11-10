@@ -1,9 +1,9 @@
-using Rtx5090Monitoring.Plugins.Msi.Contracts.Configuration;
-using Rtx5090Monitoring.Plugins.Msi.Contracts.Devices;
-using Rtx5090Monitoring.Plugins.Msi.Contracts.Telemetry;
-using Rtx5090Monitoring.Plugins.Msi.Device;
+using RTXLens.Plugins.Msi.Contracts.Configuration;
+using RTXLens.Plugins.Msi.Contracts.Devices;
+using RTXLens.Plugins.Msi.Contracts.Telemetry;
+using RTXLens.Plugins.Msi.Device;
 
-namespace Rtx5090Monitoring.Tests.TestDoubles;
+namespace RTXLens.Tests.TestDoubles;
 
 internal sealed class TestMsiReader(MsiTestState state) : IMsiPsuReader
 {

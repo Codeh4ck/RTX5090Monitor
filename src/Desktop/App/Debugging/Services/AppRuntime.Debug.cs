@@ -1,15 +1,15 @@
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Windowing;
-using Rtx5090Monitoring.App.Debugging.Windows;
-using Rtx5090Monitoring.Debugging;
-using Rtx5090Monitoring.Debugging.Api;
-using Rtx5090Monitoring.Debugging.Catalog;
-using Rtx5090Monitoring.Debugging.Models;
-using Rtx5090Monitoring.Presentation.Configuration;
-using Rtx5090Monitoring.Presentation.Notifications;
-using Rtx5090Monitoring.Presentation.Telemetry;
+using RTXLens.App.Debugging.Windows;
+using RTXLens.Debugging;
+using RTXLens.Debugging.Api;
+using RTXLens.Debugging.Catalog;
+using RTXLens.Debugging.Models;
+using RTXLens.Presentation.Configuration;
+using RTXLens.Presentation.Notifications;
+using RTXLens.Presentation.Telemetry;
 
-namespace Rtx5090Monitoring.App.Services;
+namespace RTXLens.App.Services;
 
 internal sealed partial class AppRuntime
 {
@@ -22,7 +22,7 @@ internal sealed partial class AppRuntime
     private long _debugRevision = -1;
     private bool _wasDebugEnabled;
     private bool _publishingDebug;
-    private Rtx5090Monitoring.Plugins.WireView.Contracts.Common.DeviceConfig? _liveWireViewConfiguration;
+    private RTXLens.Plugins.WireView.Contracts.Common.DeviceConfig? _liveWireViewConfiguration;
     public DebugSession Debug { get; } = new();
     internal DebugWindow? DebugConsole { get; private set; }
     internal int DebugNotificationCount { get; private set; }

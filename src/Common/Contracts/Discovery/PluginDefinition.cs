@@ -1,4 +1,4 @@
-namespace Rtx5090Monitoring.Contracts.Discovery;
+namespace RTXLens.Contracts.Discovery;
 
 public sealed record PluginDefinition(string Id, string Name, PluginCapability[] Capabilities)
 {

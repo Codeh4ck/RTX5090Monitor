@@ -1,15 +1,15 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Net.WebSockets;
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Contracts.Sensors;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Contracts.Monitoring;
-using Rtx5090Monitoring.Service.Configuration;
-using Rtx5090Monitoring.Tests.Infrastructure;
-using Rtx5090Monitoring.Tests.TestDoubles;
+using RTXLens.Contracts.Enums;
+using RTXLens.Contracts.Sensors;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Contracts.Monitoring;
+using RTXLens.Service.Configuration;
+using RTXLens.Tests.Infrastructure;
+using RTXLens.Tests.TestDoubles;
 
-namespace Rtx5090Monitoring.Tests.Service;
+namespace RTXLens.Tests.Service;
 
 internal static class RuntimeConfigurationTests
 {

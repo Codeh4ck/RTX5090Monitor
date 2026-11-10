@@ -1,6 +1,6 @@
-using Rtx5090Monitoring.Contracts.Sensors;
+using RTXLens.Contracts.Sensors;
 
-namespace Rtx5090Monitoring.Contracts.Monitoring;
+namespace RTXLens.Contracts.Monitoring;
 
 public static class SensorValidation
 {

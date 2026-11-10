@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Rtx5090Monitoring.Plugins.Msi.Contracts.Configuration;
+namespace RTXLens.Plugins.Msi.Contracts.Configuration;
 
 public sealed record MsiFanCurve
 {

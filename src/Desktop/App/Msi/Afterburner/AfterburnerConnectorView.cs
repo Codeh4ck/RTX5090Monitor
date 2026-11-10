@@ -1,10 +1,10 @@
 using Microsoft.UI.Xaml;
-using Rtx5090Monitoring.Plugins.Msi.Contracts.Safeguard;
+using RTXLens.Plugins.Msi.Contracts.Safeguard;
 using Microsoft.UI.Xaml.Controls;
 using Windows.Globalization.NumberFormatting;
-using Rtx5090Monitoring.Presentation.Msi.Afterburner;
+using RTXLens.Presentation.Msi.Afterburner;
 
-namespace Rtx5090Monitoring.App.Msi.Afterburner;
+namespace RTXLens.App.Msi.Afterburner;
 
 internal sealed class AfterburnerConnectorView : UserControl
 {

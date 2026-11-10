@@ -1,6 +1,6 @@
-using Rtx5090Monitoring.Contracts.Updates;
+using RTXLens.Contracts.Updates;
 
-namespace Rtx5090Monitoring.Presentation.Updates;
+namespace RTXLens.Presentation.Updates;
 
 public sealed class UpdateCheckState
 {

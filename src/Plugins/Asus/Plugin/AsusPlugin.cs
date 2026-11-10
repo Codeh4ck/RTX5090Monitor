@@ -1,19 +1,19 @@
-using Rtx5090Monitoring.Plugins.Asus.Contracts.Configuration;
+using RTXLens.Plugins.Asus.Contracts.Configuration;
 using System.Text.Json;
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Core.Plugins;
-using Rtx5090Monitoring.Core.Configuration;
-using Rtx5090Monitoring.Plugins.Asus.Configuration;
-using Rtx5090Monitoring.Plugins.Asus.Contracts.Common;
-using Rtx5090Monitoring.Plugins.Asus.Device;
-using Rtx5090Monitoring.Plugins.Asus.Mapping;
-using Rtx5090Monitoring.Plugins.Asus.Analysis.Mapping;
-using Rtx5090Monitoring.Plugins.Asus.Analysis.Monitoring;
-using Rtx5090Monitoring.Plugins.Asus.Serialization;
-using Rtx5090Monitoring.Plugins.Asus.Streaming;
+using RTXLens.Contracts.Enums;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Core.Plugins;
+using RTXLens.Core.Configuration;
+using RTXLens.Plugins.Asus.Configuration;
+using RTXLens.Plugins.Asus.Contracts.Common;
+using RTXLens.Plugins.Asus.Device;
+using RTXLens.Plugins.Asus.Mapping;
+using RTXLens.Plugins.Asus.Analysis.Mapping;
+using RTXLens.Plugins.Asus.Analysis.Monitoring;
+using RTXLens.Plugins.Asus.Serialization;
+using RTXLens.Plugins.Asus.Streaming;
 
-namespace Rtx5090Monitoring.Plugins.Asus;
+namespace RTXLens.Plugins.Asus;
 
 public sealed class AsusPlugin(PluginSettings settings, TimeProvider clock, IAsusGpuReader reader, AsusStream stream, ActiveSettingsProfileState? profiles = null) : ISensorPlugin
 {

@@ -1,7 +1,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 
-namespace Rtx5090Monitoring.App.Diagnostics;
+namespace RTXLens.App.Diagnostics;
 
 internal static class VisualTreeQuery
 {

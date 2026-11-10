@@ -1,12 +1,12 @@
-using Rtx5090Monitoring.Contracts.Discovery;
-using Rtx5090Monitoring.Plugins.Asus.Contracts.Warnings;
-using Rtx5090Monitoring.Contracts.Warnings;
-using Rtx5090Monitoring.Presentation.Notifications;
-using Rtx5090Monitoring.Presentation.Settings;
-using Rtx5090Monitoring.Tests.Infrastructure;
-using Rtx5090Monitoring.UI.Tests.Fixtures;
+using RTXLens.Contracts.Discovery;
+using RTXLens.Plugins.Asus.Contracts.Warnings;
+using RTXLens.Contracts.Warnings;
+using RTXLens.Presentation.Notifications;
+using RTXLens.Presentation.Settings;
+using RTXLens.Tests.Infrastructure;
+using RTXLens.UI.Tests.Fixtures;
 
-namespace Rtx5090Monitoring.UI.Tests.Telemetry;
+namespace RTXLens.UI.Tests.Telemetry;
 
 internal static class WarningDeliveryTests
 {
@@ -36,7 +36,7 @@ internal static class WarningDeliveryTests
         var state = new WarningState("first", "asus-astral", "gpu0", AsusWarningIds.CoreTemperature, "Core", "81 °C", WarningPhase.Active, "e", now, new WarningPolicy(), 1, now);
         var frame = UiTestData.Frame() with { Warnings = new WarningSnapshot("server", 1, true, [state, state with { Id = "second", Title = "Memory" }]) };
         var tracker = new WarningTransitionTracker();
-        TestAssert.Equal("RTX Monitor - 2 warnings", tracker.Evaluate(frame, now).Single().Title);
+        TestAssert.Equal("RTX Lens - 2 warnings", tracker.Evaluate(frame, now).Single().Title);
         TestAssert.Equal(0, tracker.Evaluate(frame, now).Length);
         TestAssert.Equal(0, tracker.Evaluate(frame, now, new AppPreferences { WarningNotifications = false }).Length);
         TestAssert.Equal(1, tracker.Evaluate(frame, now).Length);
@@ -45,7 +45,7 @@ internal static class WarningDeliveryTests
     }
     private static void UsesDynamicPluginDefinitionsAndPreservesAbsentPolicies()
     {
-        var model = new Rtx5090Monitoring.Presentation.Configuration.WarningOptionsEditorViewModel();
+        var model = new RTXLens.Presentation.Configuration.WarningOptionsEditorViewModel();
         model.Load(new WarningOptions { Overrides = new Dictionary<string, WarningPolicy> { ["vendor/custom"] = new() { RepeatWhileActive = true, RepeatIntervalSeconds = 11 } } });
         TestAssert.Equal(0, model.Overrides.Count);
         var plugin = UiTestData.Plugin with
@@ -70,7 +70,7 @@ internal static class WarningDeliveryTests
     }
     private static void EditsAndRevertsSharedPolicyWithoutLosingOverrides()
     {
-        var editor = new Rtx5090Monitoring.Presentation.Configuration.ConfigurationEditorViewModel(() => null!);
+        var editor = new RTXLens.Presentation.Configuration.ConfigurationEditorViewModel(() => null!);
         editor.SetCatalog(new PluginCatalog(1, [UiTestData.Plugin]));
         editor.Receive(UiTestData.Configuration);
         editor.Warnings.Defaults.RepeatWhileActive = true;

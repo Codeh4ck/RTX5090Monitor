@@ -1,25 +1,25 @@
 using Microsoft.Extensions.Hosting.WindowsServices;
 using Microsoft.Extensions.Logging.EventLog;
-using Rtx5090Monitoring.Plugins.Msi;
-using Rtx5090Monitoring.Plugins.GenericNvidia;
-using Rtx5090Monitoring.Plugins.GenericNvidia.Endpoints;
-using Rtx5090Monitoring.Plugins.Msi.Endpoints;
-using Rtx5090Monitoring.Plugins.Asus;
-using Rtx5090Monitoring.Plugins.Asus.Endpoints;
-using Rtx5090Monitoring.Plugins.WireView;
-using Rtx5090Monitoring.Plugins.WireView.Endpoints;
-using Rtx5090Monitoring.Service;
-using Rtx5090Monitoring.Service.Endpoints;
+using RTXLens.Plugins.Msi;
+using RTXLens.Plugins.GenericNvidia;
+using RTXLens.Plugins.GenericNvidia.Endpoints;
+using RTXLens.Plugins.Msi.Endpoints;
+using RTXLens.Plugins.Asus;
+using RTXLens.Plugins.Asus.Endpoints;
+using RTXLens.Plugins.WireView;
+using RTXLens.Plugins.WireView.Endpoints;
+using RTXLens.Service;
+using RTXLens.Service.Endpoints;
 
 var builder = WebApplication.CreateSlimBuilder(args);
-builder.Host.UseWindowsService(options => options.ServiceName = "Rtx5090MonitoringService");
+builder.Host.UseWindowsService(options => options.ServiceName = "RTXLensService");
 
 builder.Logging.ClearProviders();
 if (OperatingSystem.IsWindows())
 {
     builder.Logging.AddEventLog(new EventLogSettings
     {
-        SourceName = "Rtx5090MonitoringService",
+        SourceName = "RTXLensService",
         Filter = (_, level) => level >= LogLevel.Warning
     });
 }

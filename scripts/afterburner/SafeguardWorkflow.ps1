@@ -129,7 +129,7 @@ function Invoke-SafeguardWorkflow {
     param([string] $ScriptId, [guid] $BindingId, [string] $EntryScript, [switch] $Simulate, [string] $TestRoot)
 
     $root = if ($Simulate) { [IO.Path]::GetFullPath($TestRoot) } else {
-        Join-Path ([Environment]::GetFolderPath([Environment+SpecialFolder]::CommonApplicationData)) 'Rtx5090Monitoring.Safeguard'
+        Join-Path ([Environment]::GetFolderPath([Environment+SpecialFolder]::CommonApplicationData)) 'RTXLens.Safeguard'
     }
 
     if (!$Simulate) {
@@ -285,7 +285,7 @@ function Invoke-SafeguardWorkflow {
                 $run.status = 'Submitting shutdown'
                 Publish-SafeguardRecord $run $recordPath $security
                 $shutdownPath = Join-Path ([Environment]::SystemDirectory) 'shutdown.exe'
-                $shutdown = Start-SafeguardProcess $shutdownPath ('/s /f /t 0 /d p:0:0 /c "RTX Monitor Safeguard+ ' + $id.ToString('N') + '"') 5000
+                $shutdown = Start-SafeguardProcess $shutdownPath ('/s /f /t 0 /d p:0:0 /c "RTX Lens Safeguard+ ' + $id.ToString('N') + '"') 5000
             }
 
             $run.status = if ($Simulate) { 'Simulated' } elseif ($shutdown.ExitCode -eq 0) { 'Shutdown requested' } else { 'Shutdown request failed' }

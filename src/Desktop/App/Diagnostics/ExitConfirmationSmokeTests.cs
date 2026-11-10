@@ -3,11 +3,11 @@ using Microsoft.UI.Xaml.Automation.Peers;
 using Microsoft.UI.Xaml.Automation.Provider;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
-using Rtx5090Monitoring.App.Services;
-using Rtx5090Monitoring.App.Views.Dialogs;
-using Rtx5090Monitoring.Presentation.Settings;
+using RTXLens.App.Services;
+using RTXLens.App.Views.Dialogs;
+using RTXLens.Presentation.Settings;
 
-namespace Rtx5090Monitoring.App.Diagnostics;
+namespace RTXLens.App.Diagnostics;
 
 internal static class ExitConfirmationSmokeTests
 {

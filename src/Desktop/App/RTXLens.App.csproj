@@ -26,12 +26,12 @@
         <PackageReference Include="Microsoft.WindowsAppSDK.InteractiveExperiences" />
         <PackageReference Include="Microsoft.WindowsAppSDK.Runtime" />
         <PackageReference Include="Microsoft.Windows.SDK.BuildTools" PrivateAssets="all" />
-        <ProjectReference Include="../Presentation/Rtx5090Monitoring.Presentation.csproj" />
-        <ProjectReference Include="../../Plugins/Asus/Contracts/Rtx5090Monitoring.Plugins.Asus.Contracts.csproj" />
-        <ProjectReference Include="../../Plugins/WireView/Contracts/Rtx5090Monitoring.Plugins.WireView.Contracts.csproj" />
+        <ProjectReference Include="../Presentation/RTXLens.Presentation.csproj" />
+        <ProjectReference Include="../../Plugins/Asus/Contracts/RTXLens.Plugins.Asus.Contracts.csproj" />
+        <ProjectReference Include="../../Plugins/WireView/Contracts/RTXLens.Plugins.WireView.Contracts.csproj" />
     </ItemGroup>
     <ItemGroup Condition="'$(EnableTelemetryDebug)' == 'true'">
-        <ProjectReference Include="../Debugging/Rtx5090Monitoring.Debugging.csproj" />
+        <ProjectReference Include="../Debugging/RTXLens.Debugging.csproj" />
     </ItemGroup>
     <ItemGroup Condition="'$(EnableTelemetryDebug)' != 'true'">
         <Compile Remove="Debugging/**/*.cs;Demo/**/*.cs;Diagnostics/**/*.cs" />

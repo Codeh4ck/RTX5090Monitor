@@ -1,24 +1,24 @@
-using Rtx5090Monitoring.Tests.Infrastructure;
-using Rtx5090Monitoring.UI.Tests.Configuration;
-using Rtx5090Monitoring.UI.Tests.Settings;
-using Rtx5090Monitoring.UI.Tests.Streaming;
-using Rtx5090Monitoring.UI.Tests.Telemetry;
+using RTXLens.Tests.Infrastructure;
+using RTXLens.UI.Tests.Configuration;
+using RTXLens.UI.Tests.Settings;
+using RTXLens.UI.Tests.Streaming;
+using RTXLens.UI.Tests.Telemetry;
 
 if (args is ["--verify-release", var directory])
 {
-    Rtx5090Monitoring.UI.Tests.BuildVerification.ReleaseBuildVerification.Run(directory);
+    RTXLens.UI.Tests.BuildVerification.ReleaseBuildVerification.Run(directory);
     return 0;
 }
 
 if (args is ["--performance-fixture", var output])
 {
-    File.WriteAllText(output, Rtx5090Monitoring.Presentation.Performance.PerformanceHtmlExporter.Export(
-        Rtx5090Monitoring.UI.Tests.Performance.PerformanceRecordingTests.Fixture()));
+    File.WriteAllText(output, RTXLens.Presentation.Performance.PerformanceHtmlExporter.Export(
+        RTXLens.UI.Tests.Performance.PerformanceRecordingTests.Fixture()));
     return 0;
 }
 
 var runner = new TestRunner();
-Rtx5090Monitoring.UI.Tests.Performance.PerformanceRecordingTests.Run(runner);
+RTXLens.UI.Tests.Performance.PerformanceRecordingTests.Run(runner);
 TelemetryTests.Run(runner);
 HardwarePanelTests.Run(runner);
 WireViewPanelTests.Run(runner);
@@ -33,11 +33,11 @@ ConnectorProfilesTests.Run(runner);
 await EditorTests.RunAsync(runner);
 await LegacyConfigurationTests.RunAsync(runner);
 await PreferenceTests.RunAsync(runner);
-await Rtx5090Monitoring.UI.Tests.Updates.UpdateTests.RunAsync(runner);
+await RTXLens.UI.Tests.Updates.UpdateTests.RunAsync(runner);
 await SessionTests.RunAsync(runner);
 await FrameReaderTests.RunAsync(runner);
 #if TELEMETRY_DEBUG
-await Rtx5090Monitoring.UI.Tests.Debugging.DebugSessionTests.RunAsync(runner);
+await RTXLens.UI.Tests.Debugging.DebugSessionTests.RunAsync(runner);
 #endif
 runner.PrintSummary();
 return runner.FailedCount == 0 ? 0 : 1;

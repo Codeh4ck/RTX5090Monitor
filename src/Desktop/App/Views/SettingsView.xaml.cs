@@ -1,9 +1,9 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Rtx5090Monitoring.App.Services;
-using Rtx5090Monitoring.Presentation.Settings;
+using RTXLens.App.Services;
+using RTXLens.Presentation.Settings;
 
-namespace Rtx5090Monitoring.App.Views;
+namespace RTXLens.App.Views;
 
 public sealed partial class SettingsView : UserControl
 {

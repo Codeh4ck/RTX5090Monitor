@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace Rtx5090Monitoring.Contracts.Configuration;
+namespace RTXLens.Contracts.Configuration;
 
 public sealed record PluginSettings
 {

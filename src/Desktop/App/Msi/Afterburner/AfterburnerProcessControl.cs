@@ -3,9 +3,9 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 using Microsoft.Win32.SafeHandles;
-using Rtx5090Monitoring.Presentation.Msi.Afterburner;
+using RTXLens.Presentation.Msi.Afterburner;
 
-namespace Rtx5090Monitoring.App.Msi.Afterburner;
+namespace RTXLens.App.Msi.Afterburner;
 
 internal static class AfterburnerProcessControl
 {

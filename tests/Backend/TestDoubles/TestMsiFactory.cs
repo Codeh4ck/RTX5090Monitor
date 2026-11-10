@@ -1,9 +1,9 @@
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Core.Plugins;
-using Rtx5090Monitoring.Plugins.Msi;
-using Rtx5090Monitoring.Plugins.Msi.Configuration;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Core.Plugins;
+using RTXLens.Plugins.Msi;
+using RTXLens.Plugins.Msi.Configuration;
 
-namespace Rtx5090Monitoring.Tests.TestDoubles;
+namespace RTXLens.Tests.TestDoubles;
 
 internal sealed class TestMsiFactory(MsiTestState state) : ISensorPluginFactory
 {

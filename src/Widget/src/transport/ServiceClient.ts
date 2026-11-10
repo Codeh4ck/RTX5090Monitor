@@ -145,7 +145,7 @@ export class ServiceClient {
 
         if (this.store.connection !== 'incompatible') {
             this.store.connection = this.store.snapshot ? 'reconnecting' : 'offline';
-            this.store.connectionMessage = 'Service unavailable. Check that RTX Monitor service is running.';
+            this.store.connectionMessage = 'Service unavailable. Check that RTX Lens service is running.';
         }
 
         this.changed();

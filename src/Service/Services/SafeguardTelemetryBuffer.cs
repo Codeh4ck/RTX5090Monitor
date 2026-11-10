@@ -1,7 +1,7 @@
-using Rtx5090Monitoring.Contracts.Sensors;
-using Rtx5090Monitoring.Plugins.Msi.Contracts.Safeguard;
+using RTXLens.Contracts.Sensors;
+using RTXLens.Plugins.Msi.Contracts.Safeguard;
 
-namespace Rtx5090Monitoring.Service.Services;
+namespace RTXLens.Service.Services;
 
 internal sealed class SafeguardTelemetryBuffer
 {

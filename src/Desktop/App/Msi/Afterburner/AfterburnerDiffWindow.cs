@@ -3,11 +3,11 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Documents;
 using Microsoft.UI.Xaml.Media;
-using Rtx5090Monitoring.App.Services;
-using Rtx5090Monitoring.Presentation.Msi.Afterburner;
-using Rtx5090Monitoring.Presentation.Settings;
+using RTXLens.App.Services;
+using RTXLens.Presentation.Msi.Afterburner;
+using RTXLens.Presentation.Settings;
 
-namespace Rtx5090Monitoring.App.Msi.Afterburner;
+namespace RTXLens.App.Msi.Afterburner;
 
 internal sealed class AfterburnerDiffWindow : Window
 {
@@ -18,7 +18,7 @@ internal sealed class AfterburnerDiffWindow : Window
 
     private AfterburnerDiffWindow(AfterburnerChangeSet plan, AppPreferences preferences)
     {
-        Title = "RTX Monitor - Afterburner configuration diff";
+        Title = "RTX Lens - Afterburner configuration diff";
         AppWindow.SetIcon(Path.Combine(AppContext.BaseDirectory, "Assets", "monitor.ico"));
         var themeName = preferences.Theme == AppTheme.Dark || preferences.Theme == AppTheme.System
             && Application.Current.RequestedTheme == ApplicationTheme.Dark ? "Dark" : "Light";

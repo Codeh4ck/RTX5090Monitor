@@ -1,3 +1,3 @@
-namespace Rtx5090Monitoring.Presentation.Configuration;
+namespace RTXLens.Presentation.Configuration;
 
 public sealed record PsuChoice(string? Id, string Name);

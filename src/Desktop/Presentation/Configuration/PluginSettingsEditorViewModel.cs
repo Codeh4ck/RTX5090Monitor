@@ -1,12 +1,12 @@
 using System.Text.Json;
-using Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.Configuration;
-using Rtx5090Monitoring.Client.Serialization;
-using Rtx5090Monitoring.Plugins.Asus.Contracts.Configuration;
-using Rtx5090Monitoring.Plugins.Msi.Contracts.Configuration;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Presentation.Infrastructure;
+using RTXLens.Plugins.GenericNvidia.Contracts.Configuration;
+using RTXLens.Client.Serialization;
+using RTXLens.Plugins.Asus.Contracts.Configuration;
+using RTXLens.Plugins.Msi.Contracts.Configuration;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Presentation.Infrastructure;
 
-namespace Rtx5090Monitoring.Presentation.Configuration;
+namespace RTXLens.Presentation.Configuration;
 
 public sealed class PluginSettingsEditorViewModel : EditableObject
 {

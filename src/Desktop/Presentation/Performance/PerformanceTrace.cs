@@ -1,7 +1,7 @@
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Contracts.Sensors;
+using RTXLens.Contracts.Enums;
+using RTXLens.Contracts.Sensors;
 
-namespace Rtx5090Monitoring.Presentation.Performance;
+namespace RTXLens.Presentation.Performance;
 
 public sealed record PerformanceTrace(string Key, string Group, string Label, string Source, string DeviceId,
     string Unit, string Color, SensorIdentity Identity)

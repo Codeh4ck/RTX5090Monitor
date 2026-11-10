@@ -1,11 +1,11 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Rtx5090Monitoring.Contracts.Discovery;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Warnings;
+using RTXLens.Contracts.Discovery;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Warnings;
 
-namespace Rtx5090Monitoring.Core.Plugins;
+namespace RTXLens.Core.Plugins;
 
 public sealed class PluginRuntimeManager : IHostedService, IAsyncDisposable
 {

@@ -2,7 +2,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 
-namespace Rtx5090Monitoring.Presentation.Msi.Afterburner;
+namespace RTXLens.Presentation.Msi.Afterburner;
 
 public sealed partial class AfterburnerFileStore
 {

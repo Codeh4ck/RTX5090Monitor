@@ -1,8 +1,8 @@
-<UserControl x:Class="Rtx5090Monitoring.App.Views.MsiHardwareView"
+<UserControl x:Class="RTXLens.App.Views.MsiHardwareView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:controls="using:Rtx5090Monitoring.App.Controls"
-    xmlns:converters="using:Rtx5090Monitoring.App.Converters">
+    xmlns:controls="using:RTXLens.App.Controls"
+    xmlns:converters="using:RTXLens.App.Converters">
     <UserControl.Resources><converters:BooleanVisibilityConverter x:Key="BoolVisibility" /></UserControl.Resources>
     <ScrollViewer HorizontalScrollBarVisibility="Disabled" Padding="12">
         <StackPanel Spacing="14">

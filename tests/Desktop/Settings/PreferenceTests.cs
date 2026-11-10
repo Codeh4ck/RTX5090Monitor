@@ -1,8 +1,8 @@
 using System.Text.Json.Nodes;
-using Rtx5090Monitoring.Presentation.Settings;
-using Rtx5090Monitoring.Tests.Infrastructure;
+using RTXLens.Presentation.Settings;
+using RTXLens.Tests.Infrastructure;
 
-namespace Rtx5090Monitoring.UI.Tests.Settings;
+namespace RTXLens.UI.Tests.Settings;
 
 internal static class PreferenceTests
 {

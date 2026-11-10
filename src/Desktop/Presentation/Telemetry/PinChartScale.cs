@@ -1,6 +1,6 @@
-using Rtx5090Monitoring.Contracts.Configuration;
+using RTXLens.Contracts.Configuration;
 
-namespace Rtx5090Monitoring.Presentation.Telemetry;
+namespace RTXLens.Presentation.Telemetry;
 
 public sealed record PinChartScale(double Minimum, double Maximum, double Baseline, string Unit, int Intervals)
 {

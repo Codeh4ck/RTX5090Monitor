@@ -1,8 +1,8 @@
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Service.Services;
-using Rtx5090Monitoring.Tests.Infrastructure;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Service.Services;
+using RTXLens.Tests.Infrastructure;
 
-namespace Rtx5090Monitoring.Tests.Service;
+namespace RTXLens.Tests.Service;
 
 internal static class HardwareDiscoveryTests
 {

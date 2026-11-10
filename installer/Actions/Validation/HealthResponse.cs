@@ -1,6 +1,6 @@
 using System.Runtime.Serialization;
 
-namespace Rtx5090Monitoring.Installer.Actions.Validation;
+namespace RTXLens.Installer.Actions.Validation;
 
 [DataContract]
 internal sealed class HealthResponse

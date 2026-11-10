@@ -1,8 +1,8 @@
 <UserControl
-    x:Class="Rtx5090Monitoring.App.Views.SettingsProfilesView"
+    x:Class="RTXLens.App.Views.SettingsProfilesView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:controls="using:Rtx5090Monitoring.App.Controls">
+    xmlns:controls="using:RTXLens.App.Controls">
     <controls:SectionPanel Header="GPU chart profiles">
         <StackPanel Spacing="16">
             <StackPanel Orientation="Horizontal" Spacing="8">

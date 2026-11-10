@@ -1,6 +1,6 @@
-using Rtx5090Monitoring.Core.Streaming;
+using RTXLens.Core.Streaming;
 
-namespace Rtx5090Monitoring.Plugins.Asus.Streaming;
+namespace RTXLens.Plugins.Asus.Streaming;
 
 public sealed class AsusStream : IDisposable
 {

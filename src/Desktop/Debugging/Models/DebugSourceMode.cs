@@ -1,4 +1,4 @@
-namespace Rtx5090Monitoring.Debugging.Models;
+namespace RTXLens.Debugging.Models;
 
 public enum DebugSourceMode
 {

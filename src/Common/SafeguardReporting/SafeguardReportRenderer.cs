@@ -1,12 +1,12 @@
 using System.Globalization;
 using System.Net;
 using System.Text;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Contracts.Sensors;
-using Rtx5090Monitoring.Plugins.Msi.Contracts.Safeguard;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Contracts.Enums;
+using RTXLens.Contracts.Sensors;
+using RTXLens.Plugins.Msi.Contracts.Safeguard;
 
-namespace Rtx5090Monitoring.SafeguardReporting;
+namespace RTXLens.SafeguardReporting;
 
 internal static class SafeguardReportRenderer
 {
@@ -45,12 +45,12 @@ internal static class SafeguardReportRenderer
 
         html.Append($"""
                             <tr><td style="padding:12px 4px 18px;border-bottom:1px solid {Border};">
-                                <p style="margin:0 0 6px;color:{Accent};font-size:12px;font-weight:bold;">RTX MONITOR</p>
+                                <p style="margin:0 0 6px;color:{Accent};font-size:12px;font-weight:bold;">RTX LENS</p>
                                 <h1 style="margin:0;color:{Text};font-size:24px;">{Encode(title)}</h1>
                                 <p style="margin:6px 0 0;color:{Muted};">{Encode(report.MachineName)}</p>
                             </td></tr>
             """);
-        plain.AppendLine("RTX Monitor").AppendLine(title).AppendLine(report.MachineName);
+        plain.AppendLine("RTX Lens").AppendLine(title).AppendLine(report.MachineName);
 
         if (simulation && !report.IsTestEmail)
         {

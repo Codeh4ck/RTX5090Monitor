@@ -1,4 +1,4 @@
-﻿namespace Rtx5090Monitoring.Contracts.Enums;
+﻿namespace RTXLens.Contracts.Enums;
 
 public enum SensorMetric
 {

@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace Rtx5090Monitoring.Plugins.Msi.Protocol;
+namespace RTXLens.Plugins.Msi.Protocol;
 
 internal static class MsiProtocol
 {

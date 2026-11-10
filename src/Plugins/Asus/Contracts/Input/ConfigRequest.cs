@@ -1,4 +1,4 @@
-namespace Rtx5090Monitoring.Plugins.Asus.Contracts.Input;
+namespace RTXLens.Plugins.Asus.Contracts.Input;
 
 public sealed record ConfigRequest
 {

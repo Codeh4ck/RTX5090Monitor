@@ -1,19 +1,19 @@
-using Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.Devices;
-using Rtx5090Monitoring.Plugins.Asus.Contracts.Common;
-using Rtx5090Monitoring.Plugins.Msi.Contracts.Devices;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Contracts.Discovery;
-using Rtx5090Monitoring.Contracts.Health;
-using Rtx5090Monitoring.Contracts.Sensors;
-using Rtx5090Monitoring.Plugins.WireView.Contracts.Common;
-using Rtx5090Monitoring.Plugins.WireView.Contracts.Input;
+using RTXLens.Plugins.GenericNvidia.Contracts.Devices;
+using RTXLens.Plugins.Asus.Contracts.Common;
+using RTXLens.Plugins.Msi.Contracts.Devices;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Contracts.Discovery;
+using RTXLens.Contracts.Health;
+using RTXLens.Contracts.Sensors;
+using RTXLens.Plugins.WireView.Contracts.Common;
+using RTXLens.Plugins.WireView.Contracts.Input;
 
-namespace Rtx5090Monitoring.Client.Http;
+namespace RTXLens.Client.Http;
 
 public interface IMonitoringApi
 {
     Uri Address { get; }
-    Task<Rtx5090Monitoring.Contracts.Updates.ServiceVersionResponse?> GetVersionAsync(CancellationToken token);
+    Task<RTXLens.Contracts.Updates.ServiceVersionResponse?> GetVersionAsync(CancellationToken token);
     Task<HealthResponse> GetHealthAsync(CancellationToken token);
     Task<PluginCatalog> GetPluginsAsync(CancellationToken token);
     Task<SettingsProfileCatalog> GetSettingsProfilesAsync(CancellationToken token) =>
@@ -35,8 +35,8 @@ public interface IMonitoringApi
     Task<AsusDeviceInfo[]> GetAsusDevicesAsync(CancellationToken token);
     Task<NvidiaDeviceInfo[]> GetNvidiaDevicesAsync(CancellationToken token) => Task.FromResult(Array.Empty<NvidiaDeviceInfo>());
     Task<MsiDeviceInfo[]> GetMsiDevicesAsync(CancellationToken token);
-    Task<Rtx5090Monitoring.Plugins.Msi.Contracts.Telemetry.MsiSnapshot> GetMsiSnapshotAsync(CancellationToken token) =>
-        Task.FromException<Rtx5090Monitoring.Plugins.Msi.Contracts.Telemetry.MsiSnapshot>(
+    Task<RTXLens.Plugins.Msi.Contracts.Telemetry.MsiSnapshot> GetMsiSnapshotAsync(CancellationToken token) =>
+        Task.FromException<RTXLens.Plugins.Msi.Contracts.Telemetry.MsiSnapshot>(
             new NotSupportedException("MSI fan telemetry is unavailable from this connection."));
     Task ClearWireViewFaultsAsync(ClearFaultsRequest request, CancellationToken token);
     Task RestartPluginAsync(string pluginId, CancellationToken token);

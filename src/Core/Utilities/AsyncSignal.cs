@@ -1,6 +1,6 @@
 using System.Threading.Channels;
 
-namespace Rtx5090Monitoring.Core.Utilities;
+namespace RTXLens.Core.Utilities;
 
 public sealed class AsyncSignal
 {

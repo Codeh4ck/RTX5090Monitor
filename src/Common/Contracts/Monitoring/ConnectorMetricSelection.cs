@@ -1,6 +1,6 @@
-using Rtx5090Monitoring.Contracts.Enums;
+using RTXLens.Contracts.Enums;
 
-namespace Rtx5090Monitoring.Contracts.Monitoring;
+namespace RTXLens.Contracts.Monitoring;
 
 public sealed class ConnectorMetricSelection
 {

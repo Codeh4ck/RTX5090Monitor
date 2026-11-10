@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Http;
-using Rtx5090Monitoring.Contracts.Configuration;
+using RTXLens.Contracts.Configuration;
 
-namespace Rtx5090Monitoring.Core.Http;
+namespace RTXLens.Core.Http;
 
 public static class ConfigurationPrecondition
 {

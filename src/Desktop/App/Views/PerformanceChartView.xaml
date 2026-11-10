@@ -1,5 +1,5 @@
 <UserControl
-    x:Class="Rtx5090Monitoring.App.Views.PerformanceChartView"
+    x:Class="RTXLens.App.Views.PerformanceChartView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Grid Padding="12" RowDefinitions="Auto,Auto,*" RowSpacing="12">

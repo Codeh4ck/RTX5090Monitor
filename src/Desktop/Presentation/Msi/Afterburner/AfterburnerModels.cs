@@ -1,9 +1,9 @@
 using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
-using Rtx5090Monitoring.Plugins.Msi.Contracts.Safeguard;
+using RTXLens.Plugins.Msi.Contracts.Safeguard;
 
-namespace Rtx5090Monitoring.Presentation.Msi.Afterburner;
+namespace RTXLens.Presentation.Msi.Afterburner;
 
 public sealed record AfterburnerSettings(
     bool MonitoringEnabled,

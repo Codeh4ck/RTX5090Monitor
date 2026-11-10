@@ -1,4 +1,4 @@
-namespace Rtx5090Monitoring.Debugging.Processing;
+namespace RTXLens.Debugging.Processing;
 
 public static class SimulationConnectorProfiles
 {

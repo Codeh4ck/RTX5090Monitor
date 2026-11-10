@@ -1,8 +1,8 @@
 using System.Collections.ObjectModel;
-using Rtx5090Monitoring.Contracts.Updates;
-using Rtx5090Monitoring.Presentation.Infrastructure;
+using RTXLens.Contracts.Updates;
+using RTXLens.Presentation.Infrastructure;
 
-namespace Rtx5090Monitoring.Presentation.Updates;
+namespace RTXLens.Presentation.Updates;
 
 public sealed class UpdateViewModel : ObservableObject
 {

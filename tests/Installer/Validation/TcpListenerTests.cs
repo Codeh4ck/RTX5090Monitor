@@ -2,9 +2,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using Rtx5090Monitoring.Installer.Actions.Validation;
+using RTXLens.Installer.Actions.Validation;
 
-namespace Rtx5090Monitoring.Installer.Tests.Validation;
+namespace RTXLens.Installer.Tests.Validation;
 
 internal static class TcpListenerTests
 {

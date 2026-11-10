@@ -1,9 +1,9 @@
 using System.Text.Json;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Contracts.Sensors;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Contracts.Enums;
+using RTXLens.Contracts.Sensors;
 
-namespace Rtx5090Monitoring.Service.Configuration;
+namespace RTXLens.Service.Configuration;
 
 internal sealed class DeviceWarningProfileStore(SettingsProfileStore settings, ILogger<DeviceWarningProfileStore> logger)
 {

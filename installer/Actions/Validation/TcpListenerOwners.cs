@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.Net;
 using System.Runtime.InteropServices;
 
-namespace Rtx5090Monitoring.Installer.Actions.Validation;
+namespace RTXLens.Installer.Actions.Validation;
 
 public static class TcpListenerOwners
 {

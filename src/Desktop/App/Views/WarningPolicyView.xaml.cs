@@ -1,7 +1,7 @@
 using Microsoft.UI.Xaml.Controls;
-using Rtx5090Monitoring.Presentation.Configuration;
+using RTXLens.Presentation.Configuration;
 
-namespace Rtx5090Monitoring.App.Views;
+namespace RTXLens.App.Views;
 
 public sealed partial class WarningPolicyView : UserControl
 {

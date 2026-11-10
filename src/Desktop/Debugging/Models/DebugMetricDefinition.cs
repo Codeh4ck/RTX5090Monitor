@@ -1,7 +1,7 @@
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Contracts.Sensors;
+using RTXLens.Contracts.Enums;
+using RTXLens.Contracts.Sensors;
 
-namespace Rtx5090Monitoring.Debugging.Models;
+namespace RTXLens.Debugging.Models;
 
 public sealed record DebugMetricDefinition(string Group, string Label, SensorComponent Component, SensorMetric Metric,
     double DefaultValue, int? Channel = null, string? ConnectorId = null)

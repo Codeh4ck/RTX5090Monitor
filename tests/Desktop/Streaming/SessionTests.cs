@@ -1,9 +1,9 @@
-using Rtx5090Monitoring.Client.Streaming;
-using Rtx5090Monitoring.Tests.Infrastructure;
-using Rtx5090Monitoring.UI.Tests.Fixtures;
-using Rtx5090Monitoring.UI.Tests.TestDoubles;
+using RTXLens.Client.Streaming;
+using RTXLens.Tests.Infrastructure;
+using RTXLens.UI.Tests.Fixtures;
+using RTXLens.UI.Tests.TestDoubles;
 
-namespace Rtx5090Monitoring.UI.Tests.Streaming;
+namespace RTXLens.UI.Tests.Streaming;
 
 internal static class SessionTests
 {

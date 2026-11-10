@@ -1,22 +1,22 @@
 using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
 
-namespace Rtx5090Monitoring.UI.Tests.BuildVerification;
+namespace RTXLens.UI.Tests.BuildVerification;
 
 internal static class ReleaseBuildVerification
 {
     public static void Run(string directory)
     {
-        using var stream = File.OpenRead(Path.Combine(directory, "Rtx5090Monitoring.App.dll"));
+        using var stream = File.OpenRead(Path.Combine(directory, "RTXLens.App.dll"));
         using var pe = new PEReader(stream);
         var metadata = pe.GetMetadataReader();
         foreach (var handle in metadata.TypeDefinitions)
         {
             var definition = metadata.GetTypeDefinition(handle);
             var name = metadata.GetString(definition.Namespace);
-            if (name.StartsWith("Rtx5090Monitoring.App.Debugging", StringComparison.Ordinal)
-                || name.StartsWith("Rtx5090Monitoring.App.Demo", StringComparison.Ordinal)
-                || name.StartsWith("Rtx5090Monitoring.App.Diagnostics", StringComparison.Ordinal))
+            if (name.StartsWith("RTXLens.App.Debugging", StringComparison.Ordinal)
+                || name.StartsWith("RTXLens.App.Demo", StringComparison.Ordinal)
+                || name.StartsWith("RTXLens.App.Diagnostics", StringComparison.Ordinal))
             {
                 throw new InvalidOperationException("Ordinary Release includes a simulation type: " + name);
             }
@@ -30,12 +30,12 @@ internal static class ReleaseBuildVerification
         foreach (var handle in metadata.AssemblyReferences)
         {
             var name = metadata.GetString(metadata.GetAssemblyReference(handle).Name);
-            if (name is "Rtx5090Monitoring.Debugging" or "Rtx5090Monitoring.Plugins.Asus.Analysis" or "Rtx5090Monitoring.Plugins.WireView.Analysis" or "Rtx5090Monitoring.Warnings")
+            if (name is "RTXLens.Debugging" or "RTXLens.Plugins.Asus.Analysis" or "RTXLens.Plugins.WireView.Analysis" or "RTXLens.Warnings")
             {
                 throw new InvalidOperationException("Ordinary Release references a simulation dependency: " + name);
             }
         }
-        if (Directory.EnumerateFiles(directory, "Rtx5090Monitoring.Debugging.*", SearchOption.AllDirectories).Any()
+        if (Directory.EnumerateFiles(directory, "RTXLens.Debugging.*", SearchOption.AllDirectories).Any()
             || Directory.Exists(Path.Combine(directory, "Debugging")))
         {
             throw new InvalidOperationException("Ordinary Release includes simulation artifacts.");

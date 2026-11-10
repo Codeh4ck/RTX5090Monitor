@@ -1,16 +1,16 @@
 using Microsoft.UI.Dispatching;
-using Rtx5090Monitoring.App.Platform.Startup;
-using Rtx5090Monitoring.App.Platform.Tray;
-using Rtx5090Monitoring.Client.Http;
-using Rtx5090Monitoring.Client.Streaming;
-using Rtx5090Monitoring.Plugins.WireView.Contracts.Input;
-using Rtx5090Monitoring.Presentation.Configuration;
-using Rtx5090Monitoring.Presentation.Notifications;
-using Rtx5090Monitoring.Presentation.Settings;
-using Rtx5090Monitoring.Presentation.Telemetry;
-using Rtx5090Monitoring.Presentation.Performance;
+using RTXLens.App.Platform.Startup;
+using RTXLens.App.Platform.Tray;
+using RTXLens.Client.Http;
+using RTXLens.Client.Streaming;
+using RTXLens.Plugins.WireView.Contracts.Input;
+using RTXLens.Presentation.Configuration;
+using RTXLens.Presentation.Notifications;
+using RTXLens.Presentation.Settings;
+using RTXLens.Presentation.Telemetry;
+using RTXLens.Presentation.Performance;
 
-namespace Rtx5090Monitoring.App.Services;
+namespace RTXLens.App.Services;
 
 internal sealed partial class AppRuntime
 {
@@ -76,11 +76,24 @@ internal sealed partial class AppRuntime
 #endif
         _dispatcher = dispatcher;
         _diagnostic = diagnostic;
-        var directory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Rtx5090Monitoring");
+        var directory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "RTXLens");
+        string? migrationError = null;
+        if (!diagnostic && !IsDemo)
+        {
+            try
+            {
+                LegacyDesktopPreferences.Import(directory);
+            }
+            catch (Exception error) when (error is IOException or UnauthorizedAccessException)
+            {
+                migrationError = "Previous RTX Monitor preferences could not be imported: " + error.Message;
+            }
+        }
+
         _store = new PreferencesStore(Path.Combine(directory, diagnostic ? "smoke-preferences.json" : demo ? "demo-preferences.json" : "preferences.json"));
         Settings = new AppSettingsViewModel(_store.Load());
         _startupEnabled = Settings.Value.StartWithWindows;
-        Settings.Message = _store.LastError ?? string.Empty;
+        Settings.Message = migrationError ?? _store.LastError ?? string.Empty;
         Settings.Changed += PreferencesChanged;
         InitializeUpdates(directory);
         InitializeSafeguard();
@@ -363,7 +376,7 @@ internal sealed partial class AppRuntime
             }
             catch (Exception exception)
             {
-                File.WriteAllText(Path.Combine(Path.GetTempPath(), "rtx-monitor-error.txt"), exception.ToString());
+                File.WriteAllText(Path.Combine(Path.GetTempPath(), "rtxlens-error.txt"), exception.ToString());
                 throw;
             }
         }
@@ -522,7 +535,7 @@ internal sealed partial class AppRuntime
             Configuration.Message = exception.Message;
             Settings.Message = exception.Message;
             OperationCompleted?.Invoke(exception.Message);
-            ShowNotification("RTX Monitor · operation failed", exception.Message);
+            ShowNotification("RTX Lens · operation failed", exception.Message);
         }
     }
 

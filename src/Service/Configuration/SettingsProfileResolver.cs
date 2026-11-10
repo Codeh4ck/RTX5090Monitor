@@ -1,13 +1,13 @@
 using System.Text.RegularExpressions;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Contracts.Sensors;
-using Rtx5090Monitoring.Hardware.Nvidia;
-using Rtx5090Monitoring.Core.Configuration;
-using Rtx5090Monitoring.Plugins.Asus.Configuration;
-using Rtx5090Monitoring.Plugins.GenericNvidia.Configuration;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Contracts.Enums;
+using RTXLens.Contracts.Sensors;
+using RTXLens.Hardware.Nvidia;
+using RTXLens.Core.Configuration;
+using RTXLens.Plugins.Asus.Configuration;
+using RTXLens.Plugins.GenericNvidia.Configuration;
 
-namespace Rtx5090Monitoring.Service.Configuration;
+namespace RTXLens.Service.Configuration;
 
 internal sealed class SettingsProfileResolver(SettingsProfileStore profiles, ActiveSettingsProfileState state,
     IServiceProvider services, ILogger<SettingsProfileResolver> logger)
@@ -115,7 +115,7 @@ internal sealed class SettingsProfileResolver(SettingsProfileStore profiles, Act
 
         // Preserve explicitly customized legacy settings in Auto. Old stock values inherit the model defaults.
         var asus = configuration.Plugins.GetValueOrDefault("asus-astral");
-        var options = asus is null ? new Rtx5090Monitoring.Plugins.Asus.Contracts.Configuration.AsusOptions() : AsusSettings.GetOptions(asus);
+        var options = asus is null ? new RTXLens.Plugins.Asus.Contracts.Configuration.AsusOptions() : AsusSettings.GetOptions(asus);
         var legacy = SettingsProfile.Rtx5090;
         return new(defaults with
         {

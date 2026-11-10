@@ -3,7 +3,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Windows.Globalization.NumberFormatting;
 
-namespace Rtx5090Monitoring.App.Msi.Afterburner;
+namespace RTXLens.App.Msi.Afterburner;
 
 internal static class AfterburnerNumericInput
 {

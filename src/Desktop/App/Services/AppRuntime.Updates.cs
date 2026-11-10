@@ -1,9 +1,9 @@
 using System.Reflection;
 using Microsoft.UI.Dispatching;
-using Rtx5090Monitoring.Client.Updates;
-using Rtx5090Monitoring.Presentation.Updates;
+using RTXLens.Client.Updates;
+using RTXLens.Presentation.Updates;
 
-namespace Rtx5090Monitoring.App.Services;
+namespace RTXLens.App.Services;
 
 internal sealed partial class AppRuntime
 {

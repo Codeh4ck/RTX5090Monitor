@@ -1,7 +1,7 @@
-using Rtx5090Monitoring.Presentation.Infrastructure;
-using Rtx5090Monitoring.Presentation.Telemetry;
+using RTXLens.Presentation.Infrastructure;
+using RTXLens.Presentation.Telemetry;
 
-namespace Rtx5090Monitoring.Presentation.Settings;
+namespace RTXLens.Presentation.Settings;
 
 public sealed class AppSettingsViewModel(AppPreferences preferences) : ObservableObject
 {

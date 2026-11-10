@@ -1,9 +1,9 @@
-using Rtx5090Monitoring.Plugins.Asus.Contracts.Configuration;
+using RTXLens.Plugins.Asus.Contracts.Configuration;
 using System.Text.Json;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Plugins.Asus.Serialization;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Plugins.Asus.Serialization;
 
-namespace Rtx5090Monitoring.Plugins.Asus.Configuration;
+namespace RTXLens.Plugins.Asus.Configuration;
 
 public static class AsusSettings
 {

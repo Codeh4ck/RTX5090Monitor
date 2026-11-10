@@ -1,15 +1,15 @@
 using System.Text.Json;
-using Rtx5090Monitoring.Client.Http;
-using Rtx5090Monitoring.Client.Serialization;
-using Rtx5090Monitoring.Contracts.Warnings;
-using Rtx5090Monitoring.Presentation.Configuration;
-using Rtx5090Monitoring.Presentation.Settings;
-using Rtx5090Monitoring.Presentation.Telemetry;
-using Rtx5090Monitoring.Tests.Infrastructure;
-using Rtx5090Monitoring.UI.Tests.Fixtures;
-using Rtx5090Monitoring.UI.Tests.TestDoubles;
+using RTXLens.Client.Http;
+using RTXLens.Client.Serialization;
+using RTXLens.Contracts.Warnings;
+using RTXLens.Presentation.Configuration;
+using RTXLens.Presentation.Settings;
+using RTXLens.Presentation.Telemetry;
+using RTXLens.Tests.Infrastructure;
+using RTXLens.UI.Tests.Fixtures;
+using RTXLens.UI.Tests.TestDoubles;
 
-namespace Rtx5090Monitoring.UI.Tests.Configuration;
+namespace RTXLens.UI.Tests.Configuration;
 
 internal static class LegacyConfigurationTests
 {

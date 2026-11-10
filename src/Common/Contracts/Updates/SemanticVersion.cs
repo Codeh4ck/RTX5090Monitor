@@ -1,6 +1,6 @@
 using System.Globalization;
 
-namespace Rtx5090Monitoring.Contracts.Updates;
+namespace RTXLens.Contracts.Updates;
 
 public readonly record struct SemanticVersion(int Major, int Minor, int Patch) : IComparable<SemanticVersion>
 {

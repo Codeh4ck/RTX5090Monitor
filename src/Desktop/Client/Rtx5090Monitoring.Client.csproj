@@ -1,9 +1,0 @@
-<Project Sdk="Microsoft.NET.Sdk">
-    <ItemGroup>
-        <ProjectReference Include="../../Plugins/Nvidia/Contracts/Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.csproj" />
-        <ProjectReference Include="../../Plugins/Msi/Contracts/Rtx5090Monitoring.Plugins.Msi.Contracts.csproj" />
-        <ProjectReference Include="../../Common/Contracts/Rtx5090Monitoring.Contracts.csproj" />
-        <ProjectReference Include="../../Plugins/Asus/Contracts/Rtx5090Monitoring.Plugins.Asus.Contracts.csproj" />
-        <ProjectReference Include="../../Plugins/WireView/Contracts/Rtx5090Monitoring.Plugins.WireView.Contracts.csproj" />
-    </ItemGroup>
-</Project>

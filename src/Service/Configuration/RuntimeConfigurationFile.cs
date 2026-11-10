@@ -1,3 +1,3 @@
-namespace Rtx5090Monitoring.Service.Configuration;
+namespace RTXLens.Service.Configuration;
 
 public sealed record RuntimeConfigurationFile(string Path);

@@ -1,6 +1,6 @@
-using Rtx5090Monitoring.Core.Plugins;
+using RTXLens.Core.Plugins;
 
-namespace Rtx5090Monitoring.Plugins.Asus.Services;
+namespace RTXLens.Plugins.Asus.Services;
 
 internal static class AsusAccess
 {

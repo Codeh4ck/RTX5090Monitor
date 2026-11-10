@@ -1,6 +1,6 @@
-using Rtx5090Monitoring.Plugins.WireView.Contracts.Common;
+using RTXLens.Plugins.WireView.Contracts.Common;
 
-namespace Rtx5090Monitoring.Plugins.WireView.Contracts.Output;
+namespace RTXLens.Plugins.WireView.Contracts.Output;
 
 public class SensorResponse
 {

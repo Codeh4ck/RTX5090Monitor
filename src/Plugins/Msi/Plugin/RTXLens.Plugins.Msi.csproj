@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <ItemGroup>
+        <PackageReference Include="HidSharp" />
+        <ProjectReference Include="../../../Core/RTXLens.Core.csproj" />
+        <ProjectReference Include="../Contracts/RTXLens.Plugins.Msi.Contracts.csproj" />
+        <InternalsVisibleTo Include="RTXLens.Tests" />
+    </ItemGroup>
+</Project>

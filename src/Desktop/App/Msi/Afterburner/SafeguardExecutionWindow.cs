@@ -3,12 +3,12 @@ using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.Web.WebView2.Core;
-using Rtx5090Monitoring.App.Services;
-using Rtx5090Monitoring.Presentation.Settings;
-using Rtx5090Monitoring.SafeguardReporting;
+using RTXLens.App.Services;
+using RTXLens.Presentation.Settings;
+using RTXLens.SafeguardReporting;
 using Windows.Graphics;
 
-namespace Rtx5090Monitoring.App.Msi.Afterburner;
+namespace RTXLens.App.Msi.Afterburner;
 
 internal sealed class SafeguardExecutionWindow : Window
 {
@@ -22,7 +22,7 @@ internal sealed class SafeguardExecutionWindow : Window
     public SafeguardExecutionWindow(SafeguardReport report, AppPreferences preferences, double scale)
     {
         ExecutionId = report.Id;
-        Title = "RTX Monitor - Safeguard+ execution";
+        Title = "RTX Lens - Safeguard+ execution";
         AppWindow.SetIcon(Path.Combine(AppContext.BaseDirectory, "Assets", "monitor.ico"));
         var area = DisplayArea.GetFromWindowId(AppWindow.Id, DisplayAreaFallback.Primary).WorkArea;
         AppWindow.Resize(new SizeInt32(Math.Min(area.Width, (int)(820 * scale)), Math.Min(area.Height, (int)(780 * scale))));
@@ -57,7 +57,7 @@ internal sealed class SafeguardExecutionWindow : Window
         try
         {
             var folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "Rtx5090Monitoring", "SafeguardReport.WebView2");
+                "RTXLens", "SafeguardReport.WebView2");
             var environment = await CoreWebView2Environment.CreateWithOptionsAsync(null, folder, new CoreWebView2EnvironmentOptions());
             if (_closed)
             {

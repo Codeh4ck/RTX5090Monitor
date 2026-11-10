@@ -1,8 +1,8 @@
 using System.Collections.Frozen;
 using LibreHardwareMonitor.Hardware;
-using Rtx5090Monitoring.Contracts.Enums;
+using RTXLens.Contracts.Enums;
 
-namespace Rtx5090Monitoring.Plugins.Asus.Mapping;
+namespace RTXLens.Plugins.Asus.Mapping;
 
 public static class AsusSensorCatalog
 {

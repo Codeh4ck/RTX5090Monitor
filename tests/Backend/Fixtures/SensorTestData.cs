@@ -1,11 +1,11 @@
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Contracts.Sensors;
-using Rtx5090Monitoring.Core;
-using Rtx5090Monitoring.Contracts.Monitoring;
-using Rtx5090Monitoring.Core.Plugins;
-using Rtx5090Monitoring.Tests.TestDoubles;
+using RTXLens.Contracts.Enums;
+using RTXLens.Contracts.Sensors;
+using RTXLens.Core;
+using RTXLens.Contracts.Monitoring;
+using RTXLens.Core.Plugins;
+using RTXLens.Tests.TestDoubles;
 
-namespace Rtx5090Monitoring.Tests.Fixtures;
+namespace RTXLens.Tests.Fixtures;
 
 internal static class SensorTestData
 {

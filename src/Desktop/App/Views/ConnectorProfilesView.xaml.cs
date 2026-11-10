@@ -2,9 +2,9 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Data;
-using Rtx5090Monitoring.Presentation.Configuration;
+using RTXLens.Presentation.Configuration;
 
-namespace Rtx5090Monitoring.App.Views;
+namespace RTXLens.App.Views;
 
 public sealed partial class ConnectorProfilesView : UserControl
 {

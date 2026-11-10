@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Rtx5090Monitoring.Plugins.Asus.Contracts.Configuration;
+namespace RTXLens.Plugins.Asus.Contracts.Configuration;
 
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
 public sealed record AsusOptions

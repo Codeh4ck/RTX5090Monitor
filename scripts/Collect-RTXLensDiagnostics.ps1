@@ -1,13 +1,13 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-Collects a read-only RTX Monitor service diagnostic report.
+Collects a read-only RTX Lens service diagnostic report.
 .DESCRIPTION
 Works with Windows PowerShell 5.1 and PowerShell 7. No administrator rights,
 desktop app or additional modules are required. Calls only GET endpoints and
 receives WebSocket messages; it never updates configuration or controls hardware.
 .EXAMPLE
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\Collect-RTXMonitorDiagnostics.ps1
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\Collect-RTXLensDiagnostics.ps1
 #>
 [CmdletBinding()]
 param(
@@ -38,7 +38,7 @@ if (-not $OutputDirectory)
     }
 }
 
-$reportName = 'RTXMonitor-Diagnostics-' + (Get-Date -Format 'yyyyMMdd-HHmmss') + '-' + [Guid]::NewGuid().ToString('N').Substring(0, 6)
+$reportName = 'RTXLens-Diagnostics-' + (Get-Date -Format 'yyyyMMdd-HHmmss') + '-' + [Guid]::NewGuid().ToString('N').Substring(0, 6)
 $reportDirectory = Join-Path ([IO.Path]::GetFullPath($OutputDirectory)) $reportName
 $null = [IO.Directory]::CreateDirectory($reportDirectory)
 $errors = [Collections.Generic.List[string]]::new()
@@ -112,7 +112,7 @@ function Read-ServiceJson
     }
 }
 
-Write-Host 'RTX Monitor diagnostics - read only'
+Write-Host 'RTX Lens diagnostics - read only'
 Write-Host ('Service: ' + $ServiceAddress.AbsoluteUri)
 
 try
@@ -263,7 +263,7 @@ if ($frames.Count -gt 0)
 }
 
 $summary = @(
-    'RTX Monitor service diagnostics'
+    'RTX Lens service diagnostics'
     ('Captured at: ' + [DateTimeOffset]::Now.ToString('o'))
     ('PowerShell: ' + $PSVersionTable.PSVersion.ToString())
     ('Service: ' + $ServiceAddress.AbsoluteUri)

@@ -1,6 +1,6 @@
 using System.Globalization;
 
-namespace Rtx5090Monitoring.Presentation.Msi.Afterburner;
+namespace RTXLens.Presentation.Msi.Afterburner;
 
 public static class AfterburnerConfiguration
 {

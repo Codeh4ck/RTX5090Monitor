@@ -1,7 +1,7 @@
 using System.Net;
 using System.Text;
 
-namespace Rtx5090Monitoring.UI.Tests.TestDoubles;
+namespace RTXLens.UI.Tests.TestDoubles;
 
 internal sealed class JsonResponseHandler(string json) : HttpMessageHandler
 {

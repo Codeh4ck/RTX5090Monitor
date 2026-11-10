@@ -1,6 +1,6 @@
-using Rtx5090Monitoring.Plugins.Msi.Contracts.Configuration;
+using RTXLens.Plugins.Msi.Contracts.Configuration;
 
-namespace Rtx5090Monitoring.Plugins.Msi.Control;
+namespace RTXLens.Plugins.Msi.Control;
 
 internal sealed class MsiFanCurveController
 {

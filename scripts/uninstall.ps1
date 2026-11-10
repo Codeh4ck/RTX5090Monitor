@@ -1,5 +1,5 @@
 #Requires -Version 5.1
-<# Opens the registered RTX Monitor uninstaller. Keeps backend configuration and desktop preferences. #>
+<# Opens the registered RTX Lens uninstaller. Keeps backend configuration and desktop preferences. #>
 [CmdletBinding(SupportsShouldProcess)]
 param([switch] $Quiet)
 
@@ -58,7 +58,7 @@ foreach ($view in @([Microsoft.Win32.RegistryView]::Registry64, [Microsoft.Win32
 
 if (-not $registration)
 {
-    Write-Host 'RTX Monitor is not installed by this installer.'
+    Write-Host 'RTX Lens is not installed by this installer.'
     return
 }
 
@@ -67,7 +67,7 @@ if (-not (Test-Path -LiteralPath $registration -PathType Leaf))
     throw 'The cached uninstaller is missing. Run the matching setup EXE to repair its cache, then uninstall.'
 }
 
-if ($PSCmdlet.ShouldProcess('RTX Monitor service and desktop app', 'Uninstall (keep configuration and preferences)'))
+if ($PSCmdlet.ShouldProcess('RTX Lens service and desktop app', 'Uninstall (keep configuration and preferences)'))
 {
     $arguments = @('-uninstall', '-norestart')
 

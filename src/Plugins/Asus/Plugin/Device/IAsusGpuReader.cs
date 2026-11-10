@@ -1,5 +1,5 @@
-using Rtx5090Monitoring.Plugins.Asus.Contracts.Common;
-namespace Rtx5090Monitoring.Plugins.Asus.Device;
+using RTXLens.Plugins.Asus.Contracts.Common;
+namespace RTXLens.Plugins.Asus.Device;
 
 public interface IAsusGpuReader : IDisposable
 {

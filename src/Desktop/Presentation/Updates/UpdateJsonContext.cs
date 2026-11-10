@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Rtx5090Monitoring.Presentation.Updates;
+namespace RTXLens.Presentation.Updates;
 
 [JsonSourceGenerationOptions(PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase, WriteIndented = true)]
 [JsonSerializable(typeof(UpdateCheckState))]

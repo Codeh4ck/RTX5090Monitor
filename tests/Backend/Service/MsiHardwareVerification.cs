@@ -1,12 +1,12 @@
 using System.Text.Json;
-using Rtx5090Monitoring.Contracts.Configuration;
+using RTXLens.Contracts.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
-using Rtx5090Monitoring.Plugins.Msi.Configuration;
-using Rtx5090Monitoring.Plugins.Msi.Contracts.Configuration;
-using Rtx5090Monitoring.Plugins.Msi.Device;
-using Rtx5090Monitoring.Tests.Infrastructure;
+using RTXLens.Plugins.Msi.Configuration;
+using RTXLens.Plugins.Msi.Contracts.Configuration;
+using RTXLens.Plugins.Msi.Device;
+using RTXLens.Tests.Infrastructure;
 
-namespace Rtx5090Monitoring.Tests.Service;
+namespace RTXLens.Tests.Service;
 
 internal static class MsiHardwareVerification
 {
@@ -25,7 +25,7 @@ internal static class MsiHardwareVerification
         var model = json.RootElement.GetProperty("model").GetString();
         TestAssert.True(model is "MPG Ai1300TS" or "MPG Ai1600TS", "Only supported TS models may publish telemetry.");
         TestAssert.Equal(2, json.RootElement.GetProperty("pinCurrentsA").GetArrayLength());
-        var directory = Path.Combine(Environment.CurrentDirectory, "Rtx5090Monitoring", "artifacts", "msi-service-verification");
+        var directory = Path.Combine(Environment.CurrentDirectory, "RTXLens", "artifacts", "msi-service-verification");
         Directory.CreateDirectory(directory);
         await File.WriteAllTextAsync(Path.Combine(directory, "sensors.json"), snapshot.GetRawText());
         await File.WriteAllTextAsync(Path.Combine(directory, "device.json"), device);

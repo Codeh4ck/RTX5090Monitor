@@ -1,14 +1,14 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
-using Rtx5090Monitoring.Core.Configuration;
-using Rtx5090Monitoring.Core.Http;
-using Rtx5090Monitoring.Core.Plugins;
-using Rtx5090Monitoring.Hardware.Nvidia;
-using Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.Devices;
-using Rtx5090Monitoring.Plugins.GenericNvidia.Serialization;
+using RTXLens.Core.Configuration;
+using RTXLens.Core.Http;
+using RTXLens.Core.Plugins;
+using RTXLens.Hardware.Nvidia;
+using RTXLens.Plugins.GenericNvidia.Contracts.Devices;
+using RTXLens.Plugins.GenericNvidia.Serialization;
 
-namespace Rtx5090Monitoring.Plugins.GenericNvidia.Endpoints;
+namespace RTXLens.Plugins.GenericNvidia.Endpoints;
 
 public static class GenericNvidiaEndpoints
 {

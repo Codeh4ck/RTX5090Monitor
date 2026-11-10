@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+        <ProjectReference Include="../Common/Warnings/RTXLens.Warnings.csproj" />
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <ProjectReference Include="../Common/Contracts/RTXLens.Contracts.csproj" />
+  </ItemGroup>
+</Project>

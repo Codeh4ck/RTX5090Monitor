@@ -1,7 +1,7 @@
-using Rtx5090Monitoring.Tests.Fixtures;
-using Rtx5090Monitoring.Tests.Infrastructure;
+using RTXLens.Tests.Fixtures;
+using RTXLens.Tests.Infrastructure;
 
-namespace Rtx5090Monitoring.Tests.Core;
+namespace RTXLens.Tests.Core;
 
 internal static class SensorIdentityTests
 {

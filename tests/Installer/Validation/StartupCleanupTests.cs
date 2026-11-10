@@ -1,36 +1,36 @@
 using System;
 using System.Reflection;
 using Microsoft.Win32;
-using Rtx5090Monitoring.Installer.Actions.Startup;
+using RTXLens.Installer.Actions.Startup;
 
-namespace Rtx5090Monitoring.Installer.Tests.Validation;
+namespace RTXLens.Installer.Tests.Validation;
 
 internal static class StartupCleanupTests
 {
     public static void Run()
     {
-        const string parent = @"Software\Rtx5090Monitoring.Installer.Tests\";
+        const string parent = @"Software\RTXLens.Installer.Tests\";
         var id = Guid.NewGuid().ToString("N");
         var path = parent + id;
         const string runPath = @"Software\Microsoft\Windows\CurrentVersion\Run";
         const string approvedPath = @"Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run";
-        const string directory = @"C:\Program Files\Rtx5090Monitoring";
+        const string directory = @"C:\Program Files\RTXLens";
         using var hive = Registry.CurrentUser.CreateSubKey(path, true);
         try
         {
             using var run = hive.CreateSubKey(runPath, true);
             using var approved = hive.CreateSubKey(approvedPath, true);
-            run.SetValue("Rtx5090Monitoring", '"' + directory + "\\Desktop\\Rtx5090Monitoring.App.exe\" --startup");
+            run.SetValue("RTXLens", '"' + directory + "\\Desktop\\RTXLens.App.exe\" --startup");
             run.SetValue("AnotherApplication", "preserve");
-            approved.SetValue("Rtx5090Monitoring", new byte[] { 2, 0, 0, 0 });
+            approved.SetValue("RTXLens", new byte[] { 2, 0, 0, 0 });
             Clean(hive, directory);
-            Check.That(run.GetValue("Rtx5090Monitoring") is null, "Uninstall removes the installed-path Run entry in an isolated test hive.");
-            Check.That(approved.GetValue("Rtx5090Monitoring") is null, "Uninstall removes only its matching StartupApproved entry.");
+            Check.That(run.GetValue("RTXLens") is null, "Uninstall removes the installed-path Run entry in an isolated test hive.");
+            Check.That(approved.GetValue("RTXLens") is null, "Uninstall removes only its matching StartupApproved entry.");
             Check.That((string)run.GetValue("AnotherApplication") == "preserve", "Uninstall preserves other startup applications.");
-            run.SetValue("Rtx5090Monitoring", "\"C:\\Portable\\Rtx5090Monitoring.App.exe\" --startup");
-            approved.SetValue("Rtx5090Monitoring", new byte[] { 2, 0, 0, 0 });
+            run.SetValue("RTXLens", "\"C:\\Portable\\RTXLens.App.exe\" --startup");
+            approved.SetValue("RTXLens", new byte[] { 2, 0, 0, 0 });
             Clean(hive, directory);
-            Check.That(run.GetValue("Rtx5090Monitoring") is not null && approved.GetValue("Rtx5090Monitoring") is not null,
+            Check.That(run.GetValue("RTXLens") is not null && approved.GetValue("RTXLens") is not null,
                 "Portable startup registration and approval are retained when the installed app is removed.");
         }
         finally

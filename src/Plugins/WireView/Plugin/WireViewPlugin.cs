@@ -1,16 +1,16 @@
 using System.Text.Json;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Contracts.Sensors;
-using Rtx5090Monitoring.Core.Plugins;
-using Rtx5090Monitoring.Plugins.WireView.Device;
-using Rtx5090Monitoring.Plugins.WireView.Contracts.Output;
-using Rtx5090Monitoring.Plugins.WireView.Mapping;
-using Rtx5090Monitoring.Plugins.WireView.Services;
-using Rtx5090Monitoring.Plugins.WireView.Streaming;
-using Rtx5090Monitoring.Plugins.WireView.Serialization;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Contracts.Enums;
+using RTXLens.Contracts.Sensors;
+using RTXLens.Core.Plugins;
+using RTXLens.Plugins.WireView.Device;
+using RTXLens.Plugins.WireView.Contracts.Output;
+using RTXLens.Plugins.WireView.Mapping;
+using RTXLens.Plugins.WireView.Services;
+using RTXLens.Plugins.WireView.Streaming;
+using RTXLens.Plugins.WireView.Serialization;
 
-namespace Rtx5090Monitoring.Plugins.WireView;
+namespace RTXLens.Plugins.WireView;
 
 public sealed class WireViewPlugin : ISensorPlugin
 {

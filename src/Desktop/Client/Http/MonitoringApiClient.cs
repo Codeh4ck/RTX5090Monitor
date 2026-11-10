@@ -1,27 +1,27 @@
-using Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.Devices;
+using RTXLens.Plugins.GenericNvidia.Contracts.Devices;
 using System.Net.Http.Json;
 using System.Net.WebSockets;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
-using Rtx5090Monitoring.Client.Serialization;
-using Rtx5090Monitoring.Client.Streaming;
-using Rtx5090Monitoring.Plugins.Asus.Contracts.Common;
-using Rtx5090Monitoring.Plugins.Msi.Contracts.Devices;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Contracts.Discovery;
-using Rtx5090Monitoring.Contracts.Health;
-using Rtx5090Monitoring.Contracts.Sensors;
-using Rtx5090Monitoring.Plugins.WireView.Contracts.Common;
-using Rtx5090Monitoring.Plugins.WireView.Contracts.Input;
+using RTXLens.Client.Serialization;
+using RTXLens.Client.Streaming;
+using RTXLens.Plugins.Asus.Contracts.Common;
+using RTXLens.Plugins.Msi.Contracts.Devices;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Contracts.Discovery;
+using RTXLens.Contracts.Health;
+using RTXLens.Contracts.Sensors;
+using RTXLens.Plugins.WireView.Contracts.Common;
+using RTXLens.Plugins.WireView.Contracts.Input;
 
-namespace Rtx5090Monitoring.Client.Http;
+namespace RTXLens.Client.Http;
 
 public sealed class MonitoringApiClient(HttpClient http) : IMonitoringApi
 {
     public Uri Address => http.BaseAddress ?? throw new InvalidOperationException("Service base address is required.");
 
-    public async Task<Rtx5090Monitoring.Contracts.Updates.ServiceVersionResponse?> GetVersionAsync(CancellationToken token)
+    public async Task<RTXLens.Contracts.Updates.ServiceVersionResponse?> GetVersionAsync(CancellationToken token)
     {
         using var response = await http.GetAsync("version", token);
 
@@ -95,7 +95,7 @@ public sealed class MonitoringApiClient(HttpClient http) : IMonitoringApi
     public Task<MsiDeviceInfo[]> GetMsiDevicesAsync(CancellationToken token) =>
         GetAsync("plugins/msi-psu/devices", ClientJsonContext.Default.MsiDeviceInfoArray, token);
 
-    public Task<Rtx5090Monitoring.Plugins.Msi.Contracts.Telemetry.MsiSnapshot> GetMsiSnapshotAsync(CancellationToken token) =>
+    public Task<RTXLens.Plugins.Msi.Contracts.Telemetry.MsiSnapshot> GetMsiSnapshotAsync(CancellationToken token) =>
         GetAsync("plugins/msi-psu/device", ClientJsonContext.Default.MsiSnapshot, token);
 
     public async Task<ConfigurationSnapshot> SetConfigurationAsync(ServiceConfiguration configuration, string version, CancellationToken token)

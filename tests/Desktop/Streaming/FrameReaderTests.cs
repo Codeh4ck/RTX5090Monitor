@@ -1,15 +1,15 @@
-using Rtx5090Monitoring.Plugins.Asus.Contracts.Warnings;
+using RTXLens.Plugins.Asus.Contracts.Warnings;
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
-using Rtx5090Monitoring.Client.Serialization;
-using Rtx5090Monitoring.Client.Streaming;
-using Rtx5090Monitoring.Contracts.Warnings;
-using Rtx5090Monitoring.Tests.Infrastructure;
-using Rtx5090Monitoring.UI.Tests.Fixtures;
-using Rtx5090Monitoring.UI.Tests.TestDoubles;
+using RTXLens.Client.Serialization;
+using RTXLens.Client.Streaming;
+using RTXLens.Contracts.Warnings;
+using RTXLens.Tests.Infrastructure;
+using RTXLens.UI.Tests.Fixtures;
+using RTXLens.UI.Tests.TestDoubles;
 
-namespace Rtx5090Monitoring.UI.Tests.Streaming;
+namespace RTXLens.UI.Tests.Streaming;
 
 internal static class FrameReaderTests
 {

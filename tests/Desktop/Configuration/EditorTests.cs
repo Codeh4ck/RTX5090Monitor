@@ -1,11 +1,11 @@
-using Rtx5090Monitoring.Plugins.Asus.Contracts.Configuration;
-using Rtx5090Monitoring.Plugins.Asus.Contracts.Common;
-using Rtx5090Monitoring.Presentation.Configuration;
-using Rtx5090Monitoring.Tests.Infrastructure;
-using Rtx5090Monitoring.UI.Tests.Fixtures;
-using Rtx5090Monitoring.UI.Tests.TestDoubles;
+using RTXLens.Plugins.Asus.Contracts.Configuration;
+using RTXLens.Plugins.Asus.Contracts.Common;
+using RTXLens.Presentation.Configuration;
+using RTXLens.Tests.Infrastructure;
+using RTXLens.UI.Tests.Fixtures;
+using RTXLens.UI.Tests.TestDoubles;
 
-namespace Rtx5090Monitoring.UI.Tests.Configuration;
+namespace RTXLens.UI.Tests.Configuration;
 
 internal static class EditorTests
 {

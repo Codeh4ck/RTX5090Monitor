@@ -1,13 +1,13 @@
 using System.Collections.ObjectModel;
 using System.Globalization;
-using Rtx5090Monitoring.Contracts.Discovery;
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Contracts.Sensors;
-using Rtx5090Monitoring.Plugins.WireView.Contracts.Common;
-using Rtx5090Monitoring.Presentation.Infrastructure;
-using Rtx5090Monitoring.Presentation.Settings;
+using RTXLens.Contracts.Discovery;
+using RTXLens.Contracts.Enums;
+using RTXLens.Contracts.Sensors;
+using RTXLens.Plugins.WireView.Contracts.Common;
+using RTXLens.Presentation.Infrastructure;
+using RTXLens.Presentation.Settings;
 
-namespace Rtx5090Monitoring.Presentation.Telemetry;
+namespace RTXLens.Presentation.Telemetry;
 
 public sealed class HardwarePanelViewModel : ObservableObject
 {

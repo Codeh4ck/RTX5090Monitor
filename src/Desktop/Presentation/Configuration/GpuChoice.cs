@@ -1,3 +1,3 @@
-namespace Rtx5090Monitoring.Presentation.Configuration;
+namespace RTXLens.Presentation.Configuration;
 
 public sealed record GpuChoice(string? Id, string Name);

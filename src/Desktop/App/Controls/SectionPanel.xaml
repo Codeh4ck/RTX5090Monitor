@@ -1,4 +1,4 @@
-<UserControl x:Class="Rtx5090Monitoring.App.Controls.SectionPanel"
+<UserControl x:Class="RTXLens.App.Controls.SectionPanel"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Border Style="{StaticResource MonitorCard}" Padding="0">

@@ -1,4 +1,4 @@
-namespace Rtx5090Monitoring.Plugins.Asus.Contracts.Output;
+namespace RTXLens.Plugins.Asus.Contracts.Output;
 
 public sealed record ConfigResponse
 {

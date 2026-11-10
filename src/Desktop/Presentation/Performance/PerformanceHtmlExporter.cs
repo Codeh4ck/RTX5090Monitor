@@ -1,13 +1,13 @@
 using System.Text.Json;
 
-namespace Rtx5090Monitoring.Presentation.Performance;
+namespace RTXLens.Presentation.Performance;
 
 public static class PerformanceHtmlExporter
 {
     private static readonly Lazy<string> Template = new(() =>
     {
         using var stream = typeof(PerformanceHtmlExporter).Assembly.GetManifestResourceStream(
-            "Rtx5090Monitoring.PerformanceChart.html")
+            "RTXLens.PerformanceChart.html")
             ?? throw new InvalidOperationException("The performance chart template is missing.");
         using var reader = new StreamReader(stream);
         return reader.ReadToEnd();

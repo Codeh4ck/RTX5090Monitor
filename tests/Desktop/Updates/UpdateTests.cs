@@ -1,13 +1,13 @@
 using System.Net;
 using System.Text.Json.Nodes;
-using Rtx5090Monitoring.Client.Http;
-using Rtx5090Monitoring.Contracts.Updates;
-using Rtx5090Monitoring.Presentation.Settings;
-using Rtx5090Monitoring.Presentation.Updates;
-using Rtx5090Monitoring.Tests.Infrastructure;
-using Rtx5090Monitoring.UI.Tests.TestDoubles;
+using RTXLens.Client.Http;
+using RTXLens.Contracts.Updates;
+using RTXLens.Presentation.Settings;
+using RTXLens.Presentation.Updates;
+using RTXLens.Tests.Infrastructure;
+using RTXLens.UI.Tests.TestDoubles;
 
-namespace Rtx5090Monitoring.UI.Tests.Updates;
+namespace RTXLens.UI.Tests.Updates;
 
 internal static class UpdateTests
 {

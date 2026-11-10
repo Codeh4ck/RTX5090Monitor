@@ -1,4 +1,4 @@
-namespace Rtx5090Monitoring.Hardware.Nvidia;
+namespace RTXLens.Hardware.Nvidia;
 
 public interface INvidiaHardwareSource : IDisposable
 {

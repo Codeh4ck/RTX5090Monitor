@@ -2,11 +2,11 @@ using System.ComponentModel;
 using System.Collections.Specialized;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Rtx5090Monitoring.App.Controls;
-using Rtx5090Monitoring.App.Services;
-using Rtx5090Monitoring.Presentation.Telemetry;
+using RTXLens.App.Controls;
+using RTXLens.App.Services;
+using RTXLens.Presentation.Telemetry;
 
-namespace Rtx5090Monitoring.App.Views;
+namespace RTXLens.App.Views;
 
 public sealed partial class HardwareView : UserControl
 {

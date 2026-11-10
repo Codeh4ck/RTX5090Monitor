@@ -1,4 +1,4 @@
-namespace Rtx5090Monitoring.Plugins.Asus.Contracts.Common;
+namespace RTXLens.Plugins.Asus.Contracts.Common;
 
 public sealed class GpuSensorSnapshot
 {

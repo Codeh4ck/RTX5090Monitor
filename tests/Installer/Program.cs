@@ -1,9 +1,9 @@
 using System;
-using Rtx5090Monitoring.Installer.Tests.Configuration;
-using Rtx5090Monitoring.Installer.Tests.Packaging;
-using Rtx5090Monitoring.Installer.Tests.Validation;
+using RTXLens.Installer.Tests.Configuration;
+using RTXLens.Installer.Tests.Packaging;
+using RTXLens.Installer.Tests.Validation;
 
-namespace Rtx5090Monitoring.Installer.Tests;
+namespace RTXLens.Installer.Tests;
 
 internal static class Program
 {

@@ -1,20 +1,20 @@
 using System.Text.Json;
-using Rtx5090Monitoring.Plugins.GenericNvidia.Analysis.Warnings;
-using Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.Warnings;
+using RTXLens.Plugins.GenericNvidia.Analysis.Warnings;
+using RTXLens.Plugins.GenericNvidia.Contracts.Warnings;
 using Microsoft.Extensions.Logging.Abstractions;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Contracts.Warnings;
-using Rtx5090Monitoring.Core;
-using Rtx5090Monitoring.Core.Plugins;
-using Rtx5090Monitoring.Plugins.Asus.Contracts.Configuration;
-using Rtx5090Monitoring.Plugins.Asus.Contracts.Warnings;
-using Rtx5090Monitoring.Service.Configuration;
-using Rtx5090Monitoring.Tests.Fixtures;
-using Rtx5090Monitoring.Tests.Infrastructure;
-using Rtx5090Monitoring.Tests.TestDoubles;
-using Rtx5090Monitoring.Warnings;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Contracts.Warnings;
+using RTXLens.Core;
+using RTXLens.Core.Plugins;
+using RTXLens.Plugins.Asus.Contracts.Configuration;
+using RTXLens.Plugins.Asus.Contracts.Warnings;
+using RTXLens.Service.Configuration;
+using RTXLens.Tests.Fixtures;
+using RTXLens.Tests.Infrastructure;
+using RTXLens.Tests.TestDoubles;
+using RTXLens.Warnings;
 
-namespace Rtx5090Monitoring.Tests.Core;
+namespace RTXLens.Tests.Core;
 
 internal static class WarningRegistryTests
 {
@@ -65,7 +65,7 @@ internal static class WarningRegistryTests
         TestAssert.True(upgraded.Warnings.Overrides[GenericNvidiaWarningIds.CoreTemperature].RepeatWhileActive, "Legacy overrides must survive.");
         TestAssert.False(upgraded.Warnings.Overrides.ContainsKey("AsusCoreTemperature"), "Migration must replace only known legacy aliases.");
         TestAssert.Equal(17, upgraded.Warnings.Overrides["absent-plugin/future"].RepeatIntervalSeconds);
-        var nvidia = upgraded.Plugins["generic-nvidia"].Options!.Value.Deserialize<Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.Configuration.GenericNvidiaOptions>(new JsonSerializerOptions(JsonSerializerDefaults.Web))!;
+        var nvidia = upgraded.Plugins["generic-nvidia"].Options!.Value.Deserialize<RTXLens.Plugins.GenericNvidia.Contracts.Configuration.GenericNvidiaOptions>(new JsonSerializerOptions(JsonSerializerDefaults.Web))!;
         TestAssert.Equal<double?>(81, nvidia.CoreTemperatureWarningC);
         TestAssert.Equal<double?>(85, nvidia.MemoryTemperatureWarningC);
         var options = new AsusOptions();

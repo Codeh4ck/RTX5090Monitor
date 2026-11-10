@@ -1,10 +1,10 @@
 using Microsoft.Extensions.DependencyInjection;
-using Rtx5090Monitoring.Core.Plugins;
-using Rtx5090Monitoring.Plugins.WireView.Factories;
-using Rtx5090Monitoring.Plugins.WireView.Serialization;
-using Rtx5090Monitoring.Plugins.WireView.Streaming;
+using RTXLens.Core.Plugins;
+using RTXLens.Plugins.WireView.Factories;
+using RTXLens.Plugins.WireView.Serialization;
+using RTXLens.Plugins.WireView.Streaming;
 
-namespace Rtx5090Monitoring.Plugins.WireView;
+namespace RTXLens.Plugins.WireView;
 
 public static class ServiceCollectionEx
 {

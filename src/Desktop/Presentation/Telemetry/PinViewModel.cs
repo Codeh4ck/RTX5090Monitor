@@ -1,8 +1,8 @@
 using System.Globalization;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Presentation.Infrastructure;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Presentation.Infrastructure;
 
-namespace Rtx5090Monitoring.Presentation.Telemetry;
+namespace RTXLens.Presentation.Telemetry;
 
 public sealed class PinViewModel(int channel) : ObservableObject
 {

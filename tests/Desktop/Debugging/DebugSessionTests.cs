@@ -1,25 +1,25 @@
-using Rtx5090Monitoring.Plugins.Asus.Contracts.Warnings;
+using RTXLens.Plugins.Asus.Contracts.Warnings;
 using System.Text.Json;
-using Rtx5090Monitoring.Client.Serialization;
-using Rtx5090Monitoring.Contracts.Alerts;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Contracts.Discovery;
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Contracts.Health;
-using Rtx5090Monitoring.Contracts.Monitoring;
-using Rtx5090Monitoring.Contracts.Sensors;
-using Rtx5090Monitoring.Debugging;
-using Rtx5090Monitoring.Debugging.Api;
-using Rtx5090Monitoring.Debugging.Models;
-using Rtx5090Monitoring.Debugging.ViewModels;
-using Rtx5090Monitoring.Plugins.Msi.Contracts.Configuration;
-using Rtx5090Monitoring.Plugins.WireView.Contracts.Input;
-using Rtx5090Monitoring.Presentation.Notifications;
-using Rtx5090Monitoring.Presentation.Settings;
-using Rtx5090Monitoring.Presentation.Telemetry;
-using Rtx5090Monitoring.Tests.Infrastructure;
+using RTXLens.Client.Serialization;
+using RTXLens.Contracts.Alerts;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Contracts.Discovery;
+using RTXLens.Contracts.Enums;
+using RTXLens.Contracts.Health;
+using RTXLens.Contracts.Monitoring;
+using RTXLens.Contracts.Sensors;
+using RTXLens.Debugging;
+using RTXLens.Debugging.Api;
+using RTXLens.Debugging.Models;
+using RTXLens.Debugging.ViewModels;
+using RTXLens.Plugins.Msi.Contracts.Configuration;
+using RTXLens.Plugins.WireView.Contracts.Input;
+using RTXLens.Presentation.Notifications;
+using RTXLens.Presentation.Settings;
+using RTXLens.Presentation.Telemetry;
+using RTXLens.Tests.Infrastructure;
 
-namespace Rtx5090Monitoring.UI.Tests.Debugging;
+namespace RTXLens.UI.Tests.Debugging;
 
 internal static class DebugSessionTests
 {

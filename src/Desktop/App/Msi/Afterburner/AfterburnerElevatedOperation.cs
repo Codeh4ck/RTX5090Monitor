@@ -4,9 +4,9 @@ using System.Security.AccessControl;
 using System.Security.Cryptography;
 using System.Security.Principal;
 using System.Text.Json;
-using Rtx5090Monitoring.Presentation.Msi.Afterburner;
+using RTXLens.Presentation.Msi.Afterburner;
 
-namespace Rtx5090Monitoring.App.Msi.Afterburner;
+namespace RTXLens.App.Msi.Afterburner;
 
 // This entry point edits validated INI files or requests a normal exit of the selected Afterburner installation. It never runs alarm commands.
 internal static class AfterburnerElevatedOperation
@@ -17,7 +17,7 @@ internal static class AfterburnerElevatedOperation
     {
         var id = Guid.NewGuid().ToString("N");
         var requests = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "Rtx5090Monitoring", "AfterburnerRequests");
+            "RTXLens", "AfterburnerRequests");
         Directory.CreateDirectory(requests);
         var request = Path.Combine(requests, id + ".json");
 

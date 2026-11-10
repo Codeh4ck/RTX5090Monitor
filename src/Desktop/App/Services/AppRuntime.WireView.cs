@@ -1,7 +1,7 @@
 using Microsoft.UI.Windowing;
-using Rtx5090Monitoring.App.WireView.Windows;
+using RTXLens.App.WireView.Windows;
 
-namespace Rtx5090Monitoring.App.Services;
+namespace RTXLens.App.Services;
 
 internal sealed partial class AppRuntime
 {

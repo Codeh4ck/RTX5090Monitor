@@ -1,14 +1,14 @@
 using System.Text.Json;
 using Microsoft.Extensions.Logging.Abstractions;
-using Rtx5090Monitoring.Client.Http;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Plugins.Msi.Configuration;
-using Rtx5090Monitoring.Plugins.Msi.Contracts.Configuration;
-using Rtx5090Monitoring.Plugins.Msi.Control;
-using Rtx5090Monitoring.Plugins.Msi.Device;
-using Rtx5090Monitoring.Tests.Infrastructure;
+using RTXLens.Client.Http;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Plugins.Msi.Configuration;
+using RTXLens.Plugins.Msi.Contracts.Configuration;
+using RTXLens.Plugins.Msi.Control;
+using RTXLens.Plugins.Msi.Device;
+using RTXLens.Tests.Infrastructure;
 
-namespace Rtx5090Monitoring.Tests.Service;
+namespace RTXLens.Tests.Service;
 
 internal static class MsiCurveHardwareVerification
 {

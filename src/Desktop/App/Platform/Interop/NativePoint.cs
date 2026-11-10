@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace Rtx5090Monitoring.App.Platform.Interop;
+namespace RTXLens.App.Platform.Interop;
 
 [StructLayout(LayoutKind.Sequential)]
 internal struct NativePoint

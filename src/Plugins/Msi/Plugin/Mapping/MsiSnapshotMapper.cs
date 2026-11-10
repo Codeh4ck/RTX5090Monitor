@@ -1,8 +1,8 @@
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Contracts.Sensors;
-using Rtx5090Monitoring.Plugins.Msi.Contracts.Telemetry;
+using RTXLens.Contracts.Enums;
+using RTXLens.Contracts.Sensors;
+using RTXLens.Plugins.Msi.Contracts.Telemetry;
 
-namespace Rtx5090Monitoring.Plugins.Msi.Mapping;
+namespace RTXLens.Plugins.Msi.Mapping;
 
 internal static class MsiSnapshotMapper
 {

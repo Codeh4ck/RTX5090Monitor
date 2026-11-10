@@ -1,18 +1,18 @@
 using System.Runtime.CompilerServices;
-using Rtx5090Monitoring.Client.Http;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Contracts.Discovery;
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Contracts.Health;
-using Rtx5090Monitoring.Contracts.Sensors;
-using Rtx5090Monitoring.Debugging.Models;
-using Rtx5090Monitoring.Debugging.Catalog;
-using Rtx5090Monitoring.Plugins.Asus.Contracts.Common;
-using Rtx5090Monitoring.Plugins.Msi.Contracts.Devices;
-using Rtx5090Monitoring.Plugins.WireView.Contracts.Common;
-using Rtx5090Monitoring.Plugins.WireView.Contracts.Input;
+using RTXLens.Client.Http;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Contracts.Discovery;
+using RTXLens.Contracts.Enums;
+using RTXLens.Contracts.Health;
+using RTXLens.Contracts.Sensors;
+using RTXLens.Debugging.Models;
+using RTXLens.Debugging.Catalog;
+using RTXLens.Plugins.Asus.Contracts.Common;
+using RTXLens.Plugins.Msi.Contracts.Devices;
+using RTXLens.Plugins.WireView.Contracts.Common;
+using RTXLens.Plugins.WireView.Contracts.Input;
 
-namespace Rtx5090Monitoring.Debugging.Api;
+namespace RTXLens.Debugging.Api;
 
 public sealed class DebugMonitoringApi(DebugSession session, TimeProvider clock) : IMonitoringApi
 {
@@ -36,8 +36,8 @@ public sealed class DebugMonitoringApi(DebugSession session, TimeProvider clock)
     }
 
     public Task<DeviceConfig> GetWireViewConfigurationAsync(CancellationToken token) => Task.FromResult(DebugDeviceDefaults.WireView());
-    public Task<Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.Devices.NvidiaDeviceInfo[]> GetNvidiaDevicesAsync(CancellationToken token) =>
-        Task.FromResult<Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.Devices.NvidiaDeviceInfo[]>([new(session.Plugins.Single(plugin => plugin.Id == "generic-nvidia").DeviceId, "DEBUG GeForce RTX GPU", "debug-nvidia")]);
+    public Task<RTXLens.Plugins.GenericNvidia.Contracts.Devices.NvidiaDeviceInfo[]> GetNvidiaDevicesAsync(CancellationToken token) =>
+        Task.FromResult<RTXLens.Plugins.GenericNvidia.Contracts.Devices.NvidiaDeviceInfo[]>([new(session.Plugins.Single(plugin => plugin.Id == "generic-nvidia").DeviceId, "DEBUG GeForce RTX GPU", "debug-nvidia")]);
 
     public Task<AsusDeviceInfo[]> GetAsusDevicesAsync(CancellationToken token) => Task.FromResult<AsusDeviceInfo[]>([new AsusDeviceInfo(session.Plugins[1].DeviceId, "DEBUG ROG Astral")]);
     public Task<MsiDeviceInfo[]> GetMsiDevicesAsync(CancellationToken token) => Task.FromResult<MsiDeviceInfo[]>([new MsiDeviceInfo(session.Plugins[2].DeviceId, "DEBUG MPG TS PSU")]);

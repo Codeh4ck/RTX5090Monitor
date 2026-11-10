@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace Rtx5090Monitoring.Plugins.WireView.Device;
+namespace RTXLens.Plugins.WireView.Device;
 
 internal static class Stm32PortFinder
 {

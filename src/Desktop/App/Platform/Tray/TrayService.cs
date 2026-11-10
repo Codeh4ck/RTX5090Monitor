@@ -1,9 +1,9 @@
 using System.Runtime.InteropServices;
 using Microsoft.UI.Dispatching;
-using Rtx5090Monitoring.App.Platform.Interop;
-using Rtx5090Monitoring.App.Platform.Windowing;
+using RTXLens.App.Platform.Interop;
+using RTXLens.App.Platform.Windowing;
 
-namespace Rtx5090Monitoring.App.Platform.Tray;
+namespace RTXLens.App.Platform.Tray;
 
 internal sealed partial class TrayService : IDisposable
 {
@@ -31,7 +31,7 @@ internal sealed partial class TrayService : IDisposable
         _exit = exit;
         _minimizeChanged = minimizeChanged;
         _taskbarCreated = NativeMethods.RegisterWindowMessageW("TaskbarCreated");
-        _showMessage = NativeMethods.RegisterWindowMessageW("Rtx5090Monitoring.App.Show");
+        _showMessage = NativeMethods.RegisterWindowMessageW("RTXLens.App.Show");
 
         WindowProcedure procedure = ProcessMessage;
 
@@ -59,7 +59,7 @@ internal sealed partial class TrayService : IDisposable
             Flags = NativeConstants.NotifyMessageFlag | NativeConstants.NotifyIconFlag | NativeConstants.NotifyTipFlag | NativeConstants.NotifyGuidFlag | NativeConstants.NotifyShowTipFlag,
             CallbackMessage = CallbackMessage,
             Icon = NativeMethods.LoadImageW(0, Path.Combine(AppContext.BaseDirectory, "Assets", "monitor.ico"), NativeConstants.IconImage, 32, 32, NativeConstants.LoadFromFile),
-            Tip = "RTX Monitor · connecting",
+            Tip = "RTX Lens · connecting",
             Info = string.Empty,
             InfoTitle = string.Empty,
             Guid = new Guid("2C899FB2-3A10-4548-A37E-28F976C6B3AF")
@@ -70,7 +70,7 @@ internal sealed partial class TrayService : IDisposable
 
     public void SetStatus(string status)
     {
-        _data.Tip = ("RTX Monitor · " + status)[..Math.Min(127, 14 + status.Length)];
+        _data.Tip = ("RTX Lens · " + status)[..Math.Min(127, 14 + status.Length)];
         NativeMethods.Shell_NotifyIconW(NativeConstants.NotifyModify, ref _data);
     }
 
@@ -159,7 +159,7 @@ internal sealed partial class TrayService : IDisposable
         var menu = NativeMethods.CreatePopupMenu();
         try
         {
-            NativeMethods.AppendMenuW(menu, 0, NativeConstants.CommandOpen, "Open RTX Monitor");
+            NativeMethods.AppendMenuW(menu, 0, NativeConstants.CommandOpen, "Open RTX Lens");
             NativeMethods.AppendMenuW(menu, 0, NativeConstants.CommandSettings, "Settings");
             NativeMethods.AppendMenuW(menu, NativeConstants.MenuSeparator, 0, null);
             NativeMethods.AppendMenuW(menu, 0, NativeConstants.CommandExit, "Exit");

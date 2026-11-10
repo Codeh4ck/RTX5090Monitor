@@ -1,8 +1,8 @@
 using System.Globalization;
-using Rtx5090Monitoring.Debugging.Models;
-using Rtx5090Monitoring.Presentation.Infrastructure;
+using RTXLens.Debugging.Models;
+using RTXLens.Presentation.Infrastructure;
 
-namespace Rtx5090Monitoring.Debugging.ViewModels;
+namespace RTXLens.Debugging.ViewModels;
 
 public sealed class DebugMetricViewModel(DebugMetricDefinition definition) : ObservableObject
 {

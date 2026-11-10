@@ -5,16 +5,16 @@ using System.Runtime.InteropServices;
 using Microsoft.Win32;
 using Microsoft.Win32.SafeHandles;
 
-namespace Rtx5090Monitoring.Installer.Actions.Startup;
+namespace RTXLens.Installer.Actions.Startup;
 
 public static class StartupCleanup
 {
     private const string RunKey = @"Software\Microsoft\Windows\CurrentVersion\Run";
-    private const string ValueName = "Rtx5090Monitoring";
+    private const string ValueName = "RTXLens";
 
-    public static bool MatchesInstalledApp(string? command, string installDirectory)
+    public static bool MatchesInstalledApp(string? command, string installDirectory, bool legacy = false)
     {
-        var executable = Path.Combine(Path.GetFullPath(installDirectory), "Desktop", "Rtx5090Monitoring.App.exe");
+        var executable = Path.Combine(Path.GetFullPath(installDirectory), "Desktop", legacy ? "Rtx5090Monitoring.App.exe" : "RTXLens.App.exe");
 
         return command is not null && (command.Equals('"' + executable + '"', StringComparison.OrdinalIgnoreCase)
             || command.StartsWith('"' + executable + "\" ", StringComparison.OrdinalIgnoreCase));
@@ -22,9 +22,9 @@ public static class StartupCleanup
 
     public static void Remove(string installDirectory, Action<string> log) => Update(installDirectory, log, migrate: false);
 
-    public static void Migrate(string installDirectory, Action<string> log) => Update(installDirectory, log, migrate: true);
+    public static void Migrate(string installDirectory, Action<string> log, string? previousDirectory = null) => Update(installDirectory, log, migrate: true, previousDirectory);
 
-    private static void Update(string installDirectory, Action<string> log, bool migrate)
+    private static void Update(string installDirectory, Action<string> log, bool migrate, string? previousDirectory = null)
     {
         var loaded = new HashSet<string>(Registry.Users.GetSubKeyNames(), StringComparer.OrdinalIgnoreCase);
         using var profiles = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList");
@@ -38,9 +38,16 @@ public static class StartupCleanup
 
             try
             {
+                if (migrate && previousDirectory is not null)
+                {
+                    ElevatedStartupTask.Migrate(sid,
+                        Path.Combine(previousDirectory, "Desktop", "Rtx5090Monitoring.App.exe"),
+                        Path.Combine(installDirectory, "Desktop", "RTXLens.App.exe"));
+                }
+
                 if (!migrate)
                 {
-                    ElevatedStartupTask.Remove(sid, Path.Combine(installDirectory, "Desktop", "Rtx5090Monitoring.App.exe"));
+                    ElevatedStartupTask.Remove(sid, Path.Combine(installDirectory, "Desktop", "RTXLens.App.exe"));
                 }
 
                 if (loaded.Contains(sid))
@@ -48,7 +55,7 @@ public static class StartupCleanup
                     using var hive = Registry.Users.OpenSubKey(sid, true);
                     if (migrate)
                     {
-                        UpdateHive(hive, installDirectory, sid, true);
+                        UpdateHive(hive, installDirectory, sid, true, previousDirectory);
                     }
                     else
                     {
@@ -79,14 +86,7 @@ public static class StartupCleanup
                         }
 
                         using var hive = RegistryKey.FromHandle(handle);
-                        if (migrate)
-                    {
-                        UpdateHive(hive, installDirectory, sid, true);
-                    }
-                    else
-                    {
-                        RemoveFromHive(hive, installDirectory);
-                    }
+                        UpdateHive(hive, installDirectory, sid, migrate, previousDirectory);
                     }
                 }
             }
@@ -99,23 +99,24 @@ public static class StartupCleanup
 
     private static void RemoveFromHive(RegistryKey? hive, string installDirectory) => UpdateHive(hive, installDirectory, "", false);
 
-    private static void UpdateHive(RegistryKey? hive, string installDirectory, string sid, bool migrate)
+    private static void UpdateHive(RegistryKey? hive, string installDirectory, string sid, bool migrate, string? previousDirectory = null)
     {
         using var run = hive?.OpenSubKey(RunKey, true);
-        if (!MatchesInstalledApp(run?.GetValue(ValueName) as string, installDirectory))
+        var valueName = previousDirectory is null ? ValueName : "Rtx5090Monitoring";
+        if (!MatchesInstalledApp(run?.GetValue(valueName) as string, previousDirectory ?? installDirectory, previousDirectory is not null))
         {
             return;
         }
 
         if (migrate)
         {
-            ElevatedStartupTask.Register(sid, Path.Combine(installDirectory, "Desktop", "Rtx5090Monitoring.App.exe"));
+            ElevatedStartupTask.Register(sid, Path.Combine(installDirectory, "Desktop", "RTXLens.App.exe"));
         }
 
-        run!.DeleteValue(ValueName, false);
+        run!.DeleteValue(valueName, false);
 
         using var approved = hive?.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run", true);
-        approved?.DeleteValue(ValueName, false);
+        approved?.DeleteValue(valueName, false);
     }
 
     [DllImport("advapi32.dll", EntryPoint = "RegLoadAppKeyW", CharSet = CharSet.Unicode)]

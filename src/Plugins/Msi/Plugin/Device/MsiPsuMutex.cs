@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 
-namespace Rtx5090Monitoring.Plugins.Msi.Device;
+namespace RTXLens.Plugins.Msi.Device;
 
 internal sealed class MsiPsuMutex : IDisposable
 {

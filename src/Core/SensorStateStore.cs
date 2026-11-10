@@ -1,11 +1,11 @@
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Contracts.Health;
-using Rtx5090Monitoring.Contracts.Alerts;
-using Rtx5090Monitoring.Contracts.Sensors;
-using Rtx5090Monitoring.Contracts.Monitoring;
-using Rtx5090Monitoring.Core.Plugins;
+using RTXLens.Contracts.Enums;
+using RTXLens.Contracts.Health;
+using RTXLens.Contracts.Alerts;
+using RTXLens.Contracts.Sensors;
+using RTXLens.Contracts.Monitoring;
+using RTXLens.Core.Plugins;
 
-namespace Rtx5090Monitoring.Core;
+namespace RTXLens.Core;
 
 public sealed class SensorStateStore
 {

@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using WixToolset.Dtf.WindowsInstaller;
 
-namespace Rtx5090Monitoring.Installer.Tests.Packaging;
+namespace RTXLens.Installer.Tests.Packaging;
 
 internal static class PackageTests
 {
@@ -49,7 +49,7 @@ internal static class PackageTests
 
         Check.That(expected.Count == 0, "Every published DLL, executable, PRI, XBF, asset and runtime file is included exactly once.");
         var service = Read(database, "SELECT `Name`, `StartType`, `StartName`, `Arguments` FROM `ServiceInstall`").Single();
-        Check.That(service[0] == "Rtx5090MonitoringService" && service[1] == "2" && service[2] == "LocalSystem", "Service registers automatically under LocalSystem.");
+        Check.That(service[0] == "RTXLensService" && service[1] == "2" && service[2] == "LocalSystem", "Service registers automatically under LocalSystem.");
         Check.That(service[3].Contains("--contentRoot"), "Service content root points to its installed payload.");
         var control = Read(database, "SELECT `Name`, `Event` FROM `ServiceControl`").Single();
         Check.That((int.Parse(control[1]) & 0x80) != 0 && (int.Parse(control[1]) & 0x20) != 0, "Uninstall stops and deletes the registered service.");
@@ -63,6 +63,14 @@ internal static class PackageTests
         var actions = Read(database, "SELECT `Action`, `Type` FROM `CustomAction`").ToDictionary(row => row[0]);
         Check.That((int.Parse(actions["RestoreConfiguration"][1]) & 0x500) == 0x500, "Configuration restore is a rollback action.");
         Check.That((int.Parse(actions["RemoveStartupRegistration"][1]) & 0x600) == 0x600, "Startup cleanup occurs only when uninstall/feature removal commits.");
+        int Order(string action) => int.Parse(sequence[action][1]);
+        Check.That(Order("RemoveExistingProducts") < Order("InstallFiles")
+            && Order("InstallFiles") < Order("PrepareLegacyMigration")
+            && Order("PrepareLegacyMigration") < Order("RestoreLegacyMigration")
+            && Order("RestoreLegacyMigration") < Order("CaptureLegacyMigration")
+            && Order("CaptureLegacyMigration") < Order("ApplyLegacyMigration")
+            && Order("ApplyLegacyMigration") < Order("StartServices"),
+            "Setup migrates preserved data before starting the new service and rolls it back before restoring the old product.");
         var backupCleanup = sequence["RemoveAfterburnerBackups"];
         Check.That(backupCleanup[2] == "Installed AND REMOVE~=\"ALL\" AND NOT UPGRADINGPRODUCTCODE"
             && sequence["PrepareAfterburnerBackupCleanup"][2] == backupCleanup[2]

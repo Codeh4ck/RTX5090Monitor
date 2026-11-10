@@ -1,22 +1,22 @@
 using System.Text.Json.Serialization;
-using Rtx5090Monitoring.Contracts.Health;
-using Rtx5090Monitoring.Contracts.Sensors;
-using Rtx5090Monitoring.Contracts.Discovery;
+using RTXLens.Contracts.Health;
+using RTXLens.Contracts.Sensors;
+using RTXLens.Contracts.Discovery;
 
-namespace Rtx5090Monitoring.Service;
+namespace RTXLens.Service;
 
 [JsonSourceGenerationOptions(PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase, UseStringEnumConverter = true)]
 [JsonSerializable(typeof(SensorSnapshot))]
 [JsonSerializable(typeof(HealthResponse))]
 [JsonSerializable(typeof(Contracts.Updates.ServiceVersionResponse))]
 [JsonSerializable(typeof(PluginCatalog))]
-[JsonSerializable(typeof(Rtx5090Monitoring.Contracts.Configuration.ConfigurationSnapshot))]
-[JsonSerializable(typeof(Rtx5090Monitoring.Contracts.Configuration.ServiceConfiguration))]
-[JsonSerializable(typeof(Rtx5090Monitoring.Contracts.Configuration.PluginSettings))]
-[JsonSerializable(typeof(Rtx5090Monitoring.Contracts.Configuration.SettingsProfile))]
-[JsonSerializable(typeof(Rtx5090Monitoring.Contracts.Configuration.SettingsProfileCatalog))]
-[JsonSerializable(typeof(Rtx5090Monitoring.Contracts.Configuration.SettingsProfileRequest))]
-[JsonSerializable(typeof(Rtx5090Monitoring.Contracts.Configuration.DeviceWarningProfile[]))]
-[JsonSerializable(typeof(Rtx5090Monitoring.Contracts.Configuration.DeviceWarningProfileCatalog))]
-[JsonSerializable(typeof(Rtx5090Monitoring.Contracts.Configuration.WarningShutdownReason))]
+[JsonSerializable(typeof(RTXLens.Contracts.Configuration.ConfigurationSnapshot))]
+[JsonSerializable(typeof(RTXLens.Contracts.Configuration.ServiceConfiguration))]
+[JsonSerializable(typeof(RTXLens.Contracts.Configuration.PluginSettings))]
+[JsonSerializable(typeof(RTXLens.Contracts.Configuration.SettingsProfile))]
+[JsonSerializable(typeof(RTXLens.Contracts.Configuration.SettingsProfileCatalog))]
+[JsonSerializable(typeof(RTXLens.Contracts.Configuration.SettingsProfileRequest))]
+[JsonSerializable(typeof(RTXLens.Contracts.Configuration.DeviceWarningProfile[]))]
+[JsonSerializable(typeof(RTXLens.Contracts.Configuration.DeviceWarningProfileCatalog))]
+[JsonSerializable(typeof(RTXLens.Contracts.Configuration.WarningShutdownReason))]
 internal partial class AppJsonContext : JsonSerializerContext;

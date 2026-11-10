@@ -1,14 +1,14 @@
 <Project Sdk="WixToolset.Sdk/7.0.0">
     <PropertyGroup>
         <OutputType>Bundle</OutputType>
-        <OutputName>RtxMonitor-Setup-$(InstallerVersion)-win-x64</OutputName>
+        <OutputName>RTXLens-Setup-$(InstallerVersion)-win-x64</OutputName>
         <OutputPath>bin/x64/$(Configuration)/</OutputPath>
         <DefineConstants>$(DefineConstants);InstallerVersion=$(InstallerVersion);VcRedistPath=$(VcRedistPath);VcRedistVersion=$(VcRedistVersion)</DefineConstants>
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="WixToolset.BootstrapperApplications.wixext" />
         <PackageReference Include="WixToolset.Util.wixext" />
-        <ProjectReference Include="../Package/Rtx5090Monitoring.Installer.wixproj" />
+        <ProjectReference Include="../Package/RTXLens.Installer.wixproj" />
     </ItemGroup>
     <PropertyGroup Condition="'$(SigningCertificateThumbprint)' != ''">
         <SignOutput>true</SignOutput>

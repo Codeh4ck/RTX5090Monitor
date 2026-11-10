@@ -2,7 +2,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Markup;
 
-namespace Rtx5090Monitoring.App.Controls;
+namespace RTXLens.App.Controls;
 
 [ContentProperty(Name = nameof(Body))]
 public sealed partial class SectionPanel : UserControl

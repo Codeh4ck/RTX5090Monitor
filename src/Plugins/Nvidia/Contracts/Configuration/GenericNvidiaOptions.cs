@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.Configuration;
+namespace RTXLens.Plugins.GenericNvidia.Contracts.Configuration;
 
 [JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
 public sealed record GenericNvidiaOptions

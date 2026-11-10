@@ -1,10 +1,10 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
-using Rtx5090Monitoring.Plugins.Asus.Contracts.Configuration;
-using Rtx5090Monitoring.Plugins.Asus.Contracts.Common;
-using Rtx5090Monitoring.Presentation.Infrastructure;
+using RTXLens.Plugins.Asus.Contracts.Configuration;
+using RTXLens.Plugins.Asus.Contracts.Common;
+using RTXLens.Presentation.Infrastructure;
 
-namespace Rtx5090Monitoring.Presentation.Configuration;
+namespace RTXLens.Presentation.Configuration;
 
 public sealed class AsusSettingsEditorViewModel : EditableObject
 {

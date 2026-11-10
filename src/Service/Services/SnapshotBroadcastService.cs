@@ -1,16 +1,16 @@
 using System.Text.Json;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Core;
-using Rtx5090Monitoring.Core.Configuration;
-using Rtx5090Monitoring.Core.Streaming;
-using Rtx5090Monitoring.Core.Utilities;
-using Rtx5090Monitoring.Warnings;
-using Rtx5090Monitoring.Service.Configuration;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Core;
+using RTXLens.Core.Configuration;
+using RTXLens.Core.Streaming;
+using RTXLens.Core.Utilities;
+using RTXLens.Warnings;
+using RTXLens.Service.Configuration;
 
-namespace Rtx5090Monitoring.Service.Services;
+namespace RTXLens.Service.Services;
 
 internal sealed class SnapshotBroadcastService(IRuntimeConfiguration configuration, TimeProvider clock,
-    SensorStateStore store, SensorStreamHub hub, Rtx5090Monitoring.Core.Plugins.PluginRuntimeManager runtime,
+    SensorStateStore store, SensorStreamHub hub, RTXLens.Core.Plugins.PluginRuntimeManager runtime,
     SettingsProfileResolver profiles, DeviceWarningProfileStore warningProfiles, WarningShutdownCoordinator shutdown,
     SafeguardJournalService safeguard) : BackgroundService
 {

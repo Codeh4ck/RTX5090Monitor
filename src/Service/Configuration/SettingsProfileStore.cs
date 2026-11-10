@@ -1,7 +1,7 @@
 using System.Text.Json;
-using Rtx5090Monitoring.Contracts.Configuration;
+using RTXLens.Contracts.Configuration;
 
-namespace Rtx5090Monitoring.Service.Configuration;
+namespace RTXLens.Service.Configuration;
 
 internal sealed class SettingsProfileStore
 {

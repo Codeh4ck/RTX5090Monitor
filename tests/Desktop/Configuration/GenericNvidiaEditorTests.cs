@@ -1,9 +1,9 @@
-using Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.Configuration;
-using Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.Devices;
-using Rtx5090Monitoring.Presentation.Configuration;
-using Rtx5090Monitoring.Tests.Infrastructure;
+using RTXLens.Plugins.GenericNvidia.Contracts.Configuration;
+using RTXLens.Plugins.GenericNvidia.Contracts.Devices;
+using RTXLens.Presentation.Configuration;
+using RTXLens.Tests.Infrastructure;
 
-namespace Rtx5090Monitoring.UI.Tests.Configuration;
+namespace RTXLens.UI.Tests.Configuration;
 
 internal static class GenericNvidiaEditorTests
 {

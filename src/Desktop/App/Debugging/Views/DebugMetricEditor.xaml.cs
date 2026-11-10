@@ -1,8 +1,8 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Rtx5090Monitoring.Debugging.ViewModels;
+using RTXLens.Debugging.ViewModels;
 
-namespace Rtx5090Monitoring.App.Debugging.Views;
+namespace RTXLens.App.Debugging.Views;
 
 internal sealed partial class DebugMetricEditor : UserControl
 {

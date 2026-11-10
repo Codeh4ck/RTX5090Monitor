@@ -1,10 +1,10 @@
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Contracts.Sensors;
-using Rtx5090Monitoring.Plugins.Asus.Contracts.Common;
-using Rtx5090Monitoring.Plugins.Asus.Device;
-using Rtx5090Monitoring.Plugins.Asus.Analysis.Monitoring;
+using RTXLens.Contracts.Enums;
+using RTXLens.Contracts.Sensors;
+using RTXLens.Plugins.Asus.Contracts.Common;
+using RTXLens.Plugins.Asus.Device;
+using RTXLens.Plugins.Asus.Analysis.Monitoring;
 
-namespace Rtx5090Monitoring.Plugins.Asus.Mapping;
+namespace RTXLens.Plugins.Asus.Mapping;
 
 internal static class AsusSnapshotMapper
 {

@@ -4,18 +4,18 @@
         <PublishTrimmed>false</PublishTrimmed>
     </PropertyGroup>
     <ItemGroup>
-        <ProjectReference Include="../Plugins/Nvidia/Plugin/Rtx5090Monitoring.Plugins.GenericNvidia.csproj" />
-        <ProjectReference Include="../Plugins/Msi/Plugin/Rtx5090Monitoring.Plugins.Msi.csproj" />
+        <ProjectReference Include="../Plugins/Nvidia/Plugin/RTXLens.Plugins.GenericNvidia.csproj" />
+        <ProjectReference Include="../Plugins/Msi/Plugin/RTXLens.Plugins.Msi.csproj" />
         <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" />
         <PackageReference Include="MailKit" />
         <Compile Include="../Common/SafeguardReporting/*.cs" Link="SafeguardReporting/%(Filename)%(Extension)" />
         <PackageReference Include="System.Security.Cryptography.ProtectedData" />
         <Content Include="../../scripts/afterburner/*.ps1" Link="SafeguardScripts/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
-        <ProjectReference Include="../Core/Rtx5090Monitoring.Core.csproj" />
-        <ProjectReference Include="../Plugins/Asus/Plugin/Rtx5090Monitoring.Plugins.Asus.csproj" />
-        <ProjectReference Include="../Plugins/WireView/Plugin/Rtx5090Monitoring.Plugins.WireView.csproj" />
+        <ProjectReference Include="../Core/RTXLens.Core.csproj" />
+        <ProjectReference Include="../Plugins/Asus/Plugin/RTXLens.Plugins.Asus.csproj" />
+        <ProjectReference Include="../Plugins/WireView/Plugin/RTXLens.Plugins.WireView.csproj" />
     </ItemGroup>
     <ItemGroup>
-        <InternalsVisibleTo Include="Rtx5090Monitoring.Tests" />
+        <InternalsVisibleTo Include="RTXLens.Tests" />
     </ItemGroup>
 </Project>

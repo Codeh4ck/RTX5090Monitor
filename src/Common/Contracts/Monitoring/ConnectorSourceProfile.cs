@@ -1,4 +1,4 @@
-namespace Rtx5090Monitoring.Contracts.Monitoring;
+namespace RTXLens.Contracts.Monitoring;
 
 public sealed class ConnectorSourceProfile
 {

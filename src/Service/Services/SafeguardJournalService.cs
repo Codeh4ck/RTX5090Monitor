@@ -5,11 +5,11 @@ using System.Text.Json;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using MimeKit;
-using Rtx5090Monitoring.Contracts.Sensors;
-using Rtx5090Monitoring.Plugins.Msi.Contracts.Safeguard;
-using Rtx5090Monitoring.SafeguardReporting;
+using RTXLens.Contracts.Sensors;
+using RTXLens.Plugins.Msi.Contracts.Safeguard;
+using RTXLens.SafeguardReporting;
 
-namespace Rtx5090Monitoring.Service.Services;
+namespace RTXLens.Service.Services;
 
 internal sealed class SafeguardJournalService(TimeProvider clock, ILogger<SafeguardJournalService> logger) : BackgroundService
 {
@@ -289,7 +289,7 @@ internal sealed class SafeguardJournalService(TimeProvider clock, ILogger<Safegu
                     IsTestEmail = true,
                     ScriptVersion = script.Version
                 };
-                await SendAsync(credentials, "RTX Monitor Safeguard+ test email", CreateReportBody(report), null, token);
+                await SendAsync(credentials, "RTX Lens Safeguard+ test email", CreateReportBody(report), null, token);
                 result = new(true, "SMTP server accepted the test email.");
             }
             else
@@ -357,7 +357,7 @@ internal sealed class SafeguardJournalService(TimeProvider clock, ILogger<Safegu
                 {
                     ScriptVersion = script.Version
                 };
-            var subject = script.IsSimulation ? "RTX Monitor Safeguard+ simulation" : "RTX Monitor Safeguard+ triggered";
+            var subject = script.IsSimulation ? "RTX Lens Safeguard+ simulation" : "RTX Lens Safeguard+ triggered";
             await SendAsync(mail, subject, CreateReportBody(report), id, token);
             storage.Write("delivery", id, new SafeguardDelivery("Accepted by SMTP server", attempt, now));
             DeleteMailJob(storage, id);
@@ -406,7 +406,7 @@ internal sealed class SafeguardJournalService(TimeProvider clock, ILogger<Safegu
         using var message = new MimeMessage { Subject = subject, Body = body };
         if (id is { } executionId)
         {
-            message.MessageId = $"safeguard-{executionId:N}@rtx-monitor.local";
+            message.MessageId = $"safeguard-{executionId:N}@rtxlens.com";
         }
 
         message.From.Add(MailboxAddress.Parse(settings.Sender));

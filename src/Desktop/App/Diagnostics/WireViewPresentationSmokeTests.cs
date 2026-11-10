@@ -4,16 +4,16 @@ using Microsoft.UI.Xaml.Automation.Provider;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Media;
-using Rtx5090Monitoring.App.Controls;
-using Rtx5090Monitoring.App.Services;
-using Rtx5090Monitoring.App.Views;
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Debugging.Models;
-using Rtx5090Monitoring.Presentation.Settings;
-using Rtx5090Monitoring.Presentation.Telemetry;
+using RTXLens.App.Controls;
+using RTXLens.App.Services;
+using RTXLens.App.Views;
+using RTXLens.Contracts.Enums;
+using RTXLens.Debugging.Models;
+using RTXLens.Presentation.Settings;
+using RTXLens.Presentation.Telemetry;
 using Windows.Foundation;
 
-namespace Rtx5090Monitoring.App.Diagnostics;
+namespace RTXLens.App.Diagnostics;
 
 internal static class WireViewPresentationSmokeTests
 {

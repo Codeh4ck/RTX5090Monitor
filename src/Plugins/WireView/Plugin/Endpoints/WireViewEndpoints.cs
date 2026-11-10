@@ -1,14 +1,14 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Core;
-using Rtx5090Monitoring.Core.Http;
-using Rtx5090Monitoring.Core.Plugins;
-using Rtx5090Monitoring.Plugins.WireView.Contracts.Output;
-using Rtx5090Monitoring.Plugins.WireView.Serialization;
+using RTXLens.Contracts.Enums;
+using RTXLens.Core;
+using RTXLens.Core.Http;
+using RTXLens.Core.Plugins;
+using RTXLens.Plugins.WireView.Contracts.Output;
+using RTXLens.Plugins.WireView.Serialization;
 
-namespace Rtx5090Monitoring.Plugins.WireView.Endpoints;
+namespace RTXLens.Plugins.WireView.Endpoints;
 
 public static class WireViewEndpoints
 {

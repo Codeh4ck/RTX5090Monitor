@@ -1,11 +1,11 @@
 using Microsoft.UI.Xaml;
-using Rtx5090Monitoring.App.Platform.Startup;
-using Rtx5090Monitoring.App.Platform.Tray;
-using Rtx5090Monitoring.App.Platform.Windowing;
-using Rtx5090Monitoring.App.Services;
+using RTXLens.App.Platform.Startup;
+using RTXLens.App.Platform.Tray;
+using RTXLens.App.Platform.Windowing;
+using RTXLens.App.Services;
 using Windows.Graphics;
 
-namespace Rtx5090Monitoring.App;
+namespace RTXLens.App;
 
 public sealed partial class App : Application
 {
@@ -19,7 +19,7 @@ public sealed partial class App : Application
 
     public App()
     {
-        UnhandledException += (_, error) => File.WriteAllText(Path.Combine(Path.GetTempPath(), "rtx-monitor-error.txt"), error.Exception.ToString());
+        UnhandledException += (_, error) => File.WriteAllText(Path.Combine(Path.GetTempPath(), "rtxlens-error.txt"), error.Exception.ToString());
         InitializeComponent();
     }
 
@@ -115,7 +115,7 @@ public sealed partial class App : Application
         if (arguments.Contains("--smoke-test") && _runtime.IsDemo)
         {
             var output = arguments.FirstOrDefault(argument => argument.StartsWith("--smoke-output=", StringComparison.Ordinal))?[15..]
-                ?? Path.Combine(Path.GetTempPath(), "rtx-monitor-smoke");
+                ?? Path.Combine(Path.GetTempPath(), "rtxlens-smoke");
             try { await Diagnostics.SmokeTestRunner.RunAsync(_window, _runtime, output); }
             catch (Exception exception)
             {

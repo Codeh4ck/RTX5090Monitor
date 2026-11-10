@@ -2,11 +2,11 @@ using System.Security.Cryptography;
 using System.Security.Principal;
 using System.Text;
 using Microsoft.UI.Windowing;
-using Rtx5090Monitoring.App.Msi.Afterburner;
-using Rtx5090Monitoring.Contracts.Sensors;
-using Rtx5090Monitoring.Plugins.Msi.Contracts.Safeguard;
+using RTXLens.App.Msi.Afterburner;
+using RTXLens.Contracts.Sensors;
+using RTXLens.Plugins.Msi.Contracts.Safeguard;
 
-namespace Rtx5090Monitoring.App.Services;
+namespace RTXLens.App.Services;
 
 internal sealed partial class AppRuntime
 {

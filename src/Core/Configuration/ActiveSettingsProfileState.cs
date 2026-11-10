@@ -1,6 +1,6 @@
-using Rtx5090Monitoring.Contracts.Configuration;
+using RTXLens.Contracts.Configuration;
 
-namespace Rtx5090Monitoring.Core.Configuration;
+namespace RTXLens.Core.Configuration;
 
 public sealed class ActiveSettingsProfileState
 {

@@ -3,12 +3,12 @@ using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
-using Rtx5090Monitoring.App.Services;
-using Rtx5090Monitoring.Presentation.Msi.Afterburner;
+using RTXLens.App.Services;
+using RTXLens.Presentation.Msi.Afterburner;
 using Windows.Storage.Pickers;
 using Windows.Globalization.NumberFormatting;
 
-namespace Rtx5090Monitoring.App.Msi.Afterburner;
+namespace RTXLens.App.Msi.Afterburner;
 
 public sealed partial class AfterburnerSettingsView : UserControl
 {
@@ -54,7 +54,7 @@ public sealed partial class AfterburnerSettingsView : UserControl
     {
         _runtime = runtime;
         _selectionPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "Rtx5090Monitoring", "afterburner-installation.txt");
+            "RTXLens", "afterburner-installation.txt");
         InitializeComponent();
         Connector1Host.Content = _connector1;
         Connector2Host.Content = _connector2;
@@ -537,7 +537,7 @@ public sealed partial class AfterburnerSettingsView : UserControl
             XamlRoot = XamlRoot,
             RequestedTheme = ActualTheme,
             Title = "Afterburner Safeguard+ Integration",
-            Content = "This is one-way configuration of Afterburner. RTX Monitor does not consume its alarms or run alarm commands.\n\n"
+            Content = "This is one-way configuration of Afterburner. RTX Lens does not consume its alarms or run alarm commands.\n\n"
                 + "Close Afterburner and save a working configuration backup first. Apply changes, then restart Afterburner. "
                 + "Safeguard+ configured describes the files; it does not guarantee monitoring is running.\n\n"
                 + "Software mode alarms when any pin exceeds Maximum per-pin current, or highest minus lowest exceeds Maximum pin-current difference. "

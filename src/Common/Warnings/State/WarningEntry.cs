@@ -1,6 +1,6 @@
-using Rtx5090Monitoring.Contracts.Warnings;
+using RTXLens.Contracts.Warnings;
 
-namespace Rtx5090Monitoring.Warnings.State;
+namespace RTXLens.Warnings.State;
 
 internal sealed class WarningEntry(WarningObservation observation, WarningDefinition definition, WarningPolicy policy, DateTimeOffset now)
 {

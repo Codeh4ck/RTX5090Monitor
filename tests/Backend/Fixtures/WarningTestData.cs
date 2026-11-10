@@ -1,15 +1,15 @@
-using Rtx5090Monitoring.Plugins.WireView.Analysis.Warnings;
-using Rtx5090Monitoring.Plugins.GenericNvidia.Analysis.Warnings;
-using Rtx5090Monitoring.Plugins.Asus.Analysis.Warnings;
-using Rtx5090Monitoring.Plugins.Asus.Contracts.Warnings;
-using Rtx5090Monitoring.Contracts.Alerts;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Contracts.Health;
-using Rtx5090Monitoring.Contracts.Sensors;
-using Rtx5090Monitoring.Contracts.Warnings;
+using RTXLens.Plugins.WireView.Analysis.Warnings;
+using RTXLens.Plugins.GenericNvidia.Analysis.Warnings;
+using RTXLens.Plugins.Asus.Analysis.Warnings;
+using RTXLens.Plugins.Asus.Contracts.Warnings;
+using RTXLens.Contracts.Alerts;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Contracts.Enums;
+using RTXLens.Contracts.Health;
+using RTXLens.Contracts.Sensors;
+using RTXLens.Contracts.Warnings;
 
-namespace Rtx5090Monitoring.Tests.Fixtures;
+namespace RTXLens.Tests.Fixtures;
 
 internal static class WarningTestData
 {
@@ -20,7 +20,7 @@ internal static class WarningTestData
     public static readonly DateTimeOffset Start = new(2026, 10, 24, 12, 0, 0, TimeSpan.Zero);
     public static ServiceConfiguration Configuration(WarningPolicy? policy = null) => new()
     {
-        Plugins = new Dictionary<string, PluginSettings> { ["generic-nvidia"] = new() { Options = System.Text.Json.JsonSerializer.SerializeToElement(new Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.Configuration.GenericNvidiaOptions { CoreTemperatureWarningC = 80 }) }, ["asus-astral"] = new() { Options = System.Text.Json.JsonSerializer.SerializeToElement(new Rtx5090Monitoring.Plugins.Asus.Contracts.Configuration.AsusOptions { CoreTemperatureWarningC = 80 }) }, ["wireview-pro2"] = new() },
+        Plugins = new Dictionary<string, PluginSettings> { ["generic-nvidia"] = new() { Options = System.Text.Json.JsonSerializer.SerializeToElement(new RTXLens.Plugins.GenericNvidia.Contracts.Configuration.GenericNvidiaOptions { CoreTemperatureWarningC = 80 }) }, ["asus-astral"] = new() { Options = System.Text.Json.JsonSerializer.SerializeToElement(new RTXLens.Plugins.Asus.Contracts.Configuration.AsusOptions { CoreTemperatureWarningC = 80 }) }, ["wireview-pro2"] = new() },
         Warnings = new WarningOptions { Defaults = policy ?? new WarningPolicy() }
     };
     public static SensorSnapshot Frame(int seconds, double temperature = 81, ushort faults = 0, AlertPin[]? pins = null)

@@ -1,4 +1,4 @@
-namespace Rtx5090Monitoring.Presentation.Settings;
+namespace RTXLens.Presentation.Settings;
 
 public enum AppTheme
 {

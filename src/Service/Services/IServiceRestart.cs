@@ -1,4 +1,4 @@
-namespace Rtx5090Monitoring.Service.Services;
+namespace RTXLens.Service.Services;
 
 public interface IServiceRestart
 {

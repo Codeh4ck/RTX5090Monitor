@@ -1,9 +1,9 @@
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Contracts.Sensors;
-using Rtx5090Monitoring.Contracts.Warnings;
-using Rtx5090Monitoring.Warnings;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Contracts.Sensors;
+using RTXLens.Contracts.Warnings;
+using RTXLens.Warnings;
 
-namespace Rtx5090Monitoring.Tests.TestDoubles;
+namespace RTXLens.Tests.TestDoubles;
 
 internal sealed class CustomWarningSource : IWarningSource
 {

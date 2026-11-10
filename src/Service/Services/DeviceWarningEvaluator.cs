@@ -1,13 +1,13 @@
 using System.Globalization;
-using Rtx5090Monitoring.Contracts.Alerts;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Contracts.Sensors;
-using Rtx5090Monitoring.Contracts.Warnings;
-using Rtx5090Monitoring.Plugins.Asus.Contracts.Warnings;
-using Rtx5090Monitoring.Warnings;
+using RTXLens.Contracts.Alerts;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Contracts.Enums;
+using RTXLens.Contracts.Sensors;
+using RTXLens.Contracts.Warnings;
+using RTXLens.Plugins.Asus.Contracts.Warnings;
+using RTXLens.Warnings;
 
-namespace Rtx5090Monitoring.Service.Services;
+namespace RTXLens.Service.Services;
 
 internal sealed class DeviceWarningEvaluator
 {

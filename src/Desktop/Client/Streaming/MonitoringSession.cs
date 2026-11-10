@@ -1,9 +1,9 @@
-using Rtx5090Monitoring.Client.Http;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Contracts.Discovery;
-using Rtx5090Monitoring.Contracts.Sensors;
+using RTXLens.Client.Http;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Contracts.Discovery;
+using RTXLens.Contracts.Sensors;
 
-namespace Rtx5090Monitoring.Client.Streaming;
+namespace RTXLens.Client.Streaming;
 
 public sealed class MonitoringSession(IMonitoringApi api)
 {

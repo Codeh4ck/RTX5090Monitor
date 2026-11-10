@@ -1,6 +1,6 @@
-using Rtx5090Monitoring.Plugins.WireView.Contracts.Common;
+using RTXLens.Plugins.WireView.Contracts.Common;
 
-namespace Rtx5090Monitoring.Plugins.WireView.Device;
+namespace RTXLens.Plugins.WireView.Device;
 
 public interface IWireViewDeviceReader : IDisposable
 {

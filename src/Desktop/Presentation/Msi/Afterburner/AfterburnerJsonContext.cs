@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Rtx5090Monitoring.Presentation.Msi.Afterburner;
+namespace RTXLens.Presentation.Msi.Afterburner;
 
 [JsonSerializable(typeof(AfterburnerBackup))]
 [JsonSerializable(typeof(AfterburnerOperation))]

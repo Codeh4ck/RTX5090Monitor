@@ -1,8 +1,8 @@
 using Microsoft.UI.Windowing;
-using Rtx5090Monitoring.App.Msi.Afterburner;
-using Rtx5090Monitoring.Presentation.Msi.Afterburner;
+using RTXLens.App.Msi.Afterburner;
+using RTXLens.Presentation.Msi.Afterburner;
 
-namespace Rtx5090Monitoring.App.Services;
+namespace RTXLens.App.Services;
 
 internal sealed partial class AppRuntime
 {
@@ -13,7 +13,7 @@ internal sealed partial class AppRuntime
         try
         {
             var selection = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "Rtx5090Monitoring", "afterburner-installation.txt");
+                "RTXLens", "afterburner-installation.txt");
             var remembered = File.Exists(selection) ? await File.ReadAllTextAsync(selection) : null;
             return await Task.Run(() => AfterburnerDiscovery.Find(remembered).Length > 0);
         }

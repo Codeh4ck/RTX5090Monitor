@@ -1,18 +1,18 @@
-using Rtx5090Monitoring.Plugins.Asus.Contracts.Warnings;
-using Rtx5090Monitoring.Plugins.Asus.Contracts.Configuration;
+using RTXLens.Plugins.Asus.Contracts.Warnings;
+using RTXLens.Plugins.Asus.Contracts.Configuration;
 using System.Text.Json;
 using LibreHardwareMonitor.Hardware;
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Plugins.Asus;
-using Rtx5090Monitoring.Plugins.Asus.Configuration;
-using Rtx5090Monitoring.Plugins.Asus.Device;
-using Rtx5090Monitoring.Plugins.Asus.Streaming;
-using Rtx5090Monitoring.Tests.Fixtures;
-using Rtx5090Monitoring.Tests.Infrastructure;
-using Rtx5090Monitoring.Tests.TestDoubles;
+using RTXLens.Contracts.Enums;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Plugins.Asus;
+using RTXLens.Plugins.Asus.Configuration;
+using RTXLens.Plugins.Asus.Device;
+using RTXLens.Plugins.Asus.Streaming;
+using RTXLens.Tests.Fixtures;
+using RTXLens.Tests.Infrastructure;
+using RTXLens.Tests.TestDoubles;
 
-namespace Rtx5090Monitoring.Tests.Core;
+namespace RTXLens.Tests.Core;
 
 internal static class AsusPluginTests
 {

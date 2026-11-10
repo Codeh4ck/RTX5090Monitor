@@ -1,9 +1,9 @@
 using LibreHardwareMonitor.Hardware;
-using Rtx5090Monitoring.Hardware.Nvidia;
-using Rtx5090Monitoring.Plugins.Asus.Contracts.Common;
-using Rtx5090Monitoring.Plugins.Asus.Mapping;
+using RTXLens.Hardware.Nvidia;
+using RTXLens.Plugins.Asus.Contracts.Common;
+using RTXLens.Plugins.Asus.Mapping;
 
-namespace Rtx5090Monitoring.Plugins.Asus.Device;
+namespace RTXLens.Plugins.Asus.Device;
 
 public sealed class AsusGpuReader(NvidiaTelemetryReader reader) : IAsusGpuReader
 {

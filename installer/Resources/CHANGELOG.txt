@@ -1,3 +1,8 @@
+1.0.7 - RTX Lens
+- Rename the desktop app, backend service, and iCUE widget to RTX Lens.
+- Upgrade existing RTX Monitor installations in place and migrate saved settings, profiles, startup entries, and Safeguard+ data.
+- Check for new versions through rtxlens.com. The final release on the original GitHub repository provides the upgrade for older clients.
+
 1.0.6 - Afterburner Safeguard+ integration
 - Configure MSI Afterburner PSU monitoring, software current limits and per-connector alarms from RTX Monitor.
 - Save, restore and delete Afterburner configuration backups.

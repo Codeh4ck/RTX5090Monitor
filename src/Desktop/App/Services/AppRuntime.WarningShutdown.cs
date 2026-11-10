@@ -1,9 +1,9 @@
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml.Controls;
-using Rtx5090Monitoring.Client.Http;
-using Rtx5090Monitoring.Contracts.Configuration;
+using RTXLens.Client.Http;
+using RTXLens.Contracts.Configuration;
 
-namespace Rtx5090Monitoring.App.Services;
+namespace RTXLens.App.Services;
 
 internal sealed partial class AppRuntime
 {
@@ -58,7 +58,7 @@ internal sealed partial class AppRuntime
             var dialog = new ContentDialog
             {
                 XamlRoot = root,
-                Title = "RTX Monitor requested a shutdown",
+                Title = "RTX Lens requested a shutdown",
                 Content = new TextBlock
                 {
                     Text = $"{reason.Warning}\nProfile: {reason.ProfileName}\n{reason.Detail}\n\n{reason.RequestedAt.ToLocalTime():g}",

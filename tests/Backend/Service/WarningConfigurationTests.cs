@@ -1,18 +1,18 @@
 using Microsoft.Extensions.Configuration;
-using Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.Warnings;
-using Rtx5090Monitoring.Plugins.WireView.Contracts.Warnings;
-using Rtx5090Monitoring.Plugins.Asus.Contracts.Warnings;
+using RTXLens.Plugins.GenericNvidia.Contracts.Warnings;
+using RTXLens.Plugins.WireView.Contracts.Warnings;
+using RTXLens.Plugins.Asus.Contracts.Warnings;
 using System.Text.Json;
 using System.Net;
 using System.Text;
-using Rtx5090Monitoring.Contracts.Configuration;
-using Rtx5090Monitoring.Contracts.Monitoring;
-using Rtx5090Monitoring.Contracts.Warnings;
-using Rtx5090Monitoring.Service.Configuration;
-using Rtx5090Monitoring.Tests.Infrastructure;
-using Rtx5090Monitoring.Tests.TestDoubles;
+using RTXLens.Contracts.Configuration;
+using RTXLens.Contracts.Monitoring;
+using RTXLens.Contracts.Warnings;
+using RTXLens.Service.Configuration;
+using RTXLens.Tests.Infrastructure;
+using RTXLens.Tests.TestDoubles;
 
-namespace Rtx5090Monitoring.Tests.Service;
+namespace RTXLens.Tests.Service;
 
 internal static class WarningConfigurationTests
 {
@@ -139,7 +139,7 @@ internal static class WarningConfigurationTests
             ["Warnings:CoreTemperatureC"] = "81", ["Warnings:MemoryTemperatureC"] = "85"
         });
         var loaded = await host.GetConfigurationAsync();
-        var options = loaded.Configuration.Plugins["generic-nvidia"].Options!.Value.Deserialize<Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.Configuration.GenericNvidiaOptions>(new JsonSerializerOptions(JsonSerializerDefaults.Web))!;
+        var options = loaded.Configuration.Plugins["generic-nvidia"].Options!.Value.Deserialize<RTXLens.Plugins.GenericNvidia.Contracts.Configuration.GenericNvidiaOptions>(new JsonSerializerOptions(JsonSerializerDefaults.Web))!;
         TestAssert.Equal<double?>(81, options.CoreTemperatureWarningC);
         TestAssert.Equal<double?>(85, options.MemoryTemperatureWarningC);
     }

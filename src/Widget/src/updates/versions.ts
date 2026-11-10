@@ -1,8 +1,7 @@
 import type { ReleaseManifest } from './ReleaseManifest.ts';
 
-export const repositoryUrl = 'https://github.com/Codeh4ck/RTX5090Monitor';
-export const latestReleaseApi = 'https://api.github.com/repos/Codeh4ck/RTX5090Monitor/releases/latest';
-export const rawReleaseRoot = 'https://raw.githubusercontent.com/Codeh4ck/RTX5090Monitor/';
+export const updateManifestUrl = 'https://rtxlens.com/updates/version.json';
+export const repositoryUrl = 'https://github.com/Codeh4ck/RTXLens';
 
 export function parseVersion(value: unknown): number[] | null {
     if (typeof value !== 'string' || !/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/.test(value)) {
@@ -44,7 +43,16 @@ export function parseReleaseManifest(value: unknown): ReleaseManifest {
         throw new Error('Unsupported update manifest.');
     }
 
+    const tag = manifest.releaseTag;
+    const releaseUrl = manifest.releaseUrl;
+    if (releaseUrl !== undefined
+        && releaseUrl !== repositoryUrl + '/releases/tag/' + tag
+        && releaseUrl !== 'https://github.com/Codeh4ck/RTX5090Monitor/releases/tag/' + tag) {
+        throw new Error('Unsupported release URL.');
+    }
+
     return {
+        releaseUrl: releaseUrl as string | undefined,
         schemaVersion: 1,
         releaseTag: manifest.releaseTag,
         desktop: manifest.desktop as string,

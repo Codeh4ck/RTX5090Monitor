@@ -1,6 +1,6 @@
 import type { UpdateCheckState } from './UpdateCheckState.ts';
 import { UpdateStateStore } from './UpdateStateStore.ts';
-import { isNewerVersion, latestReleaseApi, nextUpdateCheck, parseReleaseManifest, parseVersion, rawReleaseRoot, repositoryUrl } from './versions.ts';
+import { isNewerVersion, nextUpdateCheck, parseReleaseManifest, repositoryUrl, updateManifestUrl } from './versions.ts';
 
 export class UpdateChecker {
     private readonly state: UpdateCheckState;
@@ -48,7 +48,7 @@ export class UpdateChecker {
     }
 
     get releaseUrl(): string | null {
-        return this.state.manifest ? `${repositoryUrl}/releases/tag/${encodeURIComponent(this.state.manifest.releaseTag)}` : null;
+        return this.state.manifest?.releaseUrl ?? (this.state.manifest ? `${repositoryUrl}/releases/tag/${encodeURIComponent(this.state.manifest.releaseTag)}` : null);
     }
 
     get lastChecked(): string {
@@ -90,22 +90,7 @@ export class UpdateChecker {
         this.changed();
 
         try {
-            const releaseResponse = await this.request(latestReleaseApi, { signal: controller.signal, cache: 'no-cache' });
-
-            if (!releaseResponse.ok) {
-                throw new Error('Release information is unavailable.');
-            }
-
-            const release = await releaseResponse.json() as Record<string, unknown>;
-
-            if (release.draft !== false || release.prerelease !== false || typeof release.tag_name !== 'string'
-                || !release.tag_name.startsWith('v') || !parseVersion(release.tag_name.slice(1))) {
-                throw new Error('Unsupported release information.');
-            }
-
-            const response = await this.request(`${rawReleaseRoot}${encodeURIComponent(release.tag_name)}/version.json`,
-                { signal: controller.signal, cache: 'no-cache' });
-
+            const response = await this.request(updateManifestUrl, { signal: controller.signal, cache: 'no-cache' });
             if (!response.ok) {
                 throw new Error('Update manifest is unavailable.');
             }
@@ -118,7 +103,7 @@ export class UpdateChecker {
 
             const manifest = parseReleaseManifest(JSON.parse(text));
 
-            if (manifest.releaseTag !== release.tag_name || controller.signal.aborted || this.stopped) {
+            if (controller.signal.aborted || this.stopped) {
                 throw new Error('Release manifest does not match the published release.');
             }
 

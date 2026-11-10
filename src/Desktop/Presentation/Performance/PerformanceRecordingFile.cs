@@ -2,7 +2,7 @@
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
-namespace Rtx5090Monitoring.Presentation.Performance;
+namespace RTXLens.Presentation.Performance;
 
 public static class PerformanceRecordingFile
 {
@@ -31,7 +31,7 @@ public static class PerformanceRecordingFile
                     RegexOptions.IgnoreCase | RegexOptions.CultureInvariant, TimeSpan.FromSeconds(2));
                 if (!match.Success)
                 {
-                    throw new InvalidDataException("The HTML file does not contain an RTX Monitor recording.");
+                    throw new InvalidDataException("The HTML file does not contain an RTX Lens recording.");
                 }
 
                 json = match.Groups["data"].Value;
@@ -41,7 +41,7 @@ public static class PerformanceRecordingFile
             var root = document.RootElement;
             if (root.ValueKind != JsonValueKind.Object)
             {
-                throw new InvalidDataException("The file does not contain an RTX Monitor recording.");
+                throw new InvalidDataException("The file does not contain an RTX Lens recording.");
             }
 
             PerformanceChartFrame? session;
@@ -79,7 +79,7 @@ public static class PerformanceRecordingFile
             || !double.IsFinite(session.DurationSeconds) || session.DurationSeconds < 0
             || session.DurationSeconds >= TimeSpan.MaxValue.TotalSeconds)
         {
-            throw new InvalidDataException("Select a completed RTX Monitor recording containing captured readings.");
+            throw new InvalidDataException("Select a completed RTX Lens recording containing captured readings.");
         }
 
         var keys = new HashSet<string>(StringComparer.Ordinal);

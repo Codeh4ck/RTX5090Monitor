@@ -1,9 +1,9 @@
 using System;
 using System.Diagnostics;
 using System.IO;
-using Rtx5090Monitoring.Installer.Actions.Configuration;
+using RTXLens.Installer.Actions.Configuration;
 
-namespace Rtx5090Monitoring.Installer.Tests.Configuration;
+namespace RTXLens.Installer.Tests.Configuration;
 
 internal static class AfterburnerBackupCleanupTests
 {
@@ -17,7 +17,7 @@ internal static class AfterburnerBackupCleanupTests
         var desktop = Path.Combine(installation, "Desktop");
         var store = Path.Combine(desktop, "AfterburnerBackups");
         var programData = Path.Combine(fixture, "ProgramData");
-        var legacy = Path.Combine(programData, "Rtx5090Monitoring.AfterburnerBackups", Key);
+        var legacy = Path.Combine(programData, "RTXLens.AfterburnerBackups", Key);
         var external = Path.Combine(fixture, "MSI Afterburner");
         var link = Path.Combine(store, ".import-bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
 
@@ -46,7 +46,7 @@ internal static class AfterburnerBackupCleanupTests
             Check.That(!AfterburnerBackupCleanup.ContainsOnlyBackupLeftovers(installation),
                 "Reinstall rejects a linked backup directory.");
 
-            var smtp = Path.Combine(programData, "Rtx5090Monitoring.Safeguard", "mail", "record.json");
+            var smtp = Path.Combine(programData, "RTXLens.Safeguard", "mail", "record.json");
             Directory.CreateDirectory(Path.GetDirectoryName(smtp)!);
             File.WriteAllText(smtp, "credential placeholder");
 

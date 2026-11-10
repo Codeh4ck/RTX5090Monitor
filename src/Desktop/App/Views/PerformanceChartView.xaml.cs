@@ -4,11 +4,11 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.Web.WebView2.Core;
-using Rtx5090Monitoring.App.Services;
-using Rtx5090Monitoring.Presentation.Performance;
+using RTXLens.App.Services;
+using RTXLens.Presentation.Performance;
 using Windows.Storage.Pickers;
 
-namespace Rtx5090Monitoring.App.Views;
+namespace RTXLens.App.Views;
 
 public sealed partial class PerformanceChartView : UserControl
 {
@@ -88,7 +88,7 @@ public sealed partial class PerformanceChartView : UserControl
         try
         {
             var folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "Rtx5090Monitoring", "PerformanceChart.WebView2");
+                "RTXLens", "PerformanceChart.WebView2");
             var environment = await CoreWebView2Environment.CreateWithOptionsAsync(null, folder, new CoreWebView2EnvironmentOptions());
             if (_unloaded)
             {
@@ -516,7 +516,7 @@ public sealed partial class PerformanceChartView : UserControl
                 SuggestedStartLocation = PickerLocationId.DocumentsLibrary,
                 SuggestedFileName = $"RTX-Monitor-{session.StartedAt:yyyyMMdd-HHmmss}"
             };
-            picker.FileTypeChoices.Add("RTX Monitor recording", new List<string> { ".rtxchart" });
+            picker.FileTypeChoices.Add("RTX Lens recording", new List<string> { ".rtxchart" });
             picker.FileTypeChoices.Add("Interactive HTML chart", new List<string> { ".html" });
             WinRT.Interop.InitializeWithWindow.Initialize(picker, _runtime.MainWindowHandle);
             var file = await picker.PickSaveFileAsync();

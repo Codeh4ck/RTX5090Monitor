@@ -1,6 +1,6 @@
 using System.Runtime.CompilerServices;
 
-namespace Rtx5090Monitoring.Presentation.Infrastructure;
+namespace RTXLens.Presentation.Infrastructure;
 
 public abstract class EditableObject : ObservableObject
 {

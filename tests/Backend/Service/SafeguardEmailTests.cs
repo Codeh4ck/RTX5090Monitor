@@ -1,12 +1,12 @@
 using MimeKit;
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Contracts.Sensors;
-using Rtx5090Monitoring.Plugins.Msi.Contracts.Safeguard;
-using Rtx5090Monitoring.Service.Services;
-using Rtx5090Monitoring.SafeguardReporting;
-using Rtx5090Monitoring.Tests.Infrastructure;
+using RTXLens.Contracts.Enums;
+using RTXLens.Contracts.Sensors;
+using RTXLens.Plugins.Msi.Contracts.Safeguard;
+using RTXLens.Service.Services;
+using RTXLens.SafeguardReporting;
+using RTXLens.Tests.Infrastructure;
 
-namespace Rtx5090Monitoring.Tests.Service;
+namespace RTXLens.Tests.Service;
 
 internal static class SafeguardEmailTests
 {

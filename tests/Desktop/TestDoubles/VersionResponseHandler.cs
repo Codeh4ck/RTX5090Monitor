@@ -1,6 +1,6 @@
 using System.Net;
 
-namespace Rtx5090Monitoring.UI.Tests.TestDoubles;
+namespace RTXLens.UI.Tests.TestDoubles;
 
 internal sealed class VersionResponseHandler(HttpStatusCode status, string json = "") : HttpMessageHandler
 {

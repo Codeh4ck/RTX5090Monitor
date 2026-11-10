@@ -1,9 +1,9 @@
 using System.Text.Json.Serialization;
-using Rtx5090Monitoring.Plugins.Msi.Contracts.Configuration;
-using Rtx5090Monitoring.Plugins.Msi.Contracts.Devices;
-using Rtx5090Monitoring.Plugins.Msi.Contracts.Telemetry;
+using RTXLens.Plugins.Msi.Contracts.Configuration;
+using RTXLens.Plugins.Msi.Contracts.Devices;
+using RTXLens.Plugins.Msi.Contracts.Telemetry;
 
-namespace Rtx5090Monitoring.Plugins.Msi.Serialization;
+namespace RTXLens.Plugins.Msi.Serialization;
 
 [JsonSourceGenerationOptions(PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase, PropertyNameCaseInsensitive = true, UseStringEnumConverter = true)]
 [JsonSerializable(typeof(MsiOptions))]

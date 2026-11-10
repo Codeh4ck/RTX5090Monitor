@@ -1,19 +1,19 @@
 using System.Security.Principal;
 using Microsoft.Win32;
-using Rtx5090Monitoring.Installer.Actions.Startup;
+using RTXLens.Installer.Actions.Startup;
 
-namespace Rtx5090Monitoring.App.Platform.Startup;
+namespace RTXLens.App.Platform.Startup;
 
 internal static class StartupRegistration
 {
     private const string Key = @"Software\Microsoft\Windows\CurrentVersion\Run";
-    private const string Name = "Rtx5090Monitoring";
+    private const string Name = "RTXLens";
 
     public static void SetEnabled(bool enabled)
     {
         using var identity = WindowsIdentity.GetCurrent();
         var sid = identity.User?.Value ?? throw new IOException("The Windows account could not be identified.");
-        var executable = Path.Combine(AppContext.BaseDirectory, "Rtx5090Monitoring.App.exe");
+        var executable = Path.Combine(AppContext.BaseDirectory, "RTXLens.App.exe");
         if (enabled)
         {
             ElevatedStartupTask.Register(sid, executable);

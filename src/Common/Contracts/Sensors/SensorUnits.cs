@@ -1,6 +1,6 @@
-﻿using Rtx5090Monitoring.Contracts.Enums;
+﻿using RTXLens.Contracts.Enums;
 
-namespace Rtx5090Monitoring.Contracts.Sensors;
+namespace RTXLens.Contracts.Sensors;
 
 public static class SensorUnits
 {

@@ -1,7 +1,7 @@
-using Rtx5090Monitoring.Contracts.Enums;
-using Rtx5090Monitoring.Debugging.Models;
+using RTXLens.Contracts.Enums;
+using RTXLens.Debugging.Models;
 
-namespace Rtx5090Monitoring.Debugging.Catalog;
+namespace RTXLens.Debugging.Catalog;
 
 public static class DebugMetricCatalog
 {

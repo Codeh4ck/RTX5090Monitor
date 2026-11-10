@@ -1,9 +1,9 @@
-using Rtx5090Monitoring.Core.Configuration;
-using Rtx5090Monitoring.Contracts.Health;
-using Rtx5090Monitoring.Core;
-using Rtx5090Monitoring.Service.Utilities;
+using RTXLens.Core.Configuration;
+using RTXLens.Contracts.Health;
+using RTXLens.Core;
+using RTXLens.Service.Utilities;
 
-namespace Rtx5090Monitoring.Service.Endpoints;
+namespace RTXLens.Service.Endpoints;
 
 internal static class Health
 {

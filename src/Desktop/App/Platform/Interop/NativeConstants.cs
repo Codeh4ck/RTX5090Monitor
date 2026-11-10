@@ -1,4 +1,4 @@
-namespace Rtx5090Monitoring.App.Platform.Interop;
+namespace RTXLens.App.Platform.Interop;
 
 internal static class NativeConstants
 {

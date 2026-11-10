@@ -1,4 +1,4 @@
-namespace Rtx5090Monitoring.Plugins.GenericNvidia.Contracts.Warnings;
+namespace RTXLens.Plugins.GenericNvidia.Contracts.Warnings;
 
 public static class GenericNvidiaWarningIds
 {

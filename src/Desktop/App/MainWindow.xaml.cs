@@ -2,13 +2,13 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Windowing;
-using Rtx5090Monitoring.App.Platform.Windowing;
-using Rtx5090Monitoring.App.Services;
-using Rtx5090Monitoring.App.Views;
-using Rtx5090Monitoring.Presentation.Telemetry;
-using Rtx5090Monitoring.Presentation.Settings;
+using RTXLens.App.Platform.Windowing;
+using RTXLens.App.Services;
+using RTXLens.App.Views;
+using RTXLens.Presentation.Telemetry;
+using RTXLens.Presentation.Settings;
 
-namespace Rtx5090Monitoring.App;
+namespace RTXLens.App;
 
 public sealed partial class MainWindow : Window
 {

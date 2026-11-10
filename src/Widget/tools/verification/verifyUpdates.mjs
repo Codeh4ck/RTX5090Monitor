@@ -10,9 +10,9 @@ export async function verifyUpdates(page, base, properties, setManifest, fail, r
     });
 
     setManifest({ schemaVersion: 1, releaseTag: 'v1.1.0', desktop: '1.1.0', service: '1.1.0', widget: '1.1.0' });
-    const before = requests.filter(request => request.url.includes('api.github.com')).length;
+    const before = requests.filter(request => request.url.includes('rtxlens.com/updates/version.json')).length;
     await properties({ ...base, checkUpdates: false, updateFrequency: 'Monthly', showAlerts: false });
-    assert.equal(requests.filter(request => request.url.includes('api.github.com')).length, before);
+    assert.equal(requests.filter(request => request.url.includes('rtxlens.com/updates/version.json')).length, before);
     await page.locator('#panel1 .panel-title').dblclick();
     await page.locator('.check-updates').click();
     await page.getByRole('button', { name: 'View release', exact: true }).waitFor();
@@ -22,7 +22,7 @@ export async function verifyUpdates(page, base, properties, setManifest, fail, r
     assert.match(updateText, /1.1.0/);
     await page.getByRole('button', { name: 'View release', exact: true }).click();
     assert.deepEqual(await page.evaluate(() => window.openedUpdateLinks),
-        ['https://github.com/Codeh4ck/RTX5090Monitor/releases/tag/v1.1.0']);
+        ['https://github.com/Codeh4ck/RTXLens/releases/tag/v1.1.0']);
     await page.screenshot({ path: join(output, 'L-H-updates.png') });
     await page.getByRole('button', { name: 'Skip this version', exact: true }).click();
     assert.equal(await page.locator('.update-notice').count(), 0);

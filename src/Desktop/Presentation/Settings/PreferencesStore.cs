@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace Rtx5090Monitoring.Presentation.Settings;
+namespace RTXLens.Presentation.Settings;
 
 public sealed class PreferencesStore(string path)
 {

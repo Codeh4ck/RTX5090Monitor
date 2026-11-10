@@ -267,7 +267,7 @@ export class PanelView {
 
         const detail = ['Ready', 'Alert'].includes(data.state)
             ? ''
-            : data.detail || 'Configure the backend service in the RTX Monitor desktop app.';
+            : data.detail || 'Configure the backend service in the RTX Lens desktop app.';
         setText(this.nodes['panel-detail']!, detail);
         this.nodes['panel-detail']!.hidden = !detail;
         this.element

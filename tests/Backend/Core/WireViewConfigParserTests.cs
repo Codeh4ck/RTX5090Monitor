@@ -1,9 +1,9 @@
 using System.Buffers.Binary;
 using System.Text;
-using Rtx5090Monitoring.Plugins.WireView.Device;
-using Rtx5090Monitoring.Tests.Infrastructure;
+using RTXLens.Plugins.WireView.Device;
+using RTXLens.Tests.Infrastructure;
 
-namespace Rtx5090Monitoring.Tests.Core;
+namespace RTXLens.Tests.Core;
 
 internal static class WireViewConfigParserTests
 {

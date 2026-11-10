@@ -1,11 +1,11 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Rtx5090Monitoring.Contracts.Errors;
-using Rtx5090Monitoring.Core.Plugins;
-using Rtx5090Monitoring.Core.Configuration;
+using RTXLens.Contracts.Errors;
+using RTXLens.Core.Plugins;
+using RTXLens.Core.Configuration;
 
-namespace Rtx5090Monitoring.Core.Http;
+namespace RTXLens.Core.Http;
 
 public sealed class ApiExceptionFilter(ILogger<ApiExceptionFilter> logger) : IEndpointFilter
 {

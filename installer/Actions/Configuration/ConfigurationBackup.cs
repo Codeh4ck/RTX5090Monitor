@@ -3,7 +3,7 @@ using System.IO;
 using System.Security.AccessControl;
 using System.Security.Principal;
 
-namespace Rtx5090Monitoring.Installer.Actions.Configuration;
+namespace RTXLens.Installer.Actions.Configuration;
 
 public sealed class ConfigurationBackup
 {
@@ -18,7 +18,7 @@ public sealed class ConfigurationBackup
             throw new ArgumentException("Invalid installer backup identifier.", nameof(backupId));
         }
 
-        _directory = Path.Combine(programData ?? Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "Rtx5090Monitoring");
+        _directory = Path.Combine(programData ?? Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "RTXLens");
         _configuration = Path.Combine(_directory, "appsettings.json");
         _backup = Path.Combine(_directory, "InstallerBackups", backupId);
     }
